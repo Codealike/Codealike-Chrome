@@ -1,0 +1,30 @@
+<hr/>
+{{^hasUserData}}
+	<div class="col-lg-12">
+		<h1><i class="fa fa-cloud blue"></i> Unleash the power of Codealike time tracker</h1>
+		<p>By providing your <strong>Codealike API token</strong>, you can send to the cloud your web browsing stats and analyze them along with your coding stats.</p>
+		{{^token}}
+		<p><strong>Go to <a href="https://codealike.com/Settings/Account" target="_blank" class="orange">Codealike settings</a> and we'll grab your Codealike API Token for you.</strong></p>
+		<p>Or <a class="btn btn-xs btn-success" target="_blank" href="https://codealike.com/Account/Register">Create your account</a></p>
+		{{/token}}
+		<label class="control-label red" for="token">{{error}}</label>
+		<div class="controls {{#error}}has-error{{/error}}">
+			<div class="input-prepend input-group">
+				<input id="token" placeholder="Codealike API Token" class="form-control" size="16" type="text" value="{{token}}">
+				<span class="input-group-btn">
+					<button id="login" title="Login with your Codealike token" class="btn btn-info" type="button"><i class="fa fa-key"></i></button>
+				</span>
+			</div>
+		</div>
+	</div>
+{{/hasUserData}}
+{{#hasUserData}}
+	<div class="col-lg-12">
+		<h2>
+			<img src="{{avatarUri}}" height="32" width="32" alt="Alternate Text" /> {{displayName}}
+			&nbsp;
+			<button id="logout" class="btn btn-default red btn-xs"><i class="fa fa-sign-out"></i> Logout</button>
+		</h2>
+	</div>
+{{/hasUserData}}
+<hr/>

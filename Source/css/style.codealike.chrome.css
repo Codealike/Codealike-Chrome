@@ -1,0 +1,157 @@
+﻿.site
+{
+    margin-left: 5px;
+}
+.site:hover
+{
+    margin-left: 0px;
+    border-left: 5px solid #c0c0c0;
+}
+
+.debugging 
+{
+    color: #F7A200 !important;
+}
+
+.debugger
+{
+    color: #dc00f4 !important;
+}
+
+.navigation 
+{
+    color: #00a3f4 !important;
+}
+
+ul.users-list li .name
+{
+    white-space: nowrap;
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden; 
+}
+
+.favicon {
+    display: inline;
+    border: none;
+}
+
+.bar {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.activity
+{
+    display: inline;
+    position: relative;
+    float: left;
+}
+
+.bar.debugging 
+{
+    background-color: #F7A200 !important;
+}
+
+.bar.debugger
+{
+    background-color: #dc00f4 !important;
+}
+
+.bar.navigation 
+{
+    background-color: #00a3f4 !important;
+}
+
+#content{
+    min-width: 750px;
+}
+
+.featured-row
+{
+    border-width: thin medium thin medium;
+    padding-bottom: 15px;
+    padding-top: 10px;
+    margin-bottom: 30px;
+    margin-top: 40px;
+    border-top-style: solid;
+    border-bottom-style: solid;
+    border-top-color: #FF6600;
+    border-right-color: inherit;
+    border-bottom-color: #FF6600;
+    border-left-color: inherit;
+    color: #FFFFFF;
+    background-color: #333333;
+}
+
+.footer-row
+{
+    border-width: thin medium thin medium;
+    padding-bottom: 3px;
+    padding-top: 10px;
+    margin-top: 40px;
+    border-top-style: solid;
+    border-bottom-style: solid;
+    border-top-color: #FF6600;
+    border-right-color: inherit;
+    border-bottom-color: #FF6600;
+    border-left-color: inherit;
+    color: #FFFFFF;
+    background-color: #333333;
+}
+
+.bar-container {
+    float:left;
+    position:relative;
+    width: 100%;
+}
+
+.history
+{
+    position: relative;
+    float: left;
+    height: 15px;
+    font-size: x-small;
+    overflow: hidden;
+}
+
+.idle
+{
+    background-color: lightblue;
+    color: #6699FF;
+}
+
+.active
+{
+    background-color: orangered;
+    color: #FFCC99;
+}
+
+.locked
+{
+    background-color: darkgray;
+    color: grey;
+}
+
+.panel {
+    border: 1px dashed #ccc;
+    position: relative;
+    width: 100%;
+    overflow-x: auto;
+    height: 500px;
+    overflow-y: hidden;
+}
+
+.panel > div {
+    background: #CCC;
+    height: 150px;
+    position: absolute;
+    width: 450px;
+}
+
+.panel > div[data-ss-colspan='2'] { width: 170px; }
+
+.panel .ss-placeholder-child {
+    background: transparent;
+    border: 1px dashed red;
+}

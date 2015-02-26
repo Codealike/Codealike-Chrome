@@ -1,0 +1,67 @@
+<html>
+<head>
+    <title>Codealike - Time Tracker - Options</title>
+    <script src="utils/jquery-2.1.0.min.js"></script>
+    <script src="utils/mustache.js"></script>
+    <script src="utils/quantize.js"></script>
+    <script src="utils/color-thief.js"></script>
+    <script src="utils/utils.js"></script>
+    <script src="utils/moment.min.js"></script>
+    <script src="options.js"></script>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.min.css" rel="stylesheet">
+    <link href="css/retina.min.css" rel="stylesheet">
+    <link href="css/style.codealike.chrome.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="content">
+        <div class="row">
+            <div class="col-xs-9 text-left">
+            </div>
+            <div class="col-xs-3 text-right">
+                <img src="/images/icon32.png" alt="Codealike" />
+                <span class="small">Powered by <a href="http://www.codealike.com" target="_blank">Codealike</a></span>
+            </div>
+        </div>
+        <div class="row">
+            <br />
+            <br />
+            <br />
+        </div>
+        <div class="row text-right">
+            <div class="col-xs-3">
+                <h1>Time Tracker options</h1>
+            </div>
+            <div class="col-xs-3">
+                <i class="fa fa-send fa-5x"></i>
+                <br />
+                <input type="checkbox" id="pause_check">
+                <label for="pause_check">Send stats automatically</label>
+                <br />
+                When enabled, all tracked activity will be sent to server automatically every hour if logged in with your Codealike API Token.
+                <br />
+            </div>
+            <div class="col-xs-3">
+                <i class="fa fa-globe fa-5x"></i>
+                <br />
+                <input type="checkbox" id="navigation_check">
+                <label for="navigation_check">Track navigation activity</label>
+                <br />
+                Enable to track all navigation activity, including browsing any website for any period of time.
+                <br />
+            </div>
+            <div class="col-xs-3">
+                <i class="fa fa-bug fa-5x"></i>
+                <br />
+                <input type="checkbox" id="debugging_check">
+                <label for="debugging_check">Track Debugging activity</label>
+                <br />
+                Enable to track debugging activity including time spent on Chrome Devtools and in the debugged website.
+                <br />
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<html>
+<head>
+    <title>Codealike - Time Tracker</title>
+    <script src="utils/jquery-2.1.0.min.js"></script>
+    <script src="utils/mustache.js"></script>
+    <script src="utils/quantize.js"></script>
+    <script src="utils/color-thief.js"></script>
+    <script src="utils/utils.js"></script>
+    <script src="utils/moment.min.js"></script>
+    <script src="popup.js"></script>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.min.css" rel="stylesheet">
+    <link href="css/retina.min.css" rel="stylesheet">
+    <link href="css/style.codealike.chrome.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="content">
+        <div class="row">
+            <div class="col-lg-2 col-md-1 col-sm-2"></div>
+            <div class="col-lg-4 col-md-5 col-sm-4 text-center">
+                <img src="/images/time-tracker-logo.png" alt="Codealike logo" width="350" />
+            </div>
+            <div class="col-lg-4 col-md-5 col-sm-4">
+                <br />
+                <br />
+                <br />
+                <h1 class="orange">Yay! Thanks for installing Codealike Time Tracker for Chrome!</h1>
+                <h3>Codealike is a service that tracks software developers activity on Visual Studio and Eclipse to analyze it and improve coding performance through the use of metrics.</h3>
+                <h3>This Chrome extension allows you to track all your web browsing activity as well as the web sites' debugging tasks.</h3>
+            </div>
+            <div class="col-lg-2 col-md-1 col-sm-2"></div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 text-center featured-row">
+                <h1>Visit now <a href="http://www.codealike.com" class="orange" target="_blank">www.codealike.com</a> and start logging and measuring your coding.</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-1 col-md-1 col-sm-1"></div>
+            <div class="col-lg-4 col-md-4 col-sm-4 text-center">
+                <div class="box">
+                    <div class="box-content">
+                        <h1>Use it anonymously</h1>
+                        <h3>And learn what are the most visited or debugged sites while you browse the web.</h3>
+                        <img src="/images/anonymous.png" width="100%" alt="Use it anonymously" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-1 col-md-1 col-sm-1 text-center">
+                <h2>or</h2>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 text-center">
+                <div class="box">
+                    <div class="box-content">
+                        <h1>Sign in to Codealike</h1>
+                        <h3>And automatically merge your web browsing with your coding activity. <a href="https://codealike.com">See more...</a></h3>
+                        <img src="/images/signed-in.png" width="100%" alt="Use it anonymously" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-1 col-md-1 col-sm-1"></div>
+        </div>
+        <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-2"></div>
+            <div class="col-lg-8 col-md-8 col-sm-8">
+                <h1 class="red">What do we track?</h1>
+                <p>Short answer: Everything. Is in our roadmap to add white and black lists but in this very first version we track everything.</p>
+                <p>For each visit to a web, we track: <strong>URL, Favicon URL, web site's title, timestamp for the visit start, timestamp for the visit ending, duration of the visit, if it was an Incognito tab and status of the visit.</strong></p>
+                <h3 class="red">What about my privacy?</h3>
+                <p>You can pause the transfer to our servers and choose not to enable the extension in Incognito tabs. You can also clear the tracked information whenever you want.</p>
+                <p>If you do not sign in to Codealike Extension using your Api token, NO DATA will be transfered to our servers.</p>
+                <p>Finally, we don't care what pages you browse. We collect your data to show it to yourself so you can improve your work <i class="fa fa-smile-o"></i></p>
+                <h3 class="blue">Changelog</h3>
+                <ul>
+                    <li>
+                        <strong>Tyler Durden</strong> <small>Version 1.0.3</small>
+                        <ul>
+                            <li>Small tweaks to UI</li>
+                            <li>Removed Search Companion</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Redmond Barry</strong> <small>Version 1.0.2</small>
+                        <ul>
+                            <li>Here we go!</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Barry Lyndon</strong> <small>Version 0.7.2</small>
+                        <ul>
+                            <li>Added Inline Installation aware capabilities.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Rhett Butler</strong> <small>Version 0.7</small>
+                        <ul>
+                            <li>Sending Idle/Activity/Locked History to server.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Scarlett O'Hara</strong> <small>Version 0.6.4</small>
+                        <ul>
+                            <li>Changed Debugged status logic to use debugged tab information.</li>
+                            <li>Improved some UI elements.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Charles Forster Kane</strong> <small>Version 0.6.3</small>
+                        <ul>
+                            <li>Improved error messaging and UI affordance while sending data to server.</li>
+                            <li>Added "Get Stats Summary" ability.</li>
+                            <li>Fixed some visualization bugs.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Jedediah </strong> <small>Version 0.5</small>
+                        <ul>
+                            <li>Improved Idle tracking.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Jim</strong> <small>Version 0.4</small>
+                        <ul>
+                            <li>Added options to enable/disable events tracking.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Thatcher</strong> <small>Version 0.3</small>
+                        <ul>
+                            <li>Improved authentication mechanism.</li>
+                            <li>Changed branding assets.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Mr. Bernstein</strong> <small>Version 0.2</small>
+                        <ul>
+                            <li>Fixed events tracking related bugs.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Rosebud</strong> <small>Version 0.1</small> 
+                        <ul>
+                            <li>Track web browsing activities: <span class="navigation">navigation</span>, <span class="debugging">debugging</span> (using Chrome devtools) and <span class="debugger">debugger</span> (activity on Chrome devtools unattached tabs).</li>
+                            <li>Authenticate to Codealike using Codealike Api token.</li>
+                            <li>Send data automatically each hour to Codealike servers if authenticated.</li>
+                            <li>Pause automatic data transfer to Codealike servers.</li>
+                            <li>Delete all local tracked activity.</li>
+                            <li>Search Companion: Use it to infer topics in Stack Overflow so you can improve your troubleshootings searching.</li>
+                            <li>See activity summary by visited domain and activity including total time spent and last visit.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-md-2 col-sm-2"></div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 text-right footer-row">
+                <p><a href="http://www.codealike.com" class="white" target="_blank">Codealike</a> is a company from <a href="http://www.corvalius.com" class="white" target="_blank">Corvalius</a>. Copyright 2014.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

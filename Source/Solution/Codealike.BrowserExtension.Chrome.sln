@@ -1,0 +1,79 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{64510979-1AE9-4D68-996E-86877DB799AC}"
+	ProjectSection(SolutionItems) = preProject
+		..\background.js = ..\background.js
+		chrome-helpers.js = chrome-helpers.js
+		..\content.js = ..\content.js
+		..\devtools.html = ..\devtools.html
+		..\devtools.js = ..\devtools.js
+		..\installed.html = ..\installed.html
+		..\manifest.json = ..\manifest.json
+		..\options.html = ..\options.html
+		..\options.js = ..\options.js
+		..\panels.html = ..\panels.html
+		..\panels.js = ..\panels.js
+		..\utils\parseuri.js = ..\utils\parseuri.js
+		..\popup.html = ..\popup.html
+		..\popup.js = ..\popup.js
+		..\utils\utils.js = ..\utils\utils.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utils", "utils", "{988BC1EE-202E-4D9E-B7F8-DF2A3C6DF14E}"
+	ProjectSection(SolutionItems) = preProject
+		chrome-helpers.js = chrome-helpers.js
+		..\utils\color-thief.js = ..\utils\color-thief.js
+		..\utils\jquery-2.1.0.min.js = ..\utils\jquery-2.1.0.min.js
+		..\utils\jquery.gridster.min.js = ..\utils\jquery.gridster.min.js
+		..\utils\moment.min.js = ..\utils\moment.min.js
+		..\utils\mustache.js = ..\utils\mustache.js
+		..\utils\parseuri.js = ..\utils\parseuri.js
+		..\utils\quantize.js = ..\utils\quantize.js
+		..\utils\utils.js = ..\utils\utils.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "css", "css", "{C7487E7A-5739-4DB5-AE5F-A884DC0F2E6B}"
+	ProjectSection(SolutionItems) = preProject
+		..\css\bootstrap.min.css = ..\css\bootstrap.min.css
+		..\css\font-awesome.min.css = ..\css\font-awesome.min.css
+		..\css\jquery.gridster.min.css = ..\css\jquery.gridster.min.css
+		..\css\retina.min.css = ..\css\retina.min.css
+		..\css\style.codealike.chrome.css = ..\css\style.codealike.chrome.css
+		..\css\style.min.css = ..\css\style.min.css
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{770C66D4-A5D9-4478-9A25-DC250C4D8517}"
+	ProjectSection(SolutionItems) = preProject
+		..\templates\activities.mst = ..\templates\activities.mst
+		..\templates\site.mst = ..\templates\site.mst
+		..\templates\summary.mst = ..\templates\summary.mst
+		..\templates\user.mst = ..\templates\user.mst
+		..\templates\version.mst = ..\templates\version.mst
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fonts", "fonts", "{90F17685-DC9F-4E78-BD2C-51F34BEA9070}"
+	ProjectSection(SolutionItems) = preProject
+		..\fonts\fontawesome-webfont.eot = ..\fonts\fontawesome-webfont.eot
+		..\fonts\fontawesome-webfont.svg = ..\fonts\fontawesome-webfont.svg
+		..\fonts\fontawesome-webfont.ttf = ..\fonts\fontawesome-webfont.ttf
+		..\fonts\fontawesome-webfont.woff = ..\fonts\fontawesome-webfont.woff
+		..\fonts\FontAwesome.otf = ..\fonts\FontAwesome.otf
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{988BC1EE-202E-4D9E-B7F8-DF2A3C6DF14E} = {64510979-1AE9-4D68-996E-86877DB799AC}
+		{C7487E7A-5739-4DB5-AE5F-A884DC0F2E6B} = {64510979-1AE9-4D68-996E-86877DB799AC}
+		{770C66D4-A5D9-4478-9A25-DC250C4D8517} = {64510979-1AE9-4D68-996E-86877DB799AC}
+		{90F17685-DC9F-4E78-BD2C-51F34BEA9070} = {64510979-1AE9-4D68-996E-86877DB799AC}
+	EndGlobalSection
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = ba8fc83c-fec8-40ef-ba29-01f9933e9cf8
+	EndGlobalSection
+EndGlobal

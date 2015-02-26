@@ -1,0 +1,34 @@
+<li class="site">
+  <img class="favicon" height="16" width="16" alt="" src="{{FavIconUrl}}"/>
+  <div class="name">
+    <a href="http://{{Host}}" target="_blank" title="{{Host}} Total: {{Total.DurationDisplay}} ({{SiteRelativePercentageDisplay}})">
+      {{Host}}
+    </a>
+  </div>
+  <div class="bar-container">
+    <div style="width:{{SiteRelativePercentage}}%;">
+      <div class="bar activity navigation" title="Navigation {{Navigation.DurationDisplay}} ({{Navigation.PercentageDisplay}})" style="width:{{Navigation.Percentage}}%;height: 15px;"></div>
+      <div class="bar activity debugging"  title="Debugging {{Debugging.DurationDisplay}} ({{Debugging.PercentageDisplay}})" style="width:{{Debugging.Percentage}}%;height: 15px;"></div>
+      <div class="bar activity debugger"   title="Debugger {{Debugger.DurationDisplay}} ({{Debugger.PercentageDisplay}})" style="width:{{Debugger.Percentage}}%;height: 15px;"></div>
+    </div>
+  </div>
+
+  <span class="place" title="First time on {{FirstVisit}}">
+    <a href="https://codealike.com/reports/yourtimeline?date={{FirstVisit}}&q={{Host}}" target="_blank">
+      <i class="fa fa-flag"></i>First visit about {{FirstVisitDisplay}}
+    </a>
+  </span>
+  <span class="job" title="{{LastTime}}">
+    Debugger: {{DebuggerCount}} times / 
+    Debugging: {{DebuggingCount}} times / 
+    Navigation: {{NavigationCount}} times
+  </span>
+  <span class="place" title="Last time on {{LastVisit}}">
+    <a href="https://codealike.com/reports/yourtimeline?date={{LastVisit}}&q={{Host}}" target="_blank">
+      <i class="fa fa-calendar"></i> Last visit about {{LastVisitDisplay}}
+    </a>
+  </span>
+  <span class="job">
+    <i class="fa fa-clock-o"></i> {{Total.DurationDisplay}}
+  </span>
+</li>
