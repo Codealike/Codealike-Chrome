@@ -26,7 +26,7 @@ function initializeLocalStorage()
 function getCurrentVersion() {
     var details = chrome.app.getDetails();
     currentClientVersion = details.version;
-    
+
     if (localStorage.getItem('client_version'))
     {
         if (localStorage.getItem('client_version') == currentClientVersion)
@@ -71,11 +71,9 @@ function checkSitesDataset(dataset)
     }
 }
 
-/* Methods for debugging Extension */
-
 getCurrentVersion();
 
-function getSiteFromUrl(url) {
+function isSiteIgnored(url) {
     var match = url.match(siteRegexp);
     if (match) {
         /* Check the ignored list. */
@@ -101,7 +99,7 @@ function checkIdleTime(newState) {
 
     if (!localStorage.idleHistory)
         localStorage.idleHistory = JSON.stringify([]);
-    
+
     var idleHistory = JSON.parse(localStorage.idleHistory);
     var date = new Date();
 
@@ -144,6 +142,11 @@ function updateCounter() {
     chrome.tabs.get(currentTabId, function (tab) {
         /* Make sure we're on the focused window, otherwise we're recording bogus stats. */
         chrome.windows.get(tab.windowId, function (window) {
+            if(!window)
+            {
+              return;
+            }
+
             if (!window.focused) {
                 return;
             }
@@ -295,7 +298,7 @@ function sendWebActivity(sendResponse)
         chrome.browserAction.setBadgeText({ text: "" });
         return;
     }
-    
+
     var webActivity = $.map(sites, function (item, index) {
         return {
             Url: item.url.source,
@@ -399,7 +402,7 @@ function addIgnoredSite(site) {
         var host = tab.url;
     });
 
-    site = getSiteFromUrl(site);
+    site = isSiteIgnored(site);
 
     if (!site) {
         return;
@@ -432,6 +435,11 @@ function updateTime(site) {
     var url = site.url;
 
     if (url.host == "newtab") {
+        return false;
+    }
+
+    if(isSiteIgnored(url.source) == null)
+    {
         return false;
     }
 

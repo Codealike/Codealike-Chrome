@@ -26,12 +26,12 @@ String.prototype.toHHMMSS = function () {
 function groupIdleHistory() {
     var idleHistory = JSON.parse(localStorage.idleHistory);
 
-    if (!idleHistory[0])
-        return;
-
     var groupedIdleHistory = {};
 
     groupedIdleHistory.Data = [];
+
+    if (!idleHistory[0])
+      return groupedIdleHistory;
 
     var currentStatus = idleHistory[0].status;
     var start = idleHistory[0].timeStamp;
