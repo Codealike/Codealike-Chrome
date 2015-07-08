@@ -396,16 +396,11 @@ function sendWebActivityAutomatically()
  * Adds a site to the ignored list.
  */
 function addIgnoredSite(site) {
-    console.log("Removing " + site);
-
-    chrome.tabs.get(currentTabId, function (tab) {
-        var host = tab.url;
-    });
 
     site = isSiteIgnored(site);
 
     if (!site) {
-        return;
+        return false;
     }
 
     var ignoredSites = localStorage.ignoredSites;
@@ -421,6 +416,8 @@ function addIgnoredSite(site) {
     var sites = JSON.parse(localStorage.sites);
     delete sites[site];
     localStorage.sites = JSON.stringify(sites);
+
+    return true;
 }
 
 /**
@@ -702,8 +699,12 @@ function initialize() {
               clearStatistics();
               sendResponse({});
           } else if (request.action == "addIgnoredSite") {
-              addIgnoredSite(request.site);
-              sendResponse({});
+              if(addIgnoredSite(request.url)){
+                sendResponse({status:"added"});
+              }
+              else {
+                sendResponse({status:"existing-url"});
+              }
           } else if (request.action == "pause") {
               pause();
           } else if (request.action == "resume") {
