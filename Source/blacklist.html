@@ -1,0 +1,47 @@
+<html>
+<head>
+    <title>Codealike - Time Tracker</title>
+    <script src="utils/jquery-2.1.0.min.js"></script>
+    <script src="utils/mustache.js"></script>
+    <script src="utils/quantize.js"></script>
+    <script src="utils/color-thief.js"></script>
+    <script src="utils/utils.js"></script>
+    <script src="utils/moment.min.js"></script>
+    <script src="blacklist.js"></script>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.min.css" rel="stylesheet">
+    <link href="css/retina.min.css" rel="stylesheet">
+    <link href="css/style.codealike.chrome.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="content" style="background-color:#303030;color:#fff;">
+        <div class="row">
+            <div class="col-xs-12 text-right">
+                <img src="/images/icon32.png" alt="Codealike" />
+                <span class="small">Powered by <a href="http://www.codealike.com" class="white" target="_blank">Codealike</a></span>
+                <p id="version" class="small"></p>
+            </div>
+        </div>
+        <div id="login-section" class="row" style="color:#fff"></div>
+        <hr />
+        <div class="row">
+            <div class="col-xs-12 tasks">
+                <h1>Blacklist</h1>
+                <h2>URLs on this list, won't be tracked.</h2>
+                <div class="controls">
+            			<div class="input-prepend input-group">
+            				<input id="black-url" placeholder="URL to blacklist" class="form-control" type="text">
+            				<span class="input-group-btn">
+            					<button id="add-url" title="Add URL to blacklist" class="btn btn-danger" type="button"><i class="fa fa-ban"></i></button>
+            				</span>
+            			</div>
+            		</div>
+                <div id="blacklist"></div>
+                <br />
+            </div>
+        </div>
+    </div>
+</body>
+</html>
