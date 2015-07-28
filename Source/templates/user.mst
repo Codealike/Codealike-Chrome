@@ -4,8 +4,8 @@
 		<h1><i class="fa fa-cloud blue"></i> Unleash the power of Codealike time tracker</h1>
 		<p>By providing your <strong>Codealike API token</strong>, you can send to the cloud your web browsing stats and analyze them along with your coding stats.</p>
 		{{^token}}
-		<p><strong>Go to <a href="https://codealike.com/Settings/Account" target="_blank" class="orange">Codealike settings</a> and we'll grab your Codealike API Token for you.</strong></p>
-		<p>Or <a class="btn btn-xs btn-success" target="_blank" href="https://codealike.com/Account/Register">Create your account</a></p>
+		<p><strong>Go to <a href="https://codealike.us.abb.com/Settings/Account" target="_blank" class="orange">Codealike settings</a> and we'll grab your Codealike API Token for you.</strong></p>
+		<p>Or <a class="btn btn-xs btn-success" target="_blank" href="https://codealike.us.abb.com/Account/Register">Create your account</a></p>
 		{{/token}}
 		<label class="control-label red" for="token">{{error}}</label>
 		<div class="controls {{#error}}has-error{{/error}}">

@@ -14,7 +14,7 @@
   </div>
 
   <span class="place" title="First time on {{FirstVisit}}">
-    <a href="https://codealike.com/reports/yourtimeline?date={{FirstVisit}}&q={{Host}}" target="_blank">
+    <a href="https://codealike.us.abb.com/reports/yourtimeline?date={{FirstVisit}}&q={{Host}}" target="_blank">
       <i class="fa fa-flag"></i>First visit about {{FirstVisitDisplay}}
     </a>
   </span>
@@ -24,7 +24,7 @@
     Navigation: {{NavigationCount}} times
   </span>
   <span class="place" title="Last time on {{LastVisit}}">
-    <a href="https://codealike.com/reports/yourtimeline?date={{LastVisit}}&q={{Host}}" target="_blank">
+    <a href="https://codealike.us.abb.com/reports/yourtimeline?date={{LastVisit}}&q={{Host}}" target="_blank">
       <i class="fa fa-calendar"></i> Last visit about {{LastVisitDisplay}}
     </a>
   </span>

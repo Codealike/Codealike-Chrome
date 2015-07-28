@@ -4,7 +4,7 @@ var startTime = null;
 var siteRegexp = /^(\w+:\/\/[^\/]+).*$/;
 var debuggingTabs = [];
 var updateCounterInterval = 1000;  // 1 second.
-var apiRoot = "https://codealike.com";
+var apiRoot = "https://codealike.us.abb.com";
 var currentClientVersion = "";
 
 setExtensionIcon();
