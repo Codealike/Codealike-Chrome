@@ -1,8 +1,8 @@
 {
-  "name": "Codealike time tracker",
+  "name": "Codealike time tracker for ABB Group",
   "short_name": "Codealike",
-  "version": "1.0.3",
-  "description": "Track your activity on websites and merge it with your programming activity to discover more about how you code.",
+  "version": "1.0.3.1",
+  "description": "Track your activity on websites and merge it with your programming activity to discover more about how you code. NOTE THIS IS ONLY FOR ABB GROUP IN-COMPANY DEPLOYMENT.",
   "manifest_version": 2,
   "devtools_page": "devtools.html",
   "background": {
@@ -33,10 +33,10 @@
     "default_popup": "popup.html"
   },
   "options_page": "options.html",
-  
-"icons": { 
-		"128": "images/icon128.png", 
-		"64": "images/icon64.png", 
-		"32": "images/icon32.png" 
+
+"icons": {
+		"128": "images/icon128.png",
+		"64": "images/icon64.png",
+		"32": "images/icon32.png"
 	}
 }
