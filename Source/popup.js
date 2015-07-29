@@ -339,7 +339,7 @@ function updateSendingStatus(status, initializingPopup)
         $("#sites-list li").remove();
         $('#activities').html("");
         $("#warning-section SPAN").html("All info has been sent and deleted stats from local repository.");
-        $("#warning-section STRONG").html("Hell yeah!");
+        $("#warning-section STRONG").html("Done!");
         $("#warning-section .alert").addClass("alert-success");
         $("#warning-section .alert").removeClass("alert-danger");
 
@@ -347,7 +347,7 @@ function updateSendingStatus(status, initializingPopup)
     }
     else {
         $("#warning-section SPAN").html("An error happened trying to send Web Activity <b>" + moment(localStorage.lastUpdateTry).fromNow() + "</b>. <br/> Nothing was deleted from local repository. <br/> Try again later, please.");
-        $("#warning-section STRONG").html("Oh my!");
+        $("#warning-section STRONG").html("Oups!");
         $("#warning-section .alert").removeClass("alert-success");
         $("#warning-section .alert").addClass("alert-danger");
     }
@@ -363,13 +363,13 @@ function updateGettingStatus(status, initializingPopup) {
         $("#sites-list li").remove();
         $('#activities').html("");
         $("#warning-section SPAN").html("Behold your fresh web browsing stats.");
-        $("#warning-section STRONG").html("Hell yeah!");
+        $("#warning-section STRONG").html("Done!");
         $("#warning-section .alert").addClass("alert-success");
         $("#warning-section .alert").removeClass("alert-danger");
     }
     else {
         $("#warning-section SPAN").html("An error happened trying to get Web Activity summary. Try again later, please.");
-        $("#warning-section STRONG").html("Oh my!");
+        $("#warning-section STRONG").html("Oups!");
         $("#warning-section .alert").removeClass("alert-success");
         $("#warning-section .alert").addClass("alert-danger");
     }
@@ -450,7 +450,7 @@ function updateHistorySummary(webActivitySummary) {
             data.navigationDuration = webActivitySummary.Navigation.Percentage;
             data.debuggingDuration = webActivitySummary.Debugging.Percentage;
             data.debuggerDuration = webActivitySummary.Debugger.Percentage;
-            
+
             data.navigationPercentage = webActivitySummary.Navigation.PercentageDisplay;
             data.debuggingPercentage = webActivitySummary.Debugging.PercentageDisplay;
             data.debuggerPercentage = webActivitySummary.Debugger.PercentageDisplay;
