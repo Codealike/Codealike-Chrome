@@ -1,34 +1,29 @@
-﻿.site
-{
+﻿.site {
     margin-left: 5px;
 }
-.site:hover
-{
+
+.site:hover {
     margin-left: 0px;
     border-left: 5px solid #c0c0c0;
 }
 
-.debugging 
-{
+.debugging {
     color: #F7A200 !important;
 }
 
-.debugger
-{
+.debugger {
     color: #dc00f4 !important;
 }
 
-.navigation 
-{
+.navigation {
     color: #00a3f4 !important;
 }
 
-ul.users-list li .name
-{
+ul.users-list li .name {
     white-space: nowrap;
     width: 100%;
     text-overflow: ellipsis;
-    overflow: hidden; 
+    overflow: hidden;
 }
 
 .favicon {
@@ -41,34 +36,29 @@ ul.users-list li .name
     margin-bottom: 2px;
 }
 
-.activity
-{
+.activity {
     display: inline;
     position: relative;
     float: left;
 }
 
-.bar.debugging 
-{
+.bar.debugging {
     background-color: #F7A200 !important;
 }
 
-.bar.debugger
-{
+.bar.debugger {
     background-color: #dc00f4 !important;
 }
 
-.bar.navigation 
-{
+.bar.navigation {
     background-color: #00a3f4 !important;
 }
 
-#content{
+#content {
     min-width: 750px;
 }
 
-.featured-row
-{
+.featured-row {
     border-width: thin medium thin medium;
     padding-bottom: 15px;
     padding-top: 10px;
@@ -84,8 +74,7 @@ ul.users-list li .name
     background-color: #333333;
 }
 
-.footer-row
-{
+.footer-row {
     border-width: thin medium thin medium;
     padding-bottom: 3px;
     padding-top: 10px;
@@ -101,13 +90,12 @@ ul.users-list li .name
 }
 
 .bar-container {
-    float:left;
-    position:relative;
+    float: left;
+    position: relative;
     width: 100%;
 }
 
-.history
-{
+.history {
     position: relative;
     float: left;
     height: 15px;
@@ -115,20 +103,17 @@ ul.users-list li .name
     overflow: hidden;
 }
 
-.idle
-{
+.idle {
     background-color: lightblue;
     color: #6699FF;
 }
 
-.active
-{
+.active {
     background-color: orangered;
     color: #FFCC99;
 }
 
-.locked
-{
+.locked {
     background-color: darkgray;
     color: grey;
 }
@@ -142,14 +127,16 @@ ul.users-list li .name
     overflow-y: hidden;
 }
 
-.panel > div {
+.panel>div {
     background: #CCC;
     height: 150px;
     position: absolute;
     width: 450px;
 }
 
-.panel > div[data-ss-colspan='2'] { width: 170px; }
+.panel>div[data-ss-colspan='2'] {
+    width: 170px;
+}
 
 .panel .ss-placeholder-child {
     background: transparent;
