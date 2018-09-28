@@ -3,17 +3,15 @@ var currentTabId = null;
 var startTime = null;
 var siteRegexp = /^(\w+:\/\/[^\/]+).*$/;
 var debuggingTabs = [];
-var updateCounterInterval = 1000;  // 1 second.
+var updateCounterInterval = 1000; // 1 second.
 var apiRoot = "https://codealike.com";
 var currentClientVersion = "";
 
 setExtensionIcon();
 
 
-function initializeLocalStorage()
-{
-    if (!localStorage.trackNavigation)
-    {
+function initializeLocalStorage() {
+    if (!localStorage.trackNavigation) {
         localStorage.trackNavigation = "true";
     }
 
@@ -27,29 +25,26 @@ function getCurrentVersion() {
     var details = chrome.app.getDetails();
     currentClientVersion = details.version;
 
-    if (localStorage.getItem('client_version'))
-    {
-        if (localStorage.getItem('client_version') == currentClientVersion)
-        {
+    if (localStorage.getItem('client_version')) {
+        if (localStorage.getItem('client_version') == currentClientVersion) {
             return;
         }
     }
 
     localStorage.setItem('client_version', currentClientVersion);
-    chrome.tabs.create({ url: "installed.html" });
+    chrome.tabs.create({
+        url: "installed.html"
+    });
 }
 
 /* Methods for debugging Extension */
 
-function checkAllSites()
-{
+function checkAllSites() {
     checkSitesDataset(JSON.parse(localStorage.sites));
 }
 
-function checkSitesDataset(dataset)
-{
-    for (site in dataset)
-    {
+function checkSitesDataset(dataset) {
+    for (site in dataset) {
         var data = dataset[site];
         var originFrom = new Date(data.from);
         var originTo = new Date(data.to);
@@ -64,8 +59,7 @@ function checkSitesDataset(dataset)
             console.log("currentTabId=" + currentTabId);
             console.log("startTime=" + startTime);
             console.log("site=" + site);
-        }
-        else {
+        } else {
             console.log("Data Match");
         }
     }
@@ -103,7 +97,10 @@ function checkIdleTime(newState) {
     var idleHistory = JSON.parse(localStorage.idleHistory);
     var date = new Date();
 
-    idleHistory.push({ timeStamp: date, status: newState });
+    idleHistory.push({
+        timeStamp: date,
+        status: newState
+    });
     localStorage.idleHistory = JSON.stringify(idleHistory);
 
     if ((newState == "idle" || newState == "locked")) {
@@ -128,23 +125,20 @@ function resume() {
  */
 function updateCounter() {
 
-    if (localStorage["idle"] == "true")
-    {
+    if (localStorage["idle"] == "true") {
         //currentSite = null;
         return;
     }
 
-    if (currentTabId == null)
-    {
+    if (currentTabId == null) {
         return;
     }
 
     chrome.tabs.get(currentTabId, function (tab) {
         /* Make sure we're on the focused window, otherwise we're recording bogus stats. */
         chrome.windows.get(tab.windowId, function (window) {
-            if(!window)
-            {
-              return;
+            if (!window) {
+                return;
             }
 
             if (!window.focused) {
@@ -166,12 +160,11 @@ function updateCounter() {
                 status = "debugger";
             }
 
-            if (localStorage["trackNavigation"] == "false" && status == "navigation" ) {
+            if (localStorage["trackNavigation"] == "false" && status == "navigation") {
                 return;
             }
 
-            if (localStorage["trackDebugging"] == "false" && (status == "debugger" || status == "debugging"))
-            {
+            if (localStorage["trackDebugging"] == "false" && (status == "debugger" || status == "debugging")) {
                 return;
             }
 
@@ -219,8 +212,7 @@ function updateCounter() {
 
                             if (delta < updateCounterInterval) {
                                 updateTime(currentSite);
-                            }
-                            else {
+                            } else {
                                 console.log("Delta of " + delta + " seconds too long; ignored.");
                             }
                             startTime = now;
@@ -230,14 +222,12 @@ function updateCounter() {
                         return;
                     });
                 })
-            }
-            else {
+            } else {
                 currentSite = site;
 
                 if (delta < updateCounterInterval) {
                     updateTime(currentSite);
-                }
-                else {
+                } else {
                     console.log("Delta of " + delta + " seconds too long; ignored.");
                 }
 
@@ -273,29 +263,36 @@ function getUserProfile(token) {
 
         if (xhr.status == 200) {
             return JSON.parse(xhr.response);
-        }
-        else {
-            return {error: "Not authorized or invalid token."};
+        } else {
+            return {
+                error: "Not authorized or invalid token."
+            };
         }
     } catch (e) {
-        return { error: e.message };
+        return {
+            error: e.message
+        };
     }
 }
 
-function sendWebActivity(sendResponse)
-{
+function sendWebActivity(sendResponse) {
     var userData = JSON.parse(localStorage["userData"])
     var tokenValues = userData.token.split("/");
     var identity = tokenValues[0];
     var token = tokenValues[1];
     var sites = JSON.parse(localStorage.sites);
 
-    if (!userData || !userData.token || userData.token == "" || sites.length == 0 || $.isEmptyObject(sites))
-    {
-        sendResponse({ result: "ok" });
+    if (!userData || !userData.token || userData.token == "" || sites.length == 0 || $.isEmptyObject(sites)) {
+        sendResponse({
+            result: "ok"
+        });
         localStorage.lastUpdateStatus = "ok";
-        chrome.browserAction.setTitle({ title: "Codealike time tracker. You're authenticated to Codealike. Last bundle of stats sent " + moment(localStorage.lastUpdate).fromNow() + "." });
-        chrome.browserAction.setBadgeText({ text: "" });
+        chrome.browserAction.setTitle({
+            title: "Codealike time tracker. You're authenticated to Codealike. Last bundle of stats sent " + moment(localStorage.lastUpdate).fromNow() + "."
+        });
+        chrome.browserAction.setBadgeText({
+            text: ""
+        });
         return;
     }
 
@@ -316,7 +313,11 @@ function sendWebActivity(sendResponse)
         url: apiRoot + "/api/v2/webactivity/SaveWebActivity",
         contentType: "application/json",
         dataType: "json",
-        data: JSON.stringify({ WebActivity: webActivity, WebActivityLog: groupIdleHistory().Data, Extension: currentClientVersion }),
+        data: JSON.stringify({
+            WebActivity: webActivity,
+            WebActivityLog: groupIdleHistory().Data,
+            Extension: currentClientVersion
+        }),
         beforeSend: function (request) {
             request.setRequestHeader("X-Api-Identity", identity);
             request.setRequestHeader("X-Api-Token", token);
@@ -330,19 +331,30 @@ function sendWebActivity(sendResponse)
             if (data.statusText == "OK") {
                 clearStatistics();
                 console.log("Activity sent to Server: " + webActivity.length);
-                sendResponse({ result: "ok" });
+                sendResponse({
+                    result: "ok"
+                });
                 localStorage.lastUpdateStatus = "ok";
                 localStorage.lastUpdate = lastUpdate;
-                chrome.browserAction.setTitle({ title: "Codealike time tracker. You're authenticated to Codealike. Last bundle of stats sent " + moment(localStorage.lastUpdate).fromNow() + "." });
-                chrome.browserAction.setBadgeText({ text: "" });
-            }
-            else {
+                chrome.browserAction.setTitle({
+                    title: "Codealike time tracker. You're authenticated to Codealike. Last bundle of stats sent " + moment(localStorage.lastUpdate).fromNow() + "."
+                });
+                chrome.browserAction.setBadgeText({
+                    text: ""
+                });
+            } else {
                 console.log("Activity sent to Server FAILED: " + webActivity.length);
-                sendResponse({ result: "failed" });
+                sendResponse({
+                    result: "failed"
+                });
                 localStorage.lastUpdateStatus = "failed";
                 localStorage.lastUpdateTry = lastUpdate;
-                chrome.browserAction.setTitle({ title: "Codealike time tracker. An error happened trying to send Web Activity " + moment(localStorage.lastUpdateTry).fromNow() + "." });
-                chrome.browserAction.setBadgeText({ text: "!" });
+                chrome.browserAction.setTitle({
+                    title: "Codealike time tracker. An error happened trying to send Web Activity " + moment(localStorage.lastUpdateTry).fromNow() + "."
+                });
+                chrome.browserAction.setBadgeText({
+                    text: "!"
+                });
             }
         }
     });
@@ -373,18 +385,21 @@ function getWebActivity(sendResponse) {
 
             if (data.statusText == "OK") {
                 console.log("Activity received from Server");
-                sendResponse({ result: "ok", data: data.responseJSON });
-            }
-            else {
+                sendResponse({
+                    result: "ok",
+                    data: data.responseJSON
+                });
+            } else {
                 console.log("Receiving activity from Server FAILED");
-                sendResponse({ result: "failed" });
+                sendResponse({
+                    result: "failed"
+                });
             }
         }
     });
 }
 
-function sendWebActivityAutomatically()
-{
+function sendWebActivityAutomatically() {
     if (localStorage["paused"] == "true") {
         return;
     }
@@ -438,8 +453,7 @@ function updateTime(site) {
         return false;
     }
 
-    if(isSiteIgnored(url.source) == null)
-    {
+    if (isSiteIgnored(url.source) == null) {
         return false;
     }
 
@@ -477,7 +491,7 @@ function updateTime(site) {
 function findDebuggingTabIndexFromId(tabIdOrUrl) {
 
     if (tabIdOrUrl) {
-        for (var i = 0 ; i < debuggingTabs.length; i++) {
+        for (var i = 0; i < debuggingTabs.length; i++) {
             if (tabIdOrUrl == debuggingTabs[i].tabId || tabIdOrUrl == debuggingTabs[i].url)
                 return i;
         }
@@ -489,7 +503,7 @@ function findDebuggingTabIndexFromId(tabIdOrUrl) {
 function findDebuggingTabIndexFromDevtoolsTabId(devtoolsTabId) {
 
     if (devtoolsTabId) {
-        for (var i = 0 ; i < debuggingTabs.length; i++) {
+        for (var i = 0; i < debuggingTabs.length; i++) {
             if (devtoolsTabId == debuggingTabs[i].devtoolsTabId)
                 return i;
         }
@@ -508,8 +522,7 @@ function addOrUpdateDebuggingTabData(tab) {
             title: tab.title,
             windowsId: tab.windowId
         });
-    }
-    else {
+    } else {
         debuggingTabs[index].url = tab.url;
         debuggingTabs[index].title = tab.title;
         debuggingTabs[index].windowId = tab.windowId;
@@ -524,8 +537,7 @@ function removeTabData(tabId) {
     }
 }
 
-function getUserStoredProfile(sendResponse)
-{
+function getUserStoredProfile(sendResponse) {
     var userData = {};
 
     if (!localStorage["userData"]) {
@@ -533,8 +545,7 @@ function getUserStoredProfile(sendResponse)
             token: null,
             hasUserData: false
         });
-    }
-    else {
+    } else {
         userData = JSON.parse(localStorage["userData"])
         sendResponse(userData);
     }
@@ -542,32 +553,48 @@ function getUserStoredProfile(sendResponse)
 
 function setExtensionIcon() {
     if (!localStorage["userData"]) {
-        chrome.browserAction.setIcon({ path: "images/anonymousIcon.png" });
-        chrome.browserAction.setBadgeText({ text: "!" });
-        chrome.browserAction.setTitle({ title: "Codealike time tracker. You're not authenticated. All data will remain local and might be lost according to storage quota limit." });
-    }
-    else {
-        chrome.browserAction.setIcon({ path: "images/icon.png" });
+        chrome.browserAction.setIcon({
+            path: "images/anonymousIcon.png"
+        });
+        chrome.browserAction.setBadgeText({
+            text: "!"
+        });
+        chrome.browserAction.setTitle({
+            title: "Codealike time tracker. You're not authenticated. All data will remain local and might be lost according to storage quota limit."
+        });
+    } else {
+        chrome.browserAction.setIcon({
+            path: "images/icon.png"
+        });
 
         if (localStorage.lastUpdateStatus) {
             if (localStorage.lastUpdateStatus == "ok") {
-                chrome.browserAction.setTitle({ title: "Codealike time tracker. You're authenticated to Codealike. Last bundle of stats sent on " + localStorage.lastUpdate + "." });
-                chrome.browserAction.setBadgeText({ text: "" });
+                chrome.browserAction.setTitle({
+                    title: "Codealike time tracker. You're authenticated to Codealike. Last bundle of stats sent on " + localStorage.lastUpdate + "."
+                });
+                chrome.browserAction.setBadgeText({
+                    text: ""
+                });
+            } else {
+                chrome.browserAction.setTitle({
+                    title: "Codealike time tracker. An error happened trying to send Web Activity on " + localStorage.lastUpdateTry + "."
+                });
+                chrome.browserAction.setBadgeText({
+                    text: "!"
+                });
             }
-            else {
-                chrome.browserAction.setTitle({ title: "Codealike time tracker. An error happened trying to send Web Activity on " + localStorage.lastUpdateTry + "." });
-                chrome.browserAction.setBadgeText({ text: "!" });
-            }
-        }
-        else {
-            chrome.browserAction.setTitle({ title: "Codealike time tracker. You're authenticated to Codealike." });
-            chrome.browserAction.setBadgeText({ text: "" });
+        } else {
+            chrome.browserAction.setTitle({
+                title: "Codealike time tracker. You're authenticated to Codealike."
+            });
+            chrome.browserAction.setBadgeText({
+                text: ""
+            });
         }
     }
 }
 
-function getUserData(request, sendResponse)
-{
+function getUserData(request, sendResponse) {
     var userData = {};
     var response = getUserProfile(request.token);
 
@@ -576,16 +603,14 @@ function getUserData(request, sendResponse)
             token: request.token,
             hasUserData: false
         });
-    }
-    else {
+    } else {
         if (response.error) {
             sendResponse({
                 token: request.token,
                 error: response.error,
                 hasUserData: false
             });
-        }
-        else {
+        } else {
             userData = {
                 token: request.token,
                 avatarUri: response.AvatarUri,
@@ -653,15 +678,14 @@ function initialize() {
         pause();
     }
 
-    if (!localStorage.lastUpdateStatus)
-    {
+    if (!localStorage.lastUpdateStatus) {
         localStorage.lastUpdateStatus = "ok";
     }
 
     initializeLocalStorage();
 
     /* Add some listeners for tab changing events. We want to update our
-    *  counters when this sort of stuff happens. */
+     *  counters when this sort of stuff happens. */
     chrome.tabs.onActivated.addListener(
         function (activeInfo) {
             console.log("Tab changed");
@@ -696,40 +720,40 @@ function initialize() {
 
     /* Listen for update requests. These come from the popup. */
     chrome.extension.onRequest.addListener(
-      function (request, sender, sendResponse) {
-          if (request.action == "clearStats") {
-              console.log("Clearing statistics by request.");
-              clearStatistics();
-              sendResponse({});
-          } else if (request.action == "addIgnoredSite") {
-              addIgnoredSite(request.site);
-              sendResponse({});
-          } else if (request.action == "pause") {
-              pause();
-          } else if (request.action == "resume") {
-              resume();
-          } else if (request.action == "cleanUserData") {
-              localStorage.removeItem("userData");
-              getUserData(request, sendResponse);
-              setExtensionIcon();
-          } else if (request.action == "getUserData") {
-              getUserData(request, sendResponse);
-              setExtensionIcon();
-          } else if (request.action == "getUserStoredProfile") {
-              getUserStoredProfile(sendResponse);
-              setExtensionIcon();
-          } else if (request.action == "sendWebActivity") {
-              sendWebActivity(sendResponse);
-          } else if (request.action == "getWebActivity") {
-              getWebActivity(sendResponse);
-          } else if (request.action == "getCurrentVersion") {
-              sendResponse({
-                  clientVersion: currentClientVersion
-              });
-          } else {
-              console.log("Invalid action given.");
-          }
-      });
+        function (request, sender, sendResponse) {
+            if (request.action == "clearStats") {
+                console.log("Clearing statistics by request.");
+                clearStatistics();
+                sendResponse({});
+            } else if (request.action == "addIgnoredSite") {
+                addIgnoredSite(request.site);
+                sendResponse({});
+            } else if (request.action == "pause") {
+                pause();
+            } else if (request.action == "resume") {
+                resume();
+            } else if (request.action == "cleanUserData") {
+                localStorage.removeItem("userData");
+                getUserData(request, sendResponse);
+                setExtensionIcon();
+            } else if (request.action == "getUserData") {
+                getUserData(request, sendResponse);
+                setExtensionIcon();
+            } else if (request.action == "getUserStoredProfile") {
+                getUserStoredProfile(sendResponse);
+                setExtensionIcon();
+            } else if (request.action == "sendWebActivity") {
+                sendWebActivity(sendResponse);
+            } else if (request.action == "getWebActivity") {
+                getWebActivity(sendResponse);
+            } else if (request.action == "getCurrentVersion") {
+                sendResponse({
+                    clientVersion: currentClientVersion
+                });
+            } else {
+                console.log("Invalid action given.");
+            }
+        });
 
     /* Force an update of the counter every minute. Otherwise, the counter
        only updates for selection or URL changes. */

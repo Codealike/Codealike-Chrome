@@ -7,36 +7,34 @@
   "devtools_page": "devtools.html",
   "background": {
     "scripts": [
-		"background.js",
-		"/utils/parseuri.js",
-		"/utils/moment.min.js",
-		"/utils/jquery-2.1.0.min.js",
-		"/utils/utils.js"
-	]
+      "background.js",
+      "/utils/parseuri.js",
+      "/utils/moment.min.js",
+      "/utils/jquery-2.1.0.min.js",
+      "/utils/utils.js"
+    ]
   },
   "permissions": [
     "idle",
     "tabs",
-	"activeTab",
-	"storage",
-	"debugger"
+    "activeTab",
+    "storage",
+    "debugger"
   ],
-  "content_scripts": [
-    {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["content.js"]
-    }
-  ],
+  "content_scripts": [{
+    "matches": ["http://*/*", "https://*/*"],
+    "js": ["content.js"]
+  }],
   "browser_action": {
     "default_icon": "images/icon.png",
     "default_title": "Codealike Tracker",
     "default_popup": "popup.html"
   },
   "options_page": "options.html",
-  
-"icons": { 
-		"128": "images/icon128.png", 
-		"64": "images/icon64.png", 
-		"32": "images/icon32.png" 
-	}
+
+  "icons": {
+    "128": "images/icon128.png",
+    "64": "images/icon64.png",
+    "32": "images/icon32.png"
+  }
 }

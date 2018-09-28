@@ -1,9 +1,12 @@
-
-if (typeof Codealike == "undefined" || !Codealike) { var Codealike = {}; }
+if (typeof Codealike == "undefined" || !Codealike) {
+    var Codealike = {};
+}
 
 Codealike.ChromeHelpers = {
     openURLInNewTab: function (url) {
-        chrome.tabs.create({ url: url });
+        chrome.tabs.create({
+            url: url
+        });
     },
 
     getExtensionVersion: function (callback) {

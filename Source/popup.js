@@ -1,5 +1,4 @@
-function setLastUpdate()
-{
+function setLastUpdate() {
     var lastEvent = localStorage.lastClear;
 
     if (localStorage.lastUpdate) {
@@ -7,22 +6,19 @@ function setLastUpdate()
             if (lastEvent < localStorage.lastUpdate) {
                 lastEvent = localStorage.lastUpdate;
             }
-        }
-        else {
+        } else {
             lastEvent = localStorage.lastUpdate;
         }
         $("#stats-sent").html("Last bundle of stats sent " + moment(localStorage.lastUpdate).fromNow() + ".");
         $("#visited-sites-title").html("Visited sites since " + moment(lastEvent).fromNow());
         $("#activity-history-title").html("Activity history since " + moment(lastEvent).fromNow());
-    }
-    else {
+    } else {
         $("#stats-sent").html("");
 
         if (lastEvent) {
             $("#visited-sites-title").html("Visited sites since " + moment(lastEvent).fromNow());
             $("#activity-history-title").html("Activity history since " + moment(lastEvent).fromNow());
-        }
-        else {
+        } else {
             $("#visited-sites-title").html("Visited sites");
             $("#activity-history-title").html("Activity history");
         }
@@ -41,7 +37,9 @@ function groupSitesByDuration(sites) {
         return -1;
     }
 
-    var durationFormat = function () { return this.duration.toString().toHHMMSS(); };
+    var durationFormat = function () {
+        return this.duration.toString().toHHMMSS();
+    };
 
     var toFormat = function () {
         return moment(this.to).fromNow();
@@ -61,8 +59,7 @@ function groupSitesByDuration(sites) {
 
         val = val[1];
 
-        if (val.url.host != "")
-        {
+        if (val.url.host != "") {
             var index = getIndexById(val.url.host + "_" + val.status);
 
             switch (val.status) {
@@ -100,15 +97,13 @@ function groupSitesByDuration(sites) {
                 if (grouppedSites[index].to < val.to) {
                     grouppedSites[index].to = val.to;
                 }
-            }
-            else {
+            } else {
                 site.id = val.url.host + "_" + val.status;
                 site.host = val.url.host;
 
                 if (isNaN(val.duration)) {
                     site.duration = 0;
-                }
-                else {
+                } else {
                     site.duration = val.duration;
                 }
 
@@ -161,8 +156,7 @@ function updateLocalStats() {
         $('#sites-list').html("");
 
         for (site in sortedSites) {
-            if (sortedSites[site].duration)
-            {
+            if (sortedSites[site].duration) {
                 if (i == max && document.location.href.indexOf("show=all") == -1)
                     break;
 
@@ -204,7 +198,9 @@ function updateLocalStats() {
     var showAllLink = $("#show-all");
 
     showAllLink.click(function () {
-        chrome.tabs.create({ url: "popup.html?show=all" });
+        chrome.tabs.create({
+            url: "popup.html?show=all"
+        });
     });
 
     /* Show the "Show All" link if there are some sites we didn't show. */
@@ -216,7 +212,9 @@ function updateLocalStats() {
 }
 
 function getCurrentVersion() {
-    chrome.extension.sendRequest({ action: "getCurrentVersion" }, function (response) {
+    chrome.extension.sendRequest({
+        action: "getCurrentVersion"
+    }, function (response) {
         $.get('templates/version.mst', function (template) {
             var html = Mustache.to_html(template, response);
             $('#version').html(html);
@@ -224,9 +222,10 @@ function getCurrentVersion() {
     });
 }
 
-function getUserStoredProfile()
-{
-    chrome.extension.sendRequest({ action: "getUserStoredProfile" }, function (response) {
+function getUserStoredProfile() {
+    chrome.extension.sendRequest({
+        action: "getUserStoredProfile"
+    }, function (response) {
         $.get('templates/user.mst', function (template) {
             var html = Mustache.to_html(template, response);
 
@@ -239,7 +238,9 @@ function getUserStoredProfile()
                 $("#toggle_pause").addClass("hidden");
 
                 chrome.tabs.getSelected(null, function (tab) {
-                    chrome.tabs.sendMessage(tab.id, { method: "get-dom" }, function (response) {
+                    chrome.tabs.sendMessage(tab.id, {
+                        method: "get-dom"
+                    }, function (response) {
                         if (response) {
                             dom = response.dom;
 
@@ -253,8 +254,7 @@ function getUserStoredProfile()
                         }
                     });
                 });
-            }
-            else {
+            } else {
                 $("#sendWebActivity").removeClass("hidden");
                 $("#getWebActivity").removeClass("hidden");
                 $("#toggle_pause").removeClass("hidden");
@@ -267,14 +267,12 @@ function getUserStoredProfile()
     });
 }
 
-function getUserData()
-{
+function getUserData() {
     var token = "";
 
     if ($("#token") && $("#token").val()) {
         token = $("#token").val().trim();
-    }
-    else {
+    } else {
         return;
     }
 
@@ -282,7 +280,10 @@ function getUserData()
     $("#login").addClass("disabled");
     $("#login").removeClass("btn-info");
 
-    chrome.extension.sendRequest({ action: "getUserData", token: token }, function (response) {
+    chrome.extension.sendRequest({
+        action: "getUserData",
+        token: token
+    }, function (response) {
         $.get('templates/user.mst', function (template) {
             var html = Mustache.to_html(template, response);
 
@@ -293,8 +294,7 @@ function getUserData()
                 $("#sendWebActivity").addClass("hidden");
                 $("#getWebActivity").addClass("hidden");
                 $("#toggle_pause").addClass("hidden");
-            }
-            else {
+            } else {
                 $("#sendWebActivity").removeClass("hidden");
                 $("#getWebActivity").removeClass("hidden");
                 $("#toggle_pause").removeClass("hidden");
@@ -307,11 +307,14 @@ function getUserData()
     });
 }
 
-function cleanUserData()
-{
-    chrome.extension.sendRequest({ action: "cleanUserData" }, function (response) {
+function cleanUserData() {
+    chrome.extension.sendRequest({
+        action: "cleanUserData"
+    }, function (response) {
         $.get('templates/user.mst', function (template) {
-            var html = Mustache.to_html(template, { hasUserData: false });
+            var html = Mustache.to_html(template, {
+                hasUserData: false
+            });
 
             $('#login-section').html(html);
 
@@ -320,8 +323,7 @@ function cleanUserData()
                 $("#sendWebActivity").addClass("hidden");
                 $("#getWebActivity").addClass("hidden");
                 $("#toggle_pause").addClass("hidden");
-            }
-            else {
+            } else {
                 $("#sendWebActivity").removeClass("hidden");
                 $("#getWebActivity").removeClass("hidden");
                 $("#toggle_pause").removeClass("hidden");
@@ -330,8 +332,7 @@ function cleanUserData()
     });
 }
 
-function updateSendingStatus(status, initializingPopup)
-{
+function updateSendingStatus(status, initializingPopup) {
     if (status == "ok") {
         if (initializingPopup)
             return;
@@ -344,8 +345,7 @@ function updateSendingStatus(status, initializingPopup)
         $("#warning-section .alert").removeClass("alert-danger");
 
         setLastUpdate();
-    }
-    else {
+    } else {
         $("#warning-section SPAN").html("An error happened trying to send Web Activity <b>" + moment(localStorage.lastUpdateTry).fromNow() + "</b>. <br/> Nothing was deleted from local repository. <br/> Try again later, please.");
         $("#warning-section STRONG").html("Oh my!");
         $("#warning-section .alert").removeClass("alert-success");
@@ -366,8 +366,7 @@ function updateGettingStatus(status, initializingPopup) {
         $("#warning-section STRONG").html("Hell yeah!");
         $("#warning-section .alert").addClass("alert-success");
         $("#warning-section .alert").removeClass("alert-danger");
-    }
-    else {
+    } else {
         $("#warning-section SPAN").html("An error happened trying to get Web Activity summary. Try again later, please.");
         $("#warning-section STRONG").html("Oh my!");
         $("#warning-section .alert").removeClass("alert-success");
@@ -381,19 +380,17 @@ function sendWebActivity() {
     $("#sendWebActivity").addClass("disabled");
     $("#sendWebActivity").removeClass("btn-info");
 
-    chrome.extension.sendRequest({ action: "sendWebActivity" }, function (response) {
-        if (response)
-        {
+    chrome.extension.sendRequest({
+        action: "sendWebActivity"
+    }, function (response) {
+        if (response) {
             updateSendingStatus(response.result, false);
 
-            if (response.result == "ok")
-            {
+            if (response.result == "ok") {
                 $("#sendWebActivity").html("Nothing to Send");
                 $("#sendWebActivity").addClass("disabled");
                 $("#sendWebActivity").removeClass("btn-info");
-            }
-            else
-            {
+            } else {
                 $("#sendWebActivity").html("<i class=\"fa fa-send\"></i> Send stats");
                 $("#sendWebActivity").removeClass("disabled");
                 $("#sendWebActivity").addClass("btn-info");
@@ -425,7 +422,7 @@ function updateHistorySummary(webActivitySummary) {
                 break;
 
             webActivitySummary.Data[i].SiteRelativePercentage = webActivitySummary.Data[i].Total.Duration * 100 / totalTime;
-            webActivitySummary.Data[i].SiteRelativePercentageDisplay = Math.round(( webActivitySummary.Data[i].SiteRelativePercentage * 100 )) / 100 + "%";
+            webActivitySummary.Data[i].SiteRelativePercentageDisplay = Math.round((webActivitySummary.Data[i].SiteRelativePercentage * 100)) / 100 + "%";
             webActivitySummary.Data[i].FirstVisitDisplay = firstVisitDisplay
             webActivitySummary.Data[i].LastVisitDisplay = lastVisitDisplay;
 
@@ -450,7 +447,7 @@ function updateHistorySummary(webActivitySummary) {
             data.navigationDuration = webActivitySummary.Navigation.Percentage;
             data.debuggingDuration = webActivitySummary.Debugging.Percentage;
             data.debuggerDuration = webActivitySummary.Debugger.Percentage;
-            
+
             data.navigationPercentage = webActivitySummary.Navigation.PercentageDisplay;
             data.debuggingPercentage = webActivitySummary.Debugging.PercentageDisplay;
             data.debuggerPercentage = webActivitySummary.Debugger.PercentageDisplay;
@@ -466,7 +463,9 @@ function updateHistorySummary(webActivitySummary) {
     var showAllLink = $("#show-all");
 
     showAllLink.click(function () {
-        chrome.tabs.create({ url: "popup.html?show=all" });
+        chrome.tabs.create({
+            url: "popup.html?show=all"
+        });
     });
 
     /* Show the "Show All" link if there are some sites we didn't show. */
@@ -482,9 +481,10 @@ function getWebActivity() {
     $("#getWebActivity").addClass("disabled");
     $("#getWebActivity").removeClass("btn-info");
 
-    chrome.extension.sendRequest({ action: "getWebActivity" }, function (response) {
-        if (response)
-        {
+    chrome.extension.sendRequest({
+        action: "getWebActivity"
+    }, function (response) {
+        if (response) {
             updateGettingStatus(response.result, false);
 
             if (response.result == "ok") {
@@ -493,8 +493,7 @@ function getWebActivity() {
                 $("#getWebActivity").html("<i class=\"fa fa-bar-chart-o\"></i> See history summary");
                 $("#getWebActivity").removeClass("disabled");
                 $("#getWebActivity").addClass("btn-info");
-            }
-            else {
+            } else {
 
             }
         }
@@ -503,7 +502,9 @@ function getWebActivity() {
 
 function clearStats() {
     console.log("Request to clear stats.");
-    chrome.extension.sendRequest({ action: "clearStats" }, function (response) {
+    chrome.extension.sendRequest({
+        action: "clearStats"
+    }, function (response) {
         initialize();
         $("#sites-list li").remove();
         $('#activities').html("");
@@ -516,14 +517,18 @@ function togglePause() {
 
     if (localStorage["paused"] == "false") {
         console.log("Setting to Resume");
-        chrome.extension.sendRequest({ action: "pause" }, function (response) { });
+        chrome.extension.sendRequest({
+            action: "pause"
+        }, function (response) {});
         document.getElementById("toggle_pause").innerHTML = "<i class='fa fa-play'></i> Send stats automatically";
         $("#stats-automatic").html("Stats will not be sent automatically.");
         $("#toggle_pause").removeClass("btn-success");
         $("#toggle_pause").addClass("btn-danger");
     } else if (localStorage["paused"] == "true") {
         console.log("Setting to Pause");
-        chrome.extension.sendRequest({ action: "resume" }, function (response) { });
+        chrome.extension.sendRequest({
+            action: "resume"
+        }, function (response) {});
         document.getElementById("toggle_pause").innerHTML = "<i class='fa fa-pause'></i> Stop sending stats automatically";
         $("#stats-automatic").html("Stats will be sent every hour automatically.");
         $("#toggle_pause").removeClass("btn-danger");
@@ -589,7 +594,7 @@ function initialize() {
             nextClearDiv.removeChild(nextClear.childNodes[0]);
         }
         nextClearDiv.appendChild(
-          document.createTextNode("Next Reset: " + nextClearStats.toString()));
+            document.createTextNode("Next Reset: " + nextClearStats.toString()));
     }
 
     getCurrentVersion();
@@ -600,8 +605,7 @@ function initialize() {
         $("#sendWebActivity").html("Sending...");
         $("#sendWebActivity").addClass("disabled");
         $("#sendWebActivity").removeClass("btn-info");
-    }
-    else {
+    } else {
         $("#sendWebActivity").html("<i class=\"fa fa-send\"></i> Send stats");
         $("#sendWebActivity").removeClass("disabled");
         $("#sendWebActivity").addClass("btn-info");
@@ -621,12 +625,16 @@ var tagsQuery = "";
 
 function getStackOverflowData() {
     chrome.tabs.getSelected(null, function (tab) {
-        chrome.tabs.sendMessage(tab.id, { method: "get-dom" }, function (response) {
+        chrome.tabs.sendMessage(tab.id, {
+            method: "get-dom"
+        }, function (response) {
             $("#search-column").hide();
 
             if (response) {
                 dom = response.dom;
-                var tags = $(dom).find(".post-taglist a").map(function () { return this.innerText });
+                var tags = $(dom).find(".post-taglist a").map(function () {
+                    return this.innerText
+                });
 
                 if (tags.length) {
                     for (var i = 0; i < tags.length; i++) {
@@ -639,22 +647,19 @@ function getStackOverflowData() {
 
                     $("#toggle-mode-query").show();
                     $("#search-column").show();
-                }
-                else {
+                } else {
                     if ($(dom).find(".textbox")[0]) {
                         var searchTextbox = $(dom).find(".textbox")[0].value;
 
                         $("#stackoverflow-tags").val(searchTextbox);
                         $("#search-column").show();
                         $("#toggle-mode-query").hide();
-                    }
-                    else {
+                    } else {
                         $("#search-column").show();
                         $("#toggle-mode-query").hide();
                     }
                 }
-            }
-            else {
+            } else {
                 $("#search-column").show();
                 $("#toggle-mode-query").hide();
             }
@@ -678,7 +683,9 @@ function useTagsForQuery() {
 function getStackOverflowTitle() {
     $("#search-column").hide();
 
-    title = $(dom).find("#question-header a").map(function () { return this.innerText })[0];
+    title = $(dom).find("#question-header a").map(function () {
+        return this.innerText
+    })[0];
 
     if (title) {
         $("#search-column").show();
@@ -701,18 +708,21 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     $("#launch-google-search").click(function () {
-        chrome.tabs.create({ url: "http://www.google.com/#q=" + encodeURIComponent($("#stackoverflow-tags").val()) });
+        chrome.tabs.create({
+            url: "http://www.google.com/#q=" + encodeURIComponent($("#stackoverflow-tags").val())
+        });
     })
 
     $("#launch-stackoverflow-search").click(function () {
-        chrome.tabs.create({ url: "http://stackoverflow.com/search?q=" + encodeURIComponent($("#stackoverflow-tags").val()) });
+        chrome.tabs.create({
+            url: "http://stackoverflow.com/search?q=" + encodeURIComponent($("#stackoverflow-tags").val())
+        });
     })
 
     $("#toggle-mode-query").click(function () {
         if ($("#toggle-mode-query").html() == "Use question TITLE for query") {
             useTitleForQuery();
-        }
-        else {
+        } else {
             useTagsForQuery();
         }
     });

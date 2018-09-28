@@ -25,25 +25,29 @@ function getUserProfile(username) {
                 if (data.responseJSON.Message === undefined) {
                     currentUsername = data.responseJSON.Identity;
                     $('#avatar').attr("src", data.responseJSON.AvatarUri);
-                }
-                else {
-                    return { error: "Not authorized or invalid token." };
+                } else {
+                    return {
+                        error: "Not authorized or invalid token."
+                    };
                 }
             }
         });
     } catch (e) {
-        return { error: e.message };
+        return {
+            error: e.message
+        };
     }
 }
 
-function getUsersStatus()
-{
+function getUsersStatus() {
     var usernames = ["soke"];
 
     $.ajax({
         type: "POST",
         url: chrome.extension.getBackgroundPage().apiRoot + "/api/v2/public/CanInterruptUser",
-        data: JSON.stringify({ UserNames: usernames }),
+        data: JSON.stringify({
+            UserNames: usernames
+        }),
         contentType: "application/json",
         dataType: "json"
     }).done(function (success) {

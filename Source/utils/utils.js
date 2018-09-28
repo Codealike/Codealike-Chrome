@@ -1,12 +1,12 @@
 var guid = (function () {
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
-                   .toString(16)
-                   .substring(1);
+            .toString(16)
+            .substring(1);
     }
     return function () {
         return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-               s4() + '-' + s4() + s4() + s4();
+            s4() + '-' + s4() + s4() + s4();
     };
 })();
 
@@ -16,9 +16,15 @@ String.prototype.toHHMMSS = function () {
     var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
     var seconds = sec_num - (hours * 3600) - (minutes * 60);
 
-    if (hours < 10) { hours = "0" + hours; }
-    if (minutes < 10) { minutes = "0" + minutes; }
-    if (seconds < 10) { seconds = "0" + seconds; }
+    if (hours < 10) {
+        hours = "0" + hours;
+    }
+    if (minutes < 10) {
+        minutes = "0" + minutes;
+    }
+    if (seconds < 10) {
+        seconds = "0" + seconds;
+    }
     var time = hours + ':' + minutes + ':' + seconds;
     return time;
 }
@@ -31,7 +37,7 @@ function groupIdleHistory() {
     groupedIdleHistory.Data = [];
 
     if (!idleHistory[0])
-      return groupedIdleHistory;
+        return groupedIdleHistory;
 
     var currentStatus = idleHistory[0].status;
     var start = idleHistory[0].timeStamp;
@@ -44,19 +50,28 @@ function groupIdleHistory() {
             var duration = new Date(end) - new Date(start);
             durationSum += duration;
 
-            groupedIdleHistory.Data.push({ From: start, End: end, Status: currentStatus, Duration: duration });
+            groupedIdleHistory.Data.push({
+                From: start,
+                End: end,
+                Status: currentStatus,
+                Duration: duration
+            });
 
             start = new Date(idleHistory[i].timeStamp);
             end = new Date(idleHistory[i].timeStamp);
             currentStatus = idleHistory[i].status;
         }
 
-        if (i == idleHistory.length-1)
-        {
+        if (i == idleHistory.length - 1) {
             end = new Date(idleHistory[i].timeStamp);
             var duration = new Date(end) - new Date(start);
             durationSum += duration;
-            groupedIdleHistory.Data.push({ From: start, End: end, Status: currentStatus, Duration: duration });
+            groupedIdleHistory.Data.push({
+                From: start,
+                End: end,
+                Status: currentStatus,
+                Duration: duration
+            });
         }
     }
 
