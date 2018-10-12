@@ -2,10 +2,10 @@
 	<a href="http://{{host}}" target="_blank" title="{{host}} {{percentage}}%">
 		<img class="favicon" height="16" width="16" alt="" src="{{favIconUrl}}" />
 		{{host}}
+		<span class="place {{status}}"><i class="fa fa-flag"></i> {{status}}</span>
 	</a>
 	<div class="bar {{status}}" style="width:{{percentage}}%;height: 3px;"></div>
 	
-	<span class="job" title="{{fullTo}}"><i class="fa fa-calendar"></i> Last time about {{formattedTo}}</span>
+	<span class="job" title="{{fullTo}}"><i class="fa fa-calendar"></i> {{formattedTo}}</span>
 	<span class="job"><i class="fa fa-clock-o"></i> {{formattedDuration}}</span>
-	<span class="place {{status}}"><i class="fa fa-flag"></i> {{status}}</span>
 </li>

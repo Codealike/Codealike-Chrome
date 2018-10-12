@@ -64,6 +64,14 @@ h1 {
     color: #FFFFFF;
 }
 
+ul.users-list li:first-child {
+    border-bottom: 1px solid #404040;
+}
+
+ul.users-list li {
+    border-bottom: 1px solid #404040;
+}
+
 .bar.debugging {
     background-color: #F7A200 !important;
 }

@@ -204,10 +204,12 @@ function updateLocalStats() {
     });
 
     /* Show the "Show All" link if there are some sites we didn't show. */
-    $("#show-all").hide();
+    $(".show-all").hide();
+    $(".hide-all").show();
     if (document.location.href.indexOf("show=all") == -1) {
         showAllLink.attr("href", "javascript:void(0)");
-        $("#show-all").show();
+        $(".show-all").show();
+        $(".hide-all").hide();
     }
 }
 
@@ -466,10 +468,12 @@ function updateHistorySummary(webActivitySummary) {
     });
 
     /* Show the "Show All" link if there are some sites we didn't show. */
-    $("#show-all").hide();
+    $(".show-all").hide();
+    $(".hide-all").show();
     if (document.location.href.indexOf("show=all") == -1) {
         showAllLink.attr("href", "javascript:void(0)");
-        $("#show-all").show();
+        $(".show-all").show();
+        $(".hide-all").hide();
     }
 }
 
