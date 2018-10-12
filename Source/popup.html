@@ -18,33 +18,34 @@
 </head>
 
 <body>
-    <div id="content">
-        <div class="row">
-            <div class="col-xs-12 text-right">
-                <img src="/images/icon32.png" alt="Codealike" />
-                <span class="small">Powered by <a href="http://www.codealike.com" target="_blank">Codealike</a></span>
-                <p id="version" class="small"></p>
+    <div class="col-lg-3 hidden-xs">
+        <img src="/images/time-tracker-logo.png" alt="Codealike logo" width="350" />
+    </div>
+    <div id="content" class="col-lg-5">
+        <div class="row">            
+            <div class="col-xs-6 text-left">
+                <a href="options.html" target="_blank" title="Options" class="btn-link"><i class="fa fa-gear"></i></a>
+            </div>
+            <div class="col-xs-6 text-right">
+                <span class="small">Codealike</span>
+                <span id="version" class="small"></span>
             </div>
         </div>
-        <div id="login-section" class="row"></div>
-        <hr />
         <div class="row">
             <div class="col-xs-12 text-left">
-                <div id="options">
-                    <p class="btn-group">
-                        <button id="clear" data-label="Clear All Local Stats" data-icon="fa-eraser" class="btn btn-hover btn-warning"><i
-                                class="fa fa-eraser"></i> ...</button>
-                        <a href="#" id="show-all" data-label="Show All" data-icon="fa-desktop" class="btn btn-hover btn-info"><i
-                                class="fa fa-desktop"></i> ...</a>
-                        <a href="options.html" target="_blank" title="Options" data-label="Options..." data-icon="fa-gears"
-                            class="btn btn-hover btn-default"><i class="fa fa-gears"></i> ...</a>
-                    </p>
-                    <br />
-                    <p class="btn-group">
-                        <button id="sendWebActivity" class="btn btn-info btn-sm"><i class="fa fa-send"></i> Send stats</button>
-                        <button id="toggle_pause" class="btn btn-success btn-sm"></button>
-                    </p>
-                    <p id="stats-sent" class="small"></p>
+                <div id="login-section" class="row"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 text-left">
+                <div id="options" class="options-set">
+                    <a id="clear" href="#" class="btn-link"><i class="fa fa-eraser"></i>Clear All Local Stats</a><br />
+                    <a href="#" id="show-all" data-icon="fa-desktop" class="btn-link show-all"><i class="fa fa-desktop"></i>Show all...</a><br />
+                    <a id="seeCurrentActivity" title="See current activity." class="btn-link"><i class="fa fa-refresh"></i>Update current activity</a><br/>
+                    <a id="getWebActivity" title="Get fresh stats summary from the server." class="btn-link"><i class="fa fa-clock-o"></i>See history summary</a><br />
+                    <a id="sendWebActivity" href="#" class="btn-link"><i class="fa fa-send"></i>Send stats</a><br />
+                    <a id="toggle_pause" href="#" class="btn-link"></a><br />
+                    <p id="stats-sent" class="small green"></p>
                 </div>
             </div>
         </div>
@@ -55,26 +56,18 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-xs-6">
-                <p class="btn-group">
-                    <button id="seeCurrentActivity" title="See current activity." class="btn btn-info"><i class="fa fa-refresh"></i>
-                        Update current activity</button>
-                    <button id="getWebActivity" title="Get fresh stats summary from the server." class="btn btn-info"><i
-                            class="fa fa-clock-o"></i> See history summary</button>
-                </p>
-            </div>
+        <div class="row hide-all">
             <div id="search-column" class="col-xs-6">
-                <p id="activity-history-title">Activity history</p>
+                <h6 id="activity-history-title">Activity history</h6>
                 <div id="idle-history"></div>
+            </div>
+            <div class="col-xs-6">
+                <h6 id="activitiesTitle">Activities summary</h6>
+                <div id="activities"></div>
             </div>
         </div>
         <div class="row">
             <div class="col-xs-12 tasks">
-                <h1 id="activitiesTitle">Activities summary</h1>
-                <h6><a href="#" id="A1"></a></h6>
-                <div id="activities"></div>
-                <br />
                 <h1 id="visited-sites-title">Top sites</h1>
                 <ul id="sites-list" class="users-list">
                 </ul>
@@ -83,6 +76,7 @@
             </div>
         </div>
     </div>
+    <div class="col-lg-4 hidden-xs"></div>
 </body>
 
 </html>

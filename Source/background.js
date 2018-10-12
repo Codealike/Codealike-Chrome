@@ -328,7 +328,7 @@ function sendWebActivity(sendResponse) {
 
             localStorage.sendingData = "false";
 
-            if (data.statusText == "OK") {
+            if (data.status == 200) {
                 clearStatistics();
                 console.log("Activity sent to Server: " + webActivity.length);
                 sendResponse({
@@ -642,6 +642,8 @@ function initialize() {
                 // Inject a content script into the identified tab
                 if (message.status == "debugging-started") {
                     var tabId = message.tabId;
+
+                    if(tabId == null) return // This happens when debugging the extension itself.
 
                     currentUUID = "";
 

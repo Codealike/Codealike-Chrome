@@ -204,10 +204,12 @@ function updateLocalStats() {
     });
 
     /* Show the "Show All" link if there are some sites we didn't show. */
-    $("#show-all").hide();
+    $(".show-all").hide();
+    $(".hide-all").show();
     if (document.location.href.indexOf("show=all") == -1) {
         showAllLink.attr("href", "javascript:void(0)");
-        $("#show-all").show();
+        $(".show-all").show();
+        $(".hide-all").hide();
     }
 }
 
@@ -377,8 +379,7 @@ function updateGettingStatus(status, initializingPopup) {
 
 function sendWebActivity() {
     $("#sendWebActivity").html("Sending...");
-    $("#sendWebActivity").addClass("disabled");
-    $("#sendWebActivity").removeClass("btn-info");
+    $("#sendWebActivity").addClass("grey");
 
     chrome.extension.sendRequest({
         action: "sendWebActivity"
@@ -388,12 +389,10 @@ function sendWebActivity() {
 
             if (response.result == "ok") {
                 $("#sendWebActivity").html("Nothing to Send");
-                $("#sendWebActivity").addClass("disabled");
-                $("#sendWebActivity").removeClass("btn-info");
+                $("#sendWebActivity").addClass("grey");
             } else {
-                $("#sendWebActivity").html("<i class=\"fa fa-send\"></i> Send stats");
-                $("#sendWebActivity").removeClass("disabled");
-                $("#sendWebActivity").addClass("btn-info");
+                $("#sendWebActivity").html("<i class=\"fa fa-send\"></i>Send stats");
+                $("#sendWebActivity").removeClass("grey");
             }
         }
     });
@@ -469,10 +468,12 @@ function updateHistorySummary(webActivitySummary) {
     });
 
     /* Show the "Show All" link if there are some sites we didn't show. */
-    $("#show-all").hide();
+    $(".show-all").hide();
+    $(".hide-all").show();
     if (document.location.href.indexOf("show=all") == -1) {
         showAllLink.attr("href", "javascript:void(0)");
-        $("#show-all").show();
+        $(".show-all").show();
+        $(".hide-all").hide();
     }
 }
 
@@ -520,19 +521,19 @@ function togglePause() {
         chrome.extension.sendRequest({
             action: "pause"
         }, function (response) {});
-        document.getElementById("toggle_pause").innerHTML = "<i class='fa fa-play'></i> Send stats automatically";
+        document.getElementById("toggle_pause").innerHTML = "<i class='fa fa-play'></i>Send stats automatically";
         $("#stats-automatic").html("Stats will not be sent automatically.");
-        $("#toggle_pause").removeClass("btn-success");
-        $("#toggle_pause").addClass("btn-danger");
+        $("#toggle_pause").removeClass("black");
+        $("#toggle_pause").addClass("red");
     } else if (localStorage["paused"] == "true") {
         console.log("Setting to Pause");
         chrome.extension.sendRequest({
             action: "resume"
         }, function (response) {});
-        document.getElementById("toggle_pause").innerHTML = "<i class='fa fa-pause'></i> Stop sending stats automatically";
+        document.getElementById("toggle_pause").innerHTML = "<i class='fa fa-pause'></i>Stop sending stats automatically";
         $("#stats-automatic").html("Stats will be sent every hour automatically.");
-        $("#toggle_pause").removeClass("btn-danger");
-        $("#toggle_pause").addClass("btn-success");
+        $("#toggle_pause").removeClass("red");
+        $("#toggle_pause").addClass("black");
     }
 }
 
@@ -569,17 +570,17 @@ function initialize() {
 
     if (localStorage["paused"] == undefined || localStorage["paused"] == "false") {
         localStorage["paused"] = "false";
-        link.innerHTML = "<i class='fa fa-pause'></i> Stop sending stats automatically";
+        link.innerHTML = "<i class='fa fa-pause'></i>Stop sending stats automatically";
         $("#stats-automatic").html("Stats will be sent every hour automatically.");
 
-        $("#toggle_pause").removeClass("btn-danger");
-        $("#toggle_pause").addClass("btn-success");
+        $("#toggle_pause").removeClass("red");
+        $("#toggle_pause").addClass("black");
     } else {
-        link.innerHTML = "<i class='fa fa-play'></i> Send stats automatically";
+        link.innerHTML = "<i class='fa fa-play'></i>Send stats automatically";
         $("#stats-automatic").html("Stats will not be sent automatically.");
 
-        $("#toggle_pause").removeClass("btn-success");
-        $("#toggle_pause").addClass("btn-danger");
+        $("#toggle_pause").removeClass("black");
+        $("#toggle_pause").addClass("red");
     }
 
     var nextClearStats = localStorage["nextTimeToClear"];
@@ -603,12 +604,10 @@ function initialize() {
 
     if (localStorage.sendingData == "true") {
         $("#sendWebActivity").html("Sending...");
-        $("#sendWebActivity").addClass("disabled");
-        $("#sendWebActivity").removeClass("btn-info");
+        $("#sendWebActivity").addClass("grey");
     } else {
-        $("#sendWebActivity").html("<i class=\"fa fa-send\"></i> Send stats");
-        $("#sendWebActivity").removeClass("disabled");
-        $("#sendWebActivity").addClass("btn-info");
+        $("#sendWebActivity").html("<i class=\"fa fa-send\"></i>Send stats");
+        $("#sendWebActivity").removeClass("grey");
     }
 
     updateSendingStatus(localStorage.lastUpdateStatus, true);
