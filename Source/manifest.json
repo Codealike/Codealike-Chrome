@@ -1,7 +1,7 @@
 {
   "name": "Codealike time tracker",
   "short_name": "Codealike",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Track your activity on websites and merge it with your programming activity to discover more about how you code.",
   "manifest_version": 2,
   "devtools_page": "devtools.html",
