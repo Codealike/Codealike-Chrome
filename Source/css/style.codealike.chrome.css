@@ -77,9 +77,13 @@ h1 {
 }
 
 #content {
-    min-width: 300px;
+    min-width: 310px;
     background-color: #303030;
     color: #FFFFFF;
+}
+
+.options-set {
+    margin-left: 30px;
 }
 
 .featured-row {

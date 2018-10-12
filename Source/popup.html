@@ -20,8 +20,12 @@
 <body>
     <div id="content">
         <div class="row">            
-            <div class="col-xs-12 text-right">
-                <p id="version" class="small"></p>
+            <div class="col-xs-6 text-left">
+                <a href="options.html" target="_blank" title="Options" class="btn-link"><i class="fa fa-gear"></i></a>
+            </div>
+            <div class="col-xs-6 text-right">
+                <span class="small">Codealike</span>
+                <span id="version" class="small"></span>
             </div>
         </div>
         <div class="row">
@@ -31,15 +35,14 @@
         </div>
         <div class="row">
             <div class="col-xs-12 text-left">
-                <div id="options">
+                <div id="options" class="options-set">
                     <a id="clear" href="#" class="btn-link"><i class="fa fa-eraser"></i>Clear All Local Stats</a><br />
-                    <a href="options.html" target="_blank" title="Options" class="btn-link"><i class="fa fa-gears"></i>Options...</a><br />
                     <a href="#" id="show-all" data-icon="fa-desktop" class="btn-link"><i class="fa fa-desktop"></i>Show all...</a><br />
+                    <a id="seeCurrentActivity" title="See current activity." class="btn-link"><i class="fa fa-refresh"></i>Update current activity</a><br/>
+                    <a id="getWebActivity" title="Get fresh stats summary from the server." class="btn-link"><i class="fa fa-clock-o"></i>See history summary</a><br />
                     <a id="sendWebActivity" href="#" class="btn-link"><i class="fa fa-send"></i>Send stats</a><br />
                     <a id="toggle_pause" href="#" class="btn-link"></a><br />
-                    <p id="stats-sent" class="small"></p>
-                    <a id="seeCurrentActivity" title="See current activity." class="btn-link"><i class="fa fa-refresh"></i>Update current activity</a><br/>
-                    <a id="getWebActivity" title="Get fresh stats summary from the server." class="btn-link"><i class="fa fa-clock-o"></i>See history summary</a>
+                    <p id="stats-sent" class="small green"></p>
                 </div>
             </div>
         </div>
