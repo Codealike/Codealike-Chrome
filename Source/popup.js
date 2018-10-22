@@ -477,30 +477,6 @@ function updateHistorySummary(webActivitySummary) {
     }
 }
 
-function getWebActivity() {
-    $("#getWebActivity").html("Getting...");
-    $("#getWebActivity").addClass("disabled");
-    $("#getWebActivity").removeClass("btn-info");
-
-    chrome.extension.sendRequest({
-        action: "getWebActivity"
-    }, function (response) {
-        if (response) {
-            updateGettingStatus(response.result, false);
-
-            if (response.result == "ok") {
-                updateHistorySummary(response.data);
-
-                $("#getWebActivity").html("<i class=\"fa fa-bar-chart-o\"></i> See history summary");
-                $("#getWebActivity").removeClass("disabled");
-                $("#getWebActivity").addClass("btn-info");
-            } else {
-
-            }
-        }
-    });
-}
-
 function clearStats() {
     console.log("Request to clear stats.");
     chrome.extension.sendRequest({
@@ -695,7 +671,6 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("clear").addEventListener("click", clearStats);
     document.getElementById("sendWebActivity").addEventListener("click", sendWebActivity);
     document.getElementById("toggle_pause").addEventListener("click", togglePause);
-    document.getElementById("getWebActivity").addEventListener("click", getWebActivity);
     document.getElementById("seeCurrentActivity").addEventListener("click", initialize);
 
     $(".btn-hover").mouseenter(function () {

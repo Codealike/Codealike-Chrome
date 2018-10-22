@@ -9,7 +9,6 @@ var currentClientVersion = "";
 
 setExtensionIcon();
 
-
 function initializeLocalStorage() {
     if (!localStorage.trackNavigation) {
         localStorage.trackNavigation = "true";
@@ -18,7 +17,6 @@ function initializeLocalStorage() {
     if (!localStorage.trackDebugging) {
         localStorage.trackDebugging = "true";
     }
-
 }
 
 function getCurrentVersion() {
@@ -38,7 +36,6 @@ function getCurrentVersion() {
 }
 
 /* Methods for debugging Extension */
-
 function checkAllSites() {
     checkSitesDataset(JSON.parse(localStorage.sites));
 }
@@ -216,7 +213,6 @@ function updateCounter() {
                                 console.log("Delta of " + delta + " seconds too long; ignored.");
                             }
                             startTime = now;
-
                         }
 
                         return;
@@ -327,13 +323,10 @@ function sendWebActivity(sendResponse) {
             var lastUpdate = Date().toString();
 
             localStorage.sendingData = "false";
-
             if (data.status == 200) {
                 clearStatistics();
                 console.log("Activity sent to Server: " + webActivity.length);
-                sendResponse({
-                    result: "ok"
-                });
+                sendResponse({ result: "ok" });
                 localStorage.lastUpdateStatus = "ok";
                 localStorage.lastUpdate = lastUpdate;
                 chrome.browserAction.setTitle({
@@ -344,9 +337,7 @@ function sendWebActivity(sendResponse) {
                 });
             } else {
                 console.log("Activity sent to Server FAILED: " + webActivity.length);
-                sendResponse({
-                    result: "failed"
-                });
+                sendResponse({ result: "failed" });
                 localStorage.lastUpdateStatus = "failed";
                 localStorage.lastUpdateTry = lastUpdate;
                 chrome.browserAction.setTitle({
@@ -379,11 +370,9 @@ function getWebActivity(sendResponse) {
             localStorage.sendingData = "true";
         },
         complete: function (data, textStatus, jqXHR) {
-            var lastUpdate = Date().toString();
-
             localStorage.sendingData = "false";
 
-            if (data.statusText == "OK") {
+            if (data.status == 200) {
                 console.log("Activity received from Server");
                 sendResponse({
                     result: "ok",
@@ -399,12 +388,12 @@ function getWebActivity(sendResponse) {
     });
 }
 
-function sendWebActivityAutomatically() {
+function sendWebActivityAutomatically(sendResponse) {
     if (localStorage["paused"] == "true") {
         return;
     }
 
-    sendWebActivity();
+    sendWebActivity(sendResponse);
 }
 
 /**
@@ -643,7 +632,7 @@ function initialize() {
                 if (message.status == "debugging-started") {
                     var tabId = message.tabId;
 
-                    if(tabId == null) return // This happens when debugging the extension itself.
+                    if (tabId == null) return // This happens when debugging the extension itself.
 
                     currentUUID = "";
 
@@ -770,7 +759,7 @@ function initialize() {
 
     // Send statistics periodically.
     console.log("Sending stats interval " + localStorage["sendStatsInterval"]);
-    window.setInterval(sendWebActivityAutomatically, localStorage["sendStatsInterval"]);
+    window.setInterval(sendWebActivityAutomatically(sendResponse), localStorage["sendStatsInterval"]);
 
     // Keep track of idle time.
     chrome.idle.queryState(30, checkIdleTime);

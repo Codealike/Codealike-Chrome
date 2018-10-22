@@ -24,10 +24,9 @@
     <div id="content" class="col-lg-5">
         <div class="row">            
             <div class="col-xs-6 text-left">
-                <a href="options.html" target="_blank" title="Options" class="btn-link"><i class="fa fa-gear"></i></a>
+                <a href="options.html" target="_blank" title="Options" class="btn-link small"><i class="fa fa-gear"></i>Options</a>
             </div>
             <div class="col-xs-6 text-right">
-                <span class="small">Codealike</span>
                 <span id="version" class="small"></span>
             </div>
         </div>
@@ -39,12 +38,12 @@
         <div class="row">
             <div class="col-xs-12 text-left">
                 <div id="options" class="options-set">
-                    <a id="clear" href="#" class="btn-link"><i class="fa fa-eraser"></i>Clear All Local Stats</a><br />
-                    <a href="#" id="show-all" data-icon="fa-desktop" class="btn-link show-all"><i class="fa fa-desktop"></i>Show all...</a><br />
-                    <a id="seeCurrentActivity" title="See current activity." class="btn-link"><i class="fa fa-refresh"></i>Update current activity</a><br/>
-                    <a id="getWebActivity" title="Get fresh stats summary from the server." class="btn-link"><i class="fa fa-clock-o"></i>See history summary</a><br />
-                    <a id="sendWebActivity" href="#" class="btn-link"><i class="fa fa-send"></i>Send stats</a><br />
-                    <a id="toggle_pause" href="#" class="btn-link"></a><br />
+                    <a id="clear" href="#" class="btn-link small"><i class="fa fa-eraser"></i>Clear All Local Stats</a><br />
+                    <a href="#" id="show-all" data-icon="fa-desktop" class="btn-link show-all small"><i class="fa fa-desktop"></i>Show all...</a><br />
+                    <a id="seeCurrentActivity" title="See current activity." class="btn-link small"><i class="fa fa-refresh"></i>Update current activity</a><br/>
+                    <a id="getWebActivity" title="Get fresh stats summary from the server." class="btn-link small" href="https://codealike.com/web" target="_blank"><i class="fa fa-clock-o"></i>See browsing history</a><br />
+                    <a id="sendWebActivity" href="#" class="btn-link small"><i class="fa fa-send"></i>Send stats</a><br />
+                    <a id="toggle_pause" href="#" class="btn-link small"></a><br />
                     <p id="stats-sent" class="small green"></p>
                 </div>
             </div>
@@ -69,6 +68,9 @@
         <div class="row">
             <div class="col-xs-12 tasks">
                 <h1 id="visited-sites-title">Top sites</h1>
+                <span class="place navigation small" title="This include your time browsing the web."><i class="fa fa-circle"></i> Navigation</span>
+                <span class="place debugging small" title="This is the time you use debugging your own website when Chrome DevTools are active."><i class="fa fa-circle"></i> Debugging</span>
+                <span class="place debugger small" title="This is the time you spend working in Chrome DevTools window when debugging your website."><i class="fa fa-circle"></i> Debugger</span>
                 <ul id="sites-list" class="users-list">
                 </ul>
                 <table id="stats" class="table bootstrap-datatable datatable small-font dataTable">

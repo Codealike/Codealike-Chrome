@@ -1,7 +1,7 @@
 {{^hasUserData}}
 <div class="col-lg-12">
 	<h1><i class="fa fa-cloud blue"></i> Unleash the power of Codealike</h1>
-	<p>By providing your <strong>Codealike API token</strong>, you can send to the cloud your web browsing stats and
+	<p class="small">By providing your <strong>Codealike API token</strong>, you can send to the cloud your web browsing stats and
 		analyze them along with your coding stats.</p>
 	{{^token}}
 	<p><strong>Go to <a href="https://codealike.com/Settings/Account" target="_blank" class="orange">Codealike settings</a>
@@ -22,7 +22,7 @@
 {{#hasUserData}}
 <div class="col-lg-12">
 	<h2>
-		<img src="{{avatarUri}}" height="32" width="32" alt="Alternate Text" /> {{displayName}}
+		<img src="{{avatarUri}}" class="avatar" height="32" width="32" alt="Alternate Text" /> {{displayName}}
 		&nbsp;
 		<button id="logout" class="btn-link"><i class="fa fa-sign-out"></i></button>
 	</h2>
