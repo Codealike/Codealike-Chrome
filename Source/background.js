@@ -278,7 +278,7 @@ function sendWebActivity(sendResponse) {
     var token = tokenValues[1];
     var sites = JSON.parse(localStorage.sites);
 
-    if (!userData || !userData.token || userData.token == "" || sites.length == 0 || $.isEmptyObject(sites)) {
+    if (!userData || !userData.token || userData.token == "" || $.isEmptyObject(sites) || sites.length == 0) {
         sendResponse({
             result: "ok"
         });
@@ -388,12 +388,10 @@ function getWebActivity(sendResponse) {
     });
 }
 
-function sendWebActivityAutomatically(sendResponse) {
-    if (localStorage["paused"] == "true") {
-        return;
-    }
+function sendWebActivityAutomatically() {
+    if (localStorage["paused"] == "true") { return; }
 
-    sendWebActivity(sendResponse);
+    sendWebActivity(function(response) { console.log(response);});
 }
 
 /**
@@ -653,7 +651,6 @@ function initialize() {
 
             // add the listener to chrome.runtime.sendMessage(...) on devtools.js
             devToolsPort.onMessage.addListener(devToolsListener);
-
         }
     });
 
@@ -759,7 +756,7 @@ function initialize() {
 
     // Send statistics periodically.
     console.log("Sending stats interval " + localStorage["sendStatsInterval"]);
-    window.setInterval(sendWebActivityAutomatically(sendResponse), localStorage["sendStatsInterval"]);
+    window.setInterval(sendWebActivityAutomatically(), localStorage["sendStatsInterval"]);
 
     // Keep track of idle time.
     chrome.idle.queryState(30, checkIdleTime);
