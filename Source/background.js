@@ -6,8 +6,7 @@ var debuggingTabs = [];
 var updateCounterInterval = 1000; // 1 second.
 var apiRoot = "https://codealike.com";
 var currentClientVersion = "";
-
-setExtensionIcon();
+var currentUUID = "";
 
 function initializeLocalStorage() {
     if (!localStorage.trackNavigation) {
@@ -61,8 +60,6 @@ function checkSitesDataset(dataset) {
         }
     }
 }
-
-getCurrentVersion();
 
 function isSiteIgnored(url) {
     var match = url.match(siteRegexp);
@@ -430,9 +427,6 @@ function addIgnoredSite(site) {
  * @param {string} site The site to update.
  * @param {float} seconds The number of seconds to add to the counter.
  */
-
-var currentUUID = "";
-
 function updateTime(site) {
     var url = site.url;
 
@@ -751,16 +745,18 @@ function initialize() {
         localStorage["sendStatsInterval"] = 60 * 60 * 1000; //Send activity to server each hour.
     }
 
-    /* Default is to use local only storage. */
+    /* Default is set to use local only storage. */
     localStorage["storageType"] = "local";
 
     // Send statistics periodically.
+    window.setInterval(sendWebActivityAutomatically, parseInt(localStorage["sendStatsInterval"]));
     console.log("Sending stats interval " + localStorage["sendStatsInterval"]);
-    window.setInterval(sendWebActivityAutomatically(), localStorage["sendStatsInterval"]);
 
     // Keep track of idle time.
     chrome.idle.queryState(30, checkIdleTime);
     chrome.idle.onStateChanged.addListener(checkIdleTime);
 }
 
+setExtensionIcon();
+getCurrentVersion();
 initialize();
