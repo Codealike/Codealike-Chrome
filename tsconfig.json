@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "baseUrl": "./src",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "noUncheckedIndexedAccess": true,
+    "module": "es6",
+    "target": "es5",
+    "jsx": "react",
+    "lib": ["ESNext", "DOM"],
+    "allowJs": true,
+    "moduleResolution": "node",
+    "jsxFactory": "React.createElement",
+    "jsxFragmentFactory": "React.Fragment"
+  }
+}
