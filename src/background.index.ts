@@ -100,3 +100,12 @@ chrome.runtime.onMessage.addListener((message, _sender, sendMessage) => {
     });
   }
 });
+
+
+
+// This is a background script for a Google Chrome extension. It creates an alarm 
+// that runs a function at a regular interval, listens for events such as tab 
+// activation, tab updates, window focus changes, and idle state changes, and 
+// performs actions based on these events. It also listens for a custom message 
+// to wake up the background script and perform some actions. The script uses 
+// functions from various modules and types defined in other files.

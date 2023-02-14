@@ -1,3 +1,10 @@
+
+// This code defines a class ActiveTimelineRecordDao with functions for retrieving, 
+// setting, and checking the existence of an active timeline record. It also defines 
+// a function createNewActiveRecord that creates a new active timeline record with 
+// the given timestamp and focused active tab, and saves it to the database using 
+// setActiveTabRecord function.
+
 import { Tab } from '../../shared/browser-api.types';
 import { TimelineRecord } from '../../shared/db/types';
 import { getIsoDate } from '../../shared/utils/dates-helper';

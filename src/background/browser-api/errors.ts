@@ -36,3 +36,15 @@ export function isExtensionContextInvalidatedError(
     error.message.toLowerCase().indexOf('extension context invalidated') > -1
   );
 }
+
+
+
+// This file defines several utility functions for handling errors in a Chrome extension. 
+// The throwRuntimeLastError function retrieves the last runtime error from the Chrome 
+// runtime and throws it as a standard Error if it has a message property. 
+// The other functions (isTabNotExistError, isCouldNotEstablishConnectionError, 
+// isUserDraggingWindowError, and isExtensionContextInvalidatedError) take an error argument 
+// and return a boolean indicating whether the error is of a specific type. Each function 
+// checks whether the error argument is an instance of Error and whether the error message 
+// matches a specific string pattern, returning true if so and false otherwise. 
+// These functions can be used to selectively handle errors in a Chrome extension based on their type.

@@ -159,3 +159,11 @@ export const handleAlarm = async () => {
 
   return state;
 };
+
+
+
+// The file is a module that exports several functions related to tracking and managing 
+// the state of active tabs in a browser extension. The module includes functions for 
+// handling changes to the active tab state, tracking changes in idle state, and handling 
+// alarm events. The module also includes helper functions for retrieving and setting 
+// the current tab state from a state table.

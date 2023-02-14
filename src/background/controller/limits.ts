@@ -44,3 +44,12 @@ export async function handlePageLimitExceed(
     await unGreyOutTab(tabId);
   }
 }
+
+
+// This file contains a function for handling page limit exceeding in the 
+// browser. The function receives the website limits, the currently focused
+// tab, and the active timeline record as arguments, and checks if the total
+// daily activity on the website exceeds its limit. If it does, the function
+// greys out the tab, and if not, it un-greys it. This functionality is 
+// achieved using functions from the browser API and functions for retrieving
+// and manipulating data from the database.

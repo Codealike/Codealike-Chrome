@@ -17,3 +17,9 @@ export async function updateTotalTime(
     duration: timeOnRecord,
   });
 }
+
+// This file exports a function updateTotalTime that updates the total amount of 
+// time spent by the user on a specific hostname for a given date. It retrieves 
+// the activity timeline for the given date and hostname, calculates the total 
+// time spent on the hostname for that day, and stores it using the 
+// setTotalDailyHostTime function from ../../shared/db/sync-storage.

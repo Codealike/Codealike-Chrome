@@ -98,3 +98,25 @@ async function commitTabActivity(currentTimelineRecord: TimelineRecord | null) {
 
   await setActiveTabRecord(null);
 }
+
+
+// This file exports a function handleStateChange which is triggered on a change in the user's 
+// tab state. It takes two parameters, the activeTabState which contains information 
+// about the currently active tab and timestamp which is the time of the event.
+
+// The function first gets the user's preferences and the current active timeline 
+// record. It then checks the user's idle state, whether the tab is focused or not,
+//  whether the user is on a valid URL, and if the current event is impossibly long. If 
+// the current event is impossibly long, the function updates the current timeline 
+// record's activityPeriodEnd to prevent a bug in the system. The function then 
+// updates the badge if the user has enabled it and checks if the user has 
+// exceeded the page limit.
+
+// If the user is not on an ignored domain, the function checks if the user is locked, 
+// not focused, idle and not audible, has an impossibly long event, or is on an invalid
+//  URL. If any of these conditions are true, the function commits the tab activity and 
+// returns.
+
+// If the user is on a new URL, the function commits the tab activity and creates a new 
+// active record for the new URL. Finally, the function commits the tab activity and 
+// updates the total time for the day for the hostname.
