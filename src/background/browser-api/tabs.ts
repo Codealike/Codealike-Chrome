@@ -100,3 +100,4 @@ export const unGreyOutTab = async (tabId: number) => {
     ignore(isTabNotExistError, isCouldNotEstablishConnectionError)(error);
   }
 };
+
