@@ -34,9 +34,5 @@ module.exports = (env, argv) => ({
   ],
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
-    fallback: {
-      dns: false,
-      fs: false,
-    },
   },
 });
