@@ -1,6 +1,7 @@
-import { Preferences } from '../db/types';
+import {ConnectionStatus, Preferences} from '../db/types';
 
 export const DEFAULT_PREFERENCES: Preferences = {
+  connectionStatus: ConnectionStatus.Disconnected,
   ignoredHosts: [],
   limits: {},
   displayTimeOnBadge: true,
@@ -8,7 +9,6 @@ export const DEFAULT_PREFERENCES: Preferences = {
 
 export const setSettings = async (settings: Partial<Preferences>) => {
   const currentSettings = await getSettings();
-
   await chrome.storage.local.set({
     settings: { ...currentSettings, ...settings },
   });
@@ -21,3 +21,4 @@ export const getSettings = async () => {
     ...settings,
   } as Preferences;
 };
+

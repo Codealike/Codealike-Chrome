@@ -26,7 +26,20 @@ export interface LogMessage {
 }
 
 export interface Preferences {
+  connectionStatus: ConnectionStatus;
+  userToken?: string;
   ignoredHosts: string[];
   limits: Record<string, number>;
   displayTimeOnBadge: boolean;
+}
+
+export enum ConnectionStatus {
+  'Connecting',
+  'Connected',
+  'Disconnected',
+}
+
+export interface TokenProperties {
+  userId: string;
+  uuid: string;
 }

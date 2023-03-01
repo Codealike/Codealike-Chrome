@@ -1,19 +1,20 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 module.exports = (env, argv) => ({
+  devtool: argv.mode === 'development' ? 'inline-source-map' : undefined,
   entry: {
     background: './src/background.index.ts',
-    popup: './src/popup.index.tsx',
     content: './src/content.index.ts',
+    popup: './src/popup.index.tsx',
   },
-  devtool: argv.mode === 'development' ? 'inline-source-map' : undefined,
   module: {
     rules: [
       {
+        exclude: /node_modules/,
         test: /\.tsx?$/,
         use: 'ts-loader',
-        exclude: /node_modules/,
       },
       {
         test: /\.css$/i,
@@ -21,16 +22,21 @@ module.exports = (env, argv) => ({
       },
     ],
   },
+  output: {
+    filename: '[name].bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
   plugins: [
     new CopyPlugin({
       patterns: [{ from: './static', to: './' }],
     }),
+    new NodePolyfillPlugin(),
   ],
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
-  },
-  output: {
-    filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    fallback: {
+      dns: false,
+      fs: false,
+    },
   },
 });

@@ -1,5 +1,5 @@
 {
-  "name": "codealike",
+  "name": "Codealike",
   "manifest_version": 3,
   "action": {
     "default_popup": "popup.html",

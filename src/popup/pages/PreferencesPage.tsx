@@ -1,28 +1,14 @@
 import * as React from 'react';
-import { FC } from 'react';
+import {FC} from 'react';
 
-// import { Panel, PanelBody, PanelHeader } from '../../blocks/Panel';
-// import { BackupSetting } from '../components/Backup/Backup';
-// import { DisplayTimeOnBadge } from '../components/DisplayTimeOnBadgeSetting/DisplayTimeOnBadgeSetting';
-import { IgnoredDomainSetting } from '../components/IgnoredDomainsSetting/IgnoredDomainSetting';
-
-// import { LimitsSetting } from '../components/LimitsSetting/LimitsSetting';
-// import { ThemeSelector } from '../components/ThemeSelector';
+import {IgnoredDomainSetting} from '../components/IgnoredDomainsSetting/IgnoredDomainSetting';
+import {UserTokenSetting} from "../components/UserTokenSetting/UserTokenSetting";
 
 export const PreferencesPage: FC = () => {
-  return (
-    <div className="flex flex-col">
-      {/* <LimitsSetting /> */}
-      <IgnoredDomainSetting />
-      {/* App preferences */}
-      {/* <Panel>
-        <PanelHeader>Preferences</PanelHeader>
-        <PanelBody className="flex flex-col gap-1">
-          <DisplayTimeOnBadge />
-          <ThemeSelector />
-        </PanelBody>
-      </Panel> */}
-      {/* <BackupSetting /> */}
-    </div>
-  );
+    return (
+        <div className="flex flex-col">
+            <UserTokenSetting/>
+            <IgnoredDomainSetting/>
+        </div>
+    );
 };
