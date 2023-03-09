@@ -9,6 +9,8 @@ export interface TimelineRecord {
   docTitle: string;
   favIconUrl: string | undefined;
   date: string;
+  secure: boolean;
+  status?: string;
   activityPeriodStart: number;
   activityPeriodEnd: number;
 }

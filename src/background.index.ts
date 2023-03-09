@@ -21,7 +21,7 @@ chrome.alarms.create(ASYNC_POLL_ALARM_NAME, {
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === ASYNC_POLL_ALARM_NAME) {
-    logMessage('alarm fired');
+    await logMessage('alarm fired');
     const ts = Date.now();
     const newState = await handleAlarm();
 
@@ -31,7 +31,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
   const ts = Date.now();
-  logMessage('tab activated: ' + activeInfo.tabId);
+  await logMessage('tab activated: ' + activeInfo.tabId);
 
   const newState = await handleActiveTabStateChange(activeInfo);
   if (newState) {
@@ -43,7 +43,7 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
 
 chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
   const ts = Date.now();
-  logMessage('tab updated: ' + tab.id);
+  await logMessage('tab updated: ' + tab.id);
 
   const newState = await handleTabUpdate(tab as Tab);
   if (newState) {
@@ -56,7 +56,7 @@ chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
 // onFocusChanged does not work in Windows 7/8/10 when user alt-tabs or clicks away
 chrome.windows.onFocusChanged.addListener(async (windowId) => {
   const ts = Date.now();
-  logMessage('window focus changed: ' + windowId);
+  await logMessage('window focus changed: ' + windowId);
 
   const newState = await handleWindowFocusChange(windowId);
   if (newState) {
@@ -65,7 +65,7 @@ chrome.windows.onFocusChanged.addListener(async (windowId) => {
 });
 
 chrome.idle.onStateChanged.addListener(async (newIdleState) => {
-  logMessage('idle state changed: ' + newIdleState);
+  await logMessage('idle state changed: ' + newIdleState);
   const ts = Date.now();
 
   const newTabState = await handleIdleStateChange(newIdleState);
@@ -74,7 +74,7 @@ chrome.idle.onStateChanged.addListener(async (newIdleState) => {
 });
 
 chrome.webNavigation.onCompleted.addListener(async (details) => {
-  logMessage('web navigation: ' + details.tabId);
+  await logMessage('web navigation: ' + details.tabId);
   const ts = Date.now();
 
   const tab = await getTabInfo(details.tabId);
@@ -95,17 +95,15 @@ chrome.runtime.onMessage.addListener((message, _sender, sendMessage) => {
     sendMessage({ alive: true });
 
     const ts = Date.now();
-    handleAlarm().then((newState) => {
-      handleStateChange(newState, ts);
+    handleAlarm().then(async (newState) => {
+      await handleStateChange(newState, ts);
     });
   }
 });
 
-
-
-// This is a background script for a Google Chrome extension. It creates an alarm 
-// that runs a function at a regular interval, listens for events such as tab 
-// activation, tab updates, window focus changes, and idle state changes, and 
-// performs actions based on these events. It also listens for a custom message 
-// to wake up the background script and perform some actions. The script uses 
+// This is a background script for a Google Chrome extension. It creates an alarm
+// that runs a function at a regular interval, listens for events such as tab
+// activation, tab updates, window focus changes, and idle state changes, and
+// performs actions based on these events. It also listens for a custom message
+// to wake up the background script and perform some actions. The script uses
 // functions from various modules and types defined in other files.

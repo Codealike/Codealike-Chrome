@@ -50,6 +50,8 @@ export async function createNewActiveRecord(
     docTitle: title,
     favIconUrl,
     hostname,
+    secure: focusedActiveTab.incognito,
+    status: focusedActiveTab.status,
     tabId: focusedActiveTab.id,
     url,
   });

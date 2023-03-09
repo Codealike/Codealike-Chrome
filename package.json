@@ -4,11 +4,12 @@
   "description": "Track activity while coding.",
   "private": true,
   "scripts": {
+    "check:code": "npm run lint && tsc --noemit",
     "test:watch": "jest --watch",
     "test": "jest --passWithNoTests",
     "lint": "eslint src --ext ts,tsx",
     "lint:fix": "eslint src --ext ts,tsx --fix",
-    "build": "npm test && npm run lint && webpack --mode=production",
+    "build": "npm test && npm run check:code && webpack --mode=production",
     "start": "webpack --mode=development --watch",
     "release": "node ./tools/release.js",
     "release:patch": "npm version patch",
