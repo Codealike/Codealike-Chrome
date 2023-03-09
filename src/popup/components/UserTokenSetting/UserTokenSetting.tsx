@@ -3,7 +3,6 @@ import { Icon, IconType } from '../../../blocks/Icon';
 import { Input } from '../../../blocks/Input';
 import { Panel, PanelBody, PanelHeader } from '../../../blocks/Panel';
 import { ConnectionStatus } from '../../../shared/db/types';
-import { getSettings } from '../../../shared/preferences';
 import { authorize } from '../../api';
 import { usePopupContext } from '../../hooks/PopupContext';
 import * as React from 'react';

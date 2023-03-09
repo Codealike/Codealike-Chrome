@@ -1,15 +1,12 @@
-
-// This code defines a class ActiveTimelineRecordDao with functions for retrieving, 
-// setting, and checking the existence of an active timeline record. It also defines 
-// a function createNewActiveRecord that creates a new active timeline record with 
-// the given timestamp and focused active tab, and saves it to the database using 
+// This code defines a class ActiveTimelineRecordDao with functions for retrieving,
+// setting, and checking the existence of an active timeline record. It also defines
+// a function createNewActiveRecord that creates a new active timeline record with
+// the given timestamp and focused active tab, and saves it to the database using
 // setActiveTabRecord function.
-
 import { Tab } from '../../shared/browser-api.types';
 import { TimelineRecord } from '../../shared/db/types';
 import { getIsoDate } from '../../shared/utils/dates-helper';
 import { getHostNameFromUrl } from '../../shared/utils/url';
-
 import { getActiveTabRecord, setActiveTabRecord } from '../tables/state';
 
 export class ActiveTimelineRecordDao {
@@ -37,7 +34,7 @@ export class ActiveTimelineRecordDao {
 
 export async function createNewActiveRecord(
   timestamp: number,
-  focusedActiveTab: Tab
+  focusedActiveTab: Tab,
 ) {
   if (!focusedActiveTab.id) {
     return;
@@ -47,13 +44,13 @@ export async function createNewActiveRecord(
   const hostname = getHostNameFromUrl(url);
 
   await setActiveTabRecord({
-    tabId: focusedActiveTab.id,
-    url,
-    hostname,
+    activityPeriodEnd: timestamp,
+    activityPeriodStart: timestamp,
+    date,
     docTitle: title,
     favIconUrl,
-    date,
-    activityPeriodStart: timestamp,
-    activityPeriodEnd: timestamp,
+    hostname,
+    tabId: focusedActiveTab.id,
+    url,
   });
 }

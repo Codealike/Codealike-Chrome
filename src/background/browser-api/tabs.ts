@@ -1,7 +1,6 @@
 import { ActiveTabState } from '../../shared/db/types';
 import { LIMIT_EXCEEDED, LIMIT_OK } from '../../shared/messages';
 import { ignore } from '../../shared/utils/errors';
-
 import {
   isCouldNotEstablishConnectionError,
   isTabNotExistError,
@@ -45,7 +44,7 @@ export const getFocusedTab = async () => {
 
 export const getTabFromFocusedWindow = async (
   windowId: number,
-  tabId: number
+  tabId: number,
 ): Promise<Partial<ActiveTabState>> => {
   const activeTabWindow = await chrome.windows.get(windowId);
   if (!activeTabWindow.focused) {
@@ -60,8 +59,8 @@ export const getTabFromFocusedWindow = async (
   const focusedActiveTab = tabs.find((tab) => tabId === tab.id) ?? null;
 
   return {
-    focusedWindowId: windowId,
     focusedActiveTab,
+    focusedWindowId: windowId,
   };
 };
 
@@ -70,8 +69,8 @@ export const getActiveTabFromWindowId = async (windowId: number) => {
     windowId === chrome.windows.WINDOW_ID_NONE
       ? await getActiveAudibleTab()
       : await chrome.tabs.query({
-          windowId,
           active: true,
+          windowId,
         });
 
   throwRuntimeLastError();
@@ -100,4 +99,3 @@ export const unGreyOutTab = async (tabId: number) => {
     ignore(isTabNotExistError, isCouldNotEstablishConnectionError)(error);
   }
 };
-

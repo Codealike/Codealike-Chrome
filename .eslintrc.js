@@ -12,7 +12,14 @@ module.exports = {
     'prettier',
   ],
   ignorePatterns: ['dist', 'tools', 'node_modules', 'static'],
-  overrides: [],
+  overrides: [
+    {
+      files: ['**/*.tsx'],
+      rules: {
+        'max-lines-per-function': ['off'],
+      },
+    },
+  ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,

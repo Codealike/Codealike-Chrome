@@ -1,11 +1,9 @@
-import * as React from 'react';
-
 import { Preferences } from '../../shared/db/types';
 import { DEFAULT_PREFERENCES } from '../../shared/preferences';
-
 import { useActiveTabHostname } from './useActiveTab';
 import { useSettings } from './useSettings';
 import { TimeStore, useTimeStore } from './useTimeStore';
+import * as React from 'react';
 
 export type PopupContextType = {
   store: TimeStore;
@@ -15,9 +13,9 @@ export type PopupContextType = {
 };
 
 const DEFAULT_CONTEXT: PopupContextType = {
-  store: {},
   activeHostname: '',
   settings: DEFAULT_PREFERENCES,
+  store: {},
   updateSettings: () => 0,
 };
 
@@ -35,12 +33,12 @@ export const PopupContextProvider: React.FC = ({ children }) => {
     (store: Record<string, number>) => {
       const filteredStore = Object.fromEntries(
         Object.entries(store).filter(
-          ([key]) => !settings.ignoredHosts.includes(key)
-        )
+          ([key]) => !settings.ignoredHosts.includes(key),
+        ),
       );
       return filteredStore;
     },
-    [settings.ignoredHosts]
+    [settings.ignoredHosts],
   );
 
   const filteredStore = React.useMemo(
@@ -49,17 +47,17 @@ export const PopupContextProvider: React.FC = ({ children }) => {
         Object.entries(store).map(([day, value]) => [
           day,
           filterDomainsFromStore(value),
-        ])
+        ]),
       ),
-    [store, filterDomainsFromStore]
+    [store, filterDomainsFromStore],
   );
 
   return (
     <PopupContext.Provider
       value={{
-        store: filteredStore,
         activeHostname: host || '',
         settings,
+        store: filteredStore,
         updateSettings,
       }}
     >

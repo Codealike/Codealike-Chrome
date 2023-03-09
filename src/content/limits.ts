@@ -15,8 +15,8 @@ export const greyOutBody = () => {
   initialPageStyles = {
     backgroundColor: document.body.style.backgroundColor,
     filter: document.body.style.filter,
-    transition: document.body.style.transition,
     opacity: document.body.style.opacity,
+    transition: document.body.style.transition,
   };
 
   document.body.style.filter = 'grayscale(100%)';

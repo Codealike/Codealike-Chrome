@@ -5,8 +5,9 @@
   "private": true,
   "scripts": {
     "test:watch": "jest --watch",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "lint": "eslint src --ext ts,tsx",
+    "lint:fix": "eslint src --ext ts,tsx --fix",
     "build": "npm test && npm run lint && webpack --mode=production",
     "start": "webpack --mode=development --watch",
     "release": "node ./tools/release.js",

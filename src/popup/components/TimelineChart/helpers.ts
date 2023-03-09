@@ -6,7 +6,7 @@ export const MINIMUM_DISPLAYED_ACTIVITY = getMinutesInMs(1);
 
 export function getChartTimeLabels(
   timelineStartHour: number,
-  timelineEndHour: number
+  timelineEndHour: number,
 ) {
   return new Array(timelineEndHour - timelineStartHour + 1)
     .fill(0)
@@ -24,16 +24,12 @@ export const transformTimelineDataset = (activityEvents: TimelineRecord[]) => {
   let timelineStartHour = 24;
   let timelineEndHour = 0;
 
-  const updateTimelineStartAndEndHour = (hour: number) => {
-    timelineStartHour = Math.min(hour, timelineStartHour);
-    timelineEndHour = Math.max(hour, timelineEndHour);
-  };
-
   const pushTimelineDataToDataset = (
     hour: number,
-    duration: [number, number]
+    duration: [number, number],
   ) => {
-    updateTimelineStartAndEndHour(hour);
+    timelineStartHour = Math.min(hour, timelineStartHour);
+    timelineEndHour = Math.max(hour, timelineEndHour);
 
     const emptyDataset = chartDatasetData.find((dataset) => {
       const ds = dataset[hour];
@@ -81,13 +77,13 @@ export const transformTimelineDataset = (activityEvents: TimelineRecord[]) => {
 
   return {
     chartDatasetData,
-    timelineStartHour: Math.min(timelineStartHour, timelineEndHour),
     timelineEndHour: Math.max(timelineStartHour, timelineEndHour),
+    timelineStartHour: Math.min(timelineStartHour, timelineEndHour),
   };
 };
 
 export const joinNeighborTimelineEvents = (
-  activityEvents: TimelineRecord[]
+  activityEvents: TimelineRecord[],
 ) => {
   return activityEvents.reduce((acc, record, index) => {
     if (!index) {
