@@ -7,25 +7,59 @@ import {
   handleTabUpdate,
   handleWindowFocusChange,
 } from './background/services/state-service';
+import { sendWebActivityAutomatically } from './background/services/stats';
 import { logMessage } from './background/tables/logs';
 import { Tab } from './shared/browser-api.types';
 import { WAKE_UP_BACKGROUND } from './shared/messages';
 
+interface Service {
+  name: string;
+  intervalInMinutes: number;
+  handler: () => Promise<void>;
+}
+
 const ASYNC_POLL_ALARM_NAME = 'async-poll';
 const ASYNC_POLL_INTERVAL_MINUTES = 1;
 
-chrome.alarms.create(ASYNC_POLL_ALARM_NAME, {
-  periodInMinutes: ASYNC_POLL_INTERVAL_MINUTES,
-  when: Date.now() + 1000,
+const ASYNC_STATS_INTERVAL_ALARM_NAME = 'send-stats';
+const ASYNC_STATS_INTERVAL_MINUTES = 1;
+
+const asyncPollAlarmHandler = async (): Promise<void> => {
+  const ts = Date.now();
+  const newState = await handleAlarm();
+  await handleStateChange(newState, ts);
+};
+
+const sendStatsAlarmHandler = async (): Promise<void> =>
+  sendWebActivityAutomatically();
+
+const ChromeServiceDefinition: Array<Service> = [
+  {
+    handler: asyncPollAlarmHandler,
+    intervalInMinutes: ASYNC_POLL_INTERVAL_MINUTES,
+    name: ASYNC_POLL_ALARM_NAME,
+  },
+  {
+    handler: sendStatsAlarmHandler,
+    intervalInMinutes: ASYNC_STATS_INTERVAL_MINUTES,
+    name: ASYNC_STATS_INTERVAL_ALARM_NAME,
+  },
+];
+
+ChromeServiceDefinition.forEach((service) => {
+  chrome.alarms.create(service.name, {
+    periodInMinutes: service.intervalInMinutes,
+  });
 });
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
-  if (alarm.name === ASYNC_POLL_ALARM_NAME) {
-    await logMessage('alarm fired');
-    const ts = Date.now();
-    const newState = await handleAlarm();
-
-    await handleStateChange(newState, ts);
+  const { name } = alarm;
+  await logMessage(name);
+  for (let i = 0; i < ChromeServiceDefinition.length; i++) {
+    const alarm: Service = ChromeServiceDefinition[i] as Service;
+    if (alarm.name === name) {
+      await alarm.handler();
+    }
   }
 });
 

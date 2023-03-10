@@ -2,8 +2,8 @@ import { Button, ButtonType } from '../../../blocks/Button';
 import { Icon, IconType } from '../../../blocks/Icon';
 import { Input } from '../../../blocks/Input';
 import { Panel, PanelBody, PanelHeader } from '../../../blocks/Panel';
+import { authorize } from '../../../shared/api/client';
 import { ConnectionStatus } from '../../../shared/db/types';
-import { authorize } from '../../api';
 import { usePopupContext } from '../../hooks/PopupContext';
 import * as React from 'react';
 
@@ -18,7 +18,6 @@ const StatusColors: { [key in ConnectionStatus]: string } = {
   [ConnectionStatus.Connected]: 'text-green-600',
 };
 
-// eslint-disable-next-line max-lines-per-function
 export const UserTokenSetting: React.FC = () => {
   const { settings, updateSettings } = usePopupContext();
   const [state, setState] = React.useState<{
@@ -42,12 +41,7 @@ export const UserTokenSetting: React.FC = () => {
   );
 
   const authorizeUserToken = React.useCallback(() => {
-    const { userToken, connectionStatus } = state;
-    updateSettings({
-      connectionStatus,
-      userToken,
-    });
-
+    const { userToken } = state;
     setState({
       ...state,
       connectionStatus: ConnectionStatus.Connecting,
@@ -61,6 +55,10 @@ export const UserTokenSetting: React.FC = () => {
           connectionStatus: ConnectionStatus.Connected,
           status: 'Codealike is connected',
         });
+        updateSettings({
+          connectionStatus: ConnectionStatus.Connected,
+          userToken,
+        });
       })
       .catch(() => {
         setState({
@@ -68,7 +66,10 @@ export const UserTokenSetting: React.FC = () => {
           connectionStatus: ConnectionStatus.Disconnected,
           status: 'Codealike is disconnected',
         });
-        console.log('codealike not connected due to invalid token');
+        updateSettings({
+          connectionStatus: ConnectionStatus.Disconnected,
+          userToken,
+        });
       });
   }, [state, updateSettings]);
 

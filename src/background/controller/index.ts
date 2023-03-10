@@ -12,6 +12,7 @@ import { updateTimeOnBadge } from './badge';
 import { handlePageLimitExceed } from './limits';
 import { updateTotalTime } from './overall';
 import { saveTimelineRecord } from './timeline';
+import { DateTime } from 'luxon';
 
 const FIVE_MINUTES = getMinutesInMs(5);
 
@@ -61,7 +62,7 @@ const handleAndCollectDomainIgnoredInfo = async (
 
 export const handleStateChange = async (
   activeTabState: ActiveTabState,
-  timestamp: number = Date.now(),
+  timestamp: number = DateTime.now().toMillis(),
 ) => {
   const preferences = await getSettings();
   const activeTimeline = new ActiveTimelineRecordDao();

@@ -1,6 +1,23 @@
 import { IdleState, Tab } from '../browser-api.types';
+import { DateTime } from 'luxon';
 
 export type TimeStore = Record<string, Record<string, number>>;
+
+export interface WebActivityLog {
+  Duration: number;
+  Status: string;
+  From: DateTime;
+}
+
+export interface WebActivityRecord {
+  Duration: number;
+  FavIconUrl?: string;
+  From: DateTime;
+  Secure: boolean;
+  Status?: string;
+  Title: string;
+  Url: string;
+}
 
 export interface TimelineRecord {
   tabId: number;
@@ -33,6 +50,12 @@ export interface Preferences {
   ignoredHosts: string[];
   limits: Record<string, number>;
   displayTimeOnBadge: boolean;
+  lastUpdateStats?: Statistics;
+}
+
+export interface Statistics {
+  Status: 'OK' | 'NOK';
+  Datetime: DateTime;
 }
 
 export enum ConnectionStatus {
