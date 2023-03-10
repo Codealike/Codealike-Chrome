@@ -35,9 +35,9 @@ export async function updateTimeOnBadge(
 
   if (currentHostTimeInMinutes > 0) {
     await setActionBadge({
-      text: presentHoursOrMinutesFromMinutes(currentHostTimeInMinutes),
-      tabId: focusedActiveTab.id,
       color: '#4b76e3',
+      tabId: focusedActiveTab.id,
+      text: presentHoursOrMinutesFromMinutes(currentHostTimeInMinutes),
     });
   } else {
     await hideBadge(focusedActiveTab.id);

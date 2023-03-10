@@ -19,6 +19,9 @@ export enum IconType {
   Eclipse = 'fi-rr-eclipse',
   Close = 'fi-rr-cross-circle',
   Eye = 'fi-rr-eye',
+  Check = 'fi-rr-check',
+  Cross = 'fi-rr-cross',
+  Network = 'fi-rr-network',
 }
 
 export interface IconProps {

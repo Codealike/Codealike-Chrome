@@ -42,7 +42,7 @@ export interface TimelineDatabase extends DBSchema {
 
 export const connect = () =>
   openDB<TimelineDatabase>(Database.TimeTrackerStore, DB_VERSION, {
-    async upgrade(db, oldVersion, newVersion, transaction) {
+    upgrade(db, oldVersion, newVersion, transaction) {
       if (oldVersion < 1) {
         const tabsStateStore = db.createObjectStore(
           TimeTrackerStoreTables.State
@@ -61,10 +61,12 @@ export const connect = () =>
         const timelineStore = db.createObjectStore(
           TimeTrackerStoreTables.Timeline,
           {
-            // The 'id' property of the object will be the key.
-            keyPath: 'id',
+            
             // If it isn't explicitly set, create a value by auto incrementing.
-            autoIncrement: true,
+autoIncrement: true,
+            
+            // The 'id' property of the object will be the key.
+keyPath: 'id',
           }
         );
 
@@ -72,8 +74,8 @@ export const connect = () =>
         timelineStore.createIndex('hostname', 'hostname', { unique: false });
 
         db.createObjectStore(TimeTrackerStoreTables.Logs, {
-          keyPath: 'id',
           autoIncrement: true,
+          keyPath: 'id',
         });
       }
 

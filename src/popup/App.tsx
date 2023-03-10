@@ -1,15 +1,12 @@
-import * as React from 'react';
-import { twMerge } from 'tailwind-merge';
-
 import { Icon, IconType } from '../blocks/Icon';
 import { Panel } from '../blocks/Panel';
-
+import './App.css';
 import { PopupContextProvider } from './hooks/PopupContext';
 import { ActivityPage } from './pages/ActivityPage';
 import { OverallPage } from './pages/OverallPage';
 import { PreferencesPage } from './pages/PreferencesPage';
-
-import './App.css';
+import * as React from 'react';
+import { twMerge } from 'tailwind-merge';
 
 enum Pages {
   Overview = 'time',
@@ -21,16 +18,16 @@ const PAGES_VALUES = Object.values(Pages);
 
 export const PopupApp: React.FC = () => {
   const [activePage, setPage] = React.useState({
-    tab: Pages.Overview,
     params: {} as Record<string, any>,
+    tab: Pages.Overview,
   });
 
   const handleNavigateToActivityDatePage = React.useCallback((date: string) => {
     setPage({
-      tab: Pages.Detailed,
       params: {
         date,
       },
+      tab: Pages.Detailed,
     });
   }, []);
 
@@ -67,10 +64,10 @@ export const PopupApp: React.FC = () => {
                 'bg-neutral-300 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-200',
               activePage.tab !== tab &&
                 'hover:bg-neutral-100 text-neutral-400 dark:hover:bg-neutral-900 dark:text-neutral-400',
-              tab === Pages.Preferences && 'max-w-[75px]'
+              tab === Pages.Preferences && 'max-w-[75px]',
             )}
             key={tab}
-            onClick={() => setPage({ tab, params: {} })}
+            onClick={() => setPage({ params: {}, tab })}
           >
             {tab === Pages.Preferences ? (
               <Icon type={IconType.Settings} className="m-0" />
@@ -80,7 +77,7 @@ export const PopupApp: React.FC = () => {
           </div>
         );
       }),
-    [activePage.tab]
+    [activePage.tab],
   );
 
   return (

@@ -1,11 +1,12 @@
 {
-  "name": "codealike",
+  "name": "Codealike",
   "manifest_version": 3,
   "action": {
     "default_popup": "popup.html",
-    "default_title": "codealike",
+    "default_title": "Codealike",
     "default_icon": {
-      "32": "icons/icon-32.png"
+      "32": "icons/icon-32.png",
+      "16": "icons/icon-16.png"
     }
   },
   "icons": {

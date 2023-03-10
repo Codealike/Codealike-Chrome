@@ -1,6 +1,5 @@
 import { getIsoDate } from '../utils/dates-helper';
 import { mergeTimeStore } from '../utils/merge-time-store';
-
 import {
   connect,
   TimeTrackerStoreStateTableKeys,
@@ -12,17 +11,17 @@ const getDbCache = async (): Promise<TimeStore> => {
   const db = await connect();
   const store = await db.get(
     TimeTrackerStoreTables.State,
-    TimeTrackerStoreStateTableKeys.OverallState
+    TimeTrackerStoreStateTableKeys.OverallState,
   );
 
   return (store || {}) as TimeStore;
 };
 const setDbCache = async (store: TimeStore) => {
   const db = await connect();
-  db.put(
+  await db.put(
     TimeTrackerStoreTables.State,
     store,
-    TimeTrackerStoreStateTableKeys.OverallState
+    TimeTrackerStoreStateTableKeys.OverallState,
   );
 };
 

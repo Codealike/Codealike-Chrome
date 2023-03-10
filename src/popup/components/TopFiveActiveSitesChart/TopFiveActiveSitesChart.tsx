@@ -1,34 +1,32 @@
-import * as React from 'react';
-import { Doughnut } from 'react-chartjs-2';
-
-import { useIsDarkMode } from '../../hooks/useTheme';
 import {
   getMinutesInMs,
   getTimeWithoutSeconds,
 } from '../../../shared/utils/dates-helper';
-
+import { useIsDarkMode } from '../../hooks/useTheme';
 import { DailyUsageChartProps } from './types';
+import * as React from 'react';
+import { Doughnut } from 'react-chartjs-2';
 
 const DOUGHNUT_CHART_OPTIONS = {
-  responsive: true,
   plugins: {
     legend: {
-      position: 'left',
       labels: {
         color: '#222',
       },
+      position: 'left',
     },
     tooltip: {
       callbacks: {
-        title: ([item]: any) => {
-          return `${item?.label}`;
-        },
         label: (item: any) => {
           return ` ${item.formattedValue}%`;
+        },
+        title: ([item]: any) => {
+          return `${item?.label}`;
         },
       },
     },
   },
+  responsive: true,
 };
 
 const DARK_MODE_DOUGHNUT_CHART_OPTIONS = {
@@ -71,35 +69,35 @@ const buildChartDataFromActivity = ({
   const entriesByDesc = Object.entries(activity).sort(
     ([, value1], [, value2]) => {
       return value2 - value1;
-    }
+    },
   );
 
   const itemsToDisplay = entriesByDesc.splice(0, ITEMS_TO_DISPLAY);
   if (entriesByDesc.length > 0) {
     const restActivityTime = entriesByDesc.reduce(
       (acc, [_, value]) => acc + value,
-      0
+      0,
     );
 
     itemsToDisplay.push(['Other pages', restActivityTime]);
   }
 
   const labels = itemsToDisplay.map(([key, value]) =>
-    presentChartLabel(key, value)
+    presentChartLabel(key, value),
   );
   const data = itemsToDisplay.map(([_, value]) =>
-    Math.floor((value / totalDailyActivity) * 100)
+    Math.floor((value / totalDailyActivity) * 100),
   );
 
   return {
-    labels,
     datasets: [
       {
-        label: date,
-        data,
         backgroundColor: ITEMS_COLORS,
+        data,
+        label: date,
       },
     ],
+    labels,
   };
 };
 
@@ -111,7 +109,7 @@ export const DailyUsageChart: React.FC<DailyUsageChartProps> = ({
   const isDarkMode = useIsDarkMode();
   const data = React.useMemo(
     () => buildChartDataFromActivity({ activity, date, totalDailyActivity }),
-    [activity, date, totalDailyActivity]
+    [activity, date, totalDailyActivity],
   );
 
   return (
