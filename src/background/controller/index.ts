@@ -1,7 +1,9 @@
 import {
   ActiveTabState,
+  DebugTab,
   Preferences,
   TimelineRecord,
+  TimelineRecordStatus,
 } from '../../shared/db/types';
 import { getSettings } from '../../shared/preferences';
 import { getIsoDate, getMinutesInMs } from '../../shared/utils/dates-helper';
@@ -60,9 +62,26 @@ const handleAndCollectDomainIgnoredInfo = async (
   return isDomainIgnored;
 };
 
+const getTabStatus = (
+  activeTab: chrome.tabs.Tab,
+  debugTabs: DebugTab[],
+): TimelineRecordStatus => {
+  let status: TimelineRecordStatus;
+  if (activeTab.url?.startsWith('devtools://')) {
+    status = 'debugger';
+  } else if (debugTabs.some((tab) => tab.tabId === activeTab.id)) {
+    status = 'debugging';
+  } else {
+    status = 'navigation';
+  }
+  return status;
+};
+
+// eslint-disable-next-line max-lines-per-function
 export const handleStateChange = async (
   activeTabState: ActiveTabState,
-  timestamp: number = DateTime.now().toMillis(),
+  timestamp: number = DateTime.utc().toMillis(),
+  debugTabs: DebugTab[],
 ) => {
   const preferences = await getSettings();
   const activeTimeline = new ActiveTimelineRecordDao();
@@ -111,7 +130,11 @@ export const handleStateChange = async (
     currentTimelineRecord?.url !== focusedActiveTab?.url
   ) {
     await commitTabActivity(await activeTimeline.get());
-    await createNewActiveRecord(timestamp, focusedActiveTab);
+    await createNewActiveRecord(
+      timestamp,
+      focusedActiveTab,
+      getTabStatus(focusedActiveTab, debugTabs),
+    );
   }
 };
 

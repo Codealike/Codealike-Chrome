@@ -4,7 +4,7 @@
 // the given timestamp and focused active tab, and saves it to the database using
 // setActiveTabRecord function.
 import { Tab } from '../../shared/browser-api.types';
-import { TimelineRecord } from '../../shared/db/types';
+import { TimelineRecord, TimelineRecordStatus } from '../../shared/db/types';
 import { getIsoDate } from '../../shared/utils/dates-helper';
 import { getHostNameFromUrl } from '../../shared/utils/url';
 import { getActiveTabRecord, setActiveTabRecord } from '../tables/state';
@@ -35,6 +35,7 @@ export class ActiveTimelineRecordDao {
 export async function createNewActiveRecord(
   timestamp: number,
   focusedActiveTab: Tab,
+  status: TimelineRecordStatus,
 ) {
   if (!focusedActiveTab.id) {
     return;
@@ -51,7 +52,7 @@ export async function createNewActiveRecord(
     favIconUrl,
     hostname,
     secure: focusedActiveTab.incognito,
-    status: focusedActiveTab.status,
+    status,
     tabId: focusedActiveTab.id,
     url,
   });
