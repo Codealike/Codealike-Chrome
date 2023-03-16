@@ -1,6 +1,7 @@
 {
   "name": "Codealike",
   "manifest_version": 3,
+  "devtools_page": "devtools.html",
   "action": {
     "default_popup": "popup.html",
     "default_title": "Codealike",
@@ -29,8 +30,10 @@
     "idle",
     "storage",
     "tabs",
+    "activeTab",
     "alarms",
-    "webNavigation"
+    "webNavigation",
+    "debugger"
   ],
   "host_permissions": [
     "http://*/*",
