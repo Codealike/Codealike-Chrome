@@ -99,7 +99,7 @@ const transformToWebActivityLog = (record: TimelineRecord): WebActivityLog => {
   return {
     Duration: difference.seconds as number,
     From: startTime,
-    Status: record.status as string,
+    Status: record.status,
   };
 };
 

@@ -19,6 +19,8 @@ export interface WebActivityRecord {
   Url: string;
 }
 
+export type TimelineRecordStatus = 'navigation' | 'debugging' | 'debugger';
+
 export interface TimelineRecord {
   tabId: number;
   url: string;
@@ -26,8 +28,8 @@ export interface TimelineRecord {
   docTitle: string;
   favIconUrl: string | undefined;
   date: string;
+  status: TimelineRecordStatus;
   secure: boolean;
-  status?: string;
   activityPeriodStart: number;
   activityPeriodEnd: number;
 }
@@ -38,6 +40,13 @@ export type ActiveTabState = {
   focusedWindowId?: number;
   idleState?: IdleState;
 };
+
+export interface DebugTab {
+  tabId?: number;
+  title?: string;
+  url?: string;
+  windowId: number;
+}
 
 export interface LogMessage {
   message: string;
