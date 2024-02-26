@@ -15,16 +15,12 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "content.bundle.js"
-      ]
+      "matches": ["<all_urls>"],
+      "js": ["content.bundle.js"]
     }
   ],
   "minimum_chrome_version": "90",
-  "version": "2.0.1",
+  "version": "2.0.4",
   "description": "Track activity while coding.",
   "permissions": [
     "idle",
@@ -34,10 +30,7 @@
     "alarms",
     "webNavigation"
   ],
-  "host_permissions": [
-    "http://*/*",
-    "https://*/*"
-  ],
+  "host_permissions": ["http://*/*", "https://*/*"],
   "background": {
     "service_worker": "background.bundle.js"
   },
