@@ -56,7 +56,8 @@ export interface LogMessage {
 export interface Preferences {
   connectionStatus: ConnectionStatus;
   userToken?: string;
-  ignoredHosts: string[];
+  ignoredHosts: string[];   //urls that are be blacklisted
+  allowedHosts?: string[]; //urls that are to be whitelisted
   limits: Record<string, number>;
   displayTimeOnBadge: boolean;
   lastUpdateStats?: Statistics;
