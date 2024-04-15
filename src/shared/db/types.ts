@@ -65,7 +65,7 @@ export interface Preferences {
 
 export interface Statistics {
   Status: 'OK' | 'NOK';
-  Datetime: DateTime;
+  Datetime: string;
 }
 
 export enum ConnectionStatus {
