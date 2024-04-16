@@ -31,14 +31,25 @@ export const PopupContextProvider: React.FC = ({ children }) => {
 
   const filterDomainsFromStore = React.useCallback(
     (store: Record<string, number>) => {
-      const filteredStore = Object.fromEntries(
+      let filteredStore = Object.fromEntries(
         Object.entries(store).filter(
           ([key]) => !settings.ignoredHosts.includes(key),
         ),
       );
+
+      // Handling whitelisting of hosts
+      const allowedHosts = settings.allowedHosts ?? [];
+      if (allowedHosts.length > 0) {
+        filteredStore = Object.fromEntries(
+          Object.entries(filteredStore).filter(
+            ([key]) => allowedHosts.includes(key),
+          ),
+        );
+      }
+
       return filteredStore;
     },
-    [settings.ignoredHosts],
+    [settings.ignoredHosts, settings.allowedHosts],
   );
 
   const filteredStore = React.useMemo(

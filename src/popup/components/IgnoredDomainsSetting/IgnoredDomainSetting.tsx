@@ -4,7 +4,7 @@ import { twMerge } from 'tailwind-merge';
 import { Button, ButtonType } from '../../../blocks/Button';
 import { Icon, IconType } from '../../../blocks/Icon';
 import { Input } from '../../../blocks/Input';
-import { Panel, PanelBody, PanelHeader } from '../../../blocks/Panel';
+import { PanelBody } from '../../../blocks/Panel';
 import { assertDomainIsValid } from '../../../shared/utils/domains';
 import { usePopupContext } from '../../hooks/PopupContext';
 
@@ -65,8 +65,7 @@ export const IgnoredDomainSetting: React.FC = () => {
   }, [setDomainsListExpanded]);
 
   return (
-    <Panel>
-      <PanelHeader>Blacklist domains</PanelHeader>
+    <div className="p-2">
       <PanelBody className="flex flex-col gap-2">
         <p>You can hide unwanted websites to keep dashboards clean.</p>
         <div className="flex justify-between items-end gap-2">
@@ -111,6 +110,6 @@ export const IgnoredDomainSetting: React.FC = () => {
           </div>
         </div>
       </PanelBody>
-    </Panel>
+    </div>
   );
 };
