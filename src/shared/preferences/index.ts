@@ -1,6 +1,7 @@
 import { ConnectionStatus, Preferences } from '../db/types';
 
 export const DEFAULT_PREFERENCES: Preferences = {
+  allowedHosts: [], //whitelisted domains
   connectionStatus: ConnectionStatus.Disconnected,
   displayTimeOnBadge: true,
   ignoredHosts: [],
