@@ -19,6 +19,8 @@ export interface WebActivityRecord {
   Url: string;
 }
 
+export type TimelineRecordStatus = 'navigation' | 'debugging' | 'debugger';
+
 export interface TimelineRecord {
   tabId: number;
   url: string;
@@ -26,8 +28,8 @@ export interface TimelineRecord {
   docTitle: string;
   favIconUrl: string | undefined;
   date: string;
+  status: TimelineRecordStatus;
   secure: boolean;
-  status?: string;
   activityPeriodStart: number;
   activityPeriodEnd: number;
 }
@@ -39,6 +41,13 @@ export type ActiveTabState = {
   idleState?: IdleState;
 };
 
+export interface DebugTab {
+  tabId?: number;
+  title?: string;
+  url?: string;
+  windowId: number;
+}
+
 export interface LogMessage {
   message: string;
   timestamp: number;
@@ -47,7 +56,8 @@ export interface LogMessage {
 export interface Preferences {
   connectionStatus: ConnectionStatus;
   userToken?: string;
-  ignoredHosts: string[];
+  ignoredHosts: string[];   //urls that are be blacklisted
+  allowedHosts?: string[]; //urls that are to be whitelisted
   limits: Record<string, number>;
   displayTimeOnBadge: boolean;
   lastUpdateStats?: Statistics;
@@ -55,7 +65,7 @@ export interface Preferences {
 
 export interface Statistics {
   Status: 'OK' | 'NOK';
-  Datetime: DateTime;
+  Datetime: string;
 }
 
 export enum ConnectionStatus {

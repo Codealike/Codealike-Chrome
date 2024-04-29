@@ -1,11 +1,13 @@
 import {
   ActiveTabState,
+  DebugTab,
   Preferences,
   TimelineRecord,
+  TimelineRecordStatus,
 } from '../../shared/db/types';
 import { getSettings } from '../../shared/preferences';
 import { getIsoDate, getMinutesInMs } from '../../shared/utils/dates-helper';
-import { isInvalidUrl } from '../../shared/utils/url';
+import { isInvalidUrl, isDomainAllowedByUser } from '../../shared/utils/url';
 import { setActiveTabRecord } from '../tables/state';
 import { ActiveTimelineRecordDao, createNewActiveRecord } from './active';
 import { updateTimeOnBadge } from './badge';
@@ -47,22 +49,41 @@ const handleAndCollectDomainIgnoredInfo = async (
   currentTimelineRecord: TimelineRecord | null,
   focusedActiveTab: chrome.tabs.Tab | null,
 ): Promise<boolean> => {
-  const isDomainIgnored = preferences.ignoredHosts.includes(
-    currentTimelineRecord?.hostname ?? '',
-  );
-  if (!isDomainIgnored) {
+
+  const hostname = currentTimelineRecord?.hostname ?? '';
+  
+  const isDomainAllowed = isDomainAllowedByUser(hostname, preferences.allowedHosts, preferences.ignoredHosts)
+
+  if (isDomainAllowed) {
     await handlePageLimitExceed(
       preferences.limits,
       focusedActiveTab,
       currentTimelineRecord,
     );
   }
-  return isDomainIgnored;
+  return isDomainAllowed;
 };
 
+const getTabStatus = (
+  activeTab: chrome.tabs.Tab,
+  debugTabs: DebugTab[],
+): TimelineRecordStatus => {
+  let status: TimelineRecordStatus;
+  if (activeTab.url?.startsWith('devtools://')) {
+    status = 'debugger';
+  } else if (debugTabs.some((tab) => tab.tabId === activeTab.id)) {
+    status = 'debugging';
+  } else {
+    status = 'navigation';
+  }
+  return status;
+};
+
+// eslint-disable-next-line max-lines-per-function
 export const handleStateChange = async (
   activeTabState: ActiveTabState,
-  timestamp: number = DateTime.now().toMillis(),
+  timestamp: number = DateTime.utc().toMillis(),
+  debugTabs: DebugTab[],
 ) => {
   const preferences = await getSettings();
   const activeTimeline = new ActiveTimelineRecordDao();
@@ -85,7 +106,7 @@ export const handleStateChange = async (
     await activeTimeline.set(currentTimelineRecord);
   }
 
-  const isDomainIgnored = await handleAndCollectDomainIgnoredInfo(
+  const isDomainAllowed = await handleAndCollectDomainIgnoredInfo(
     preferences,
     currentTimelineRecord,
     focusedActiveTab,
@@ -94,7 +115,7 @@ export const handleStateChange = async (
   await updateTimeOnBadge(
     focusedActiveTab,
     currentTimelineRecord,
-    preferences.displayTimeOnBadge && !isDomainIgnored,
+    preferences.displayTimeOnBadge && isDomainAllowed,
   );
 
   if (
@@ -102,7 +123,7 @@ export const handleStateChange = async (
     isImpossiblyLongEvent ||
     isInvalidUrl(focusedActiveTab?.url)
   ) {
-    await commitTabActivity(await activeTimeline.get());
+    await commitTabActivity(await activeTimeline.get(), preferences);
     return;
   }
 
@@ -110,13 +131,22 @@ export const handleStateChange = async (
     focusedActiveTab &&
     currentTimelineRecord?.url !== focusedActiveTab?.url
   ) {
-    await commitTabActivity(await activeTimeline.get());
-    await createNewActiveRecord(timestamp, focusedActiveTab);
+    await commitTabActivity(await activeTimeline.get(), preferences);
+    await createNewActiveRecord(
+      timestamp,
+      focusedActiveTab,
+      getTabStatus(focusedActiveTab, debugTabs),
+    );
   }
 };
 
-async function commitTabActivity(currentTimelineRecord: TimelineRecord | null) {
+async function commitTabActivity(currentTimelineRecord: TimelineRecord | null, preferences: Preferences) {
   if (!currentTimelineRecord) {
+    return;
+  }
+
+  const isDomainAllowed = isDomainAllowedByUser(currentTimelineRecord.hostname, preferences.allowedHosts, preferences.ignoredHosts);
+  if (!isDomainAllowed) {
     return;
   }
 

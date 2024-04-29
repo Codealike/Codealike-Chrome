@@ -34,18 +34,24 @@ const emitSuccessSyncStats = async (
   await callback({
     result: 'ok',
   });
-  const lastUpdateDateTime = preferences.lastUpdateStats?.Datetime;
+
+  let lastUpdateDateTime = DateTime.fromJSDate(new Date());
+  if (preferences.lastUpdateStats?.Datetime) {
+    lastUpdateDateTime = DateTime.fromISO(preferences.lastUpdateStats?.Datetime);
+  }
+
   await chrome.action.setTitle({
     title:
       "Codealike time tracker. You're authenticated to Codealike. Last bundle of stats sent " +
-        lastUpdateDateTime ?? DateTime.now() + '.',
+      lastUpdateDateTime.toLocaleString(DateTime.DATETIME_SHORT) + '.',
   });
   await chrome.action.setBadgeText({
     text: '',
   });
+
   await setSettings({
     lastUpdateStats: {
-      Datetime: DateTime.fromJSDate(new Date()),
+      Datetime: new Date().toJSON(),
       Status: 'OK',
     },
   });
@@ -58,18 +64,23 @@ const emitFailedSyncStats = async (
   await callback({
     result: 'failed',
   });
-  const lastUpdateDateTime = preferences.lastUpdateStats?.Datetime;
+  
+  let lastUpdateDateTime = DateTime.fromJSDate(new Date());
+  if (preferences.lastUpdateStats?.Datetime) {
+    lastUpdateDateTime = DateTime.fromISO(preferences.lastUpdateStats?.Datetime);
+  }
   await chrome.action.setTitle({
     title:
       'Codealike time tracker. An error happened trying to send Web Activity ' +
-        lastUpdateDateTime ?? DateTime.now() + '.',
+        lastUpdateDateTime.toLocaleString(DateTime.DATETIME_SHORT) + '.',
   });
   await chrome.action.setBadgeText({
     text: '',
   });
+
   await setSettings({
     lastUpdateStats: {
-      Datetime: DateTime.fromJSDate(new Date()),
+      Datetime: new Date().toJSON(),
       Status: 'NOK',
     },
   });
@@ -99,7 +110,7 @@ const transformToWebActivityLog = (record: TimelineRecord): WebActivityLog => {
   return {
     Duration: difference.seconds as number,
     From: startTime,
-    Status: record.status as string,
+    Status: record.status,
   };
 };
 
@@ -135,7 +146,13 @@ const sendWebActivity = async (
   }
 
   const { records, states } = transformTimelineInWebActivity(timeline);
-  const result = await sendStats(userToken, records, states);
+  let result = null; 
+  try {
+    result = await sendStats(userToken, records, states);
+  }
+  catch(err) {
+    console.log(err);
+  }
 
   if (result) {
     await Promise.all([
