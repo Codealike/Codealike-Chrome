@@ -75,7 +75,15 @@ export const UserTokenSetting: React.FC = () => {
 
   React.useEffect(() => {
     (async function () {
-      authorizeUserToken();
+      const { connectionStatus } = settings;
+
+      if (connectionStatus === ConnectionStatus.Connected) {
+        setState({
+          ...state,
+          connectionStatus: ConnectionStatus.Connected,
+          status: 'Codealike is connected',
+        });
+      }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
