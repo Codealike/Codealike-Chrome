@@ -45,6 +45,8 @@ const WebsiteActivityTableFC: React.FC<ActivityTableProps> = ({
     [settings.ignoredHosts, updateSettings]
   );
 
+  console.log('websiteSortedDesc --> ', JSON.stringify(websiteSortedDesc, null, 2))
+
   return (
     <Panel>
       <PanelHeader className="flex justify-between pb-2">
@@ -84,7 +86,7 @@ const WebsiteActivityTableFC: React.FC<ActivityTableProps> = ({
                 {domain}
               </a>
               <span className="min-w-[90px] text-right">
-                {getTimeFromMs(time)}
+                {getTimeFromMs(Math.abs(time))}
               </span>
             </div>
           );
