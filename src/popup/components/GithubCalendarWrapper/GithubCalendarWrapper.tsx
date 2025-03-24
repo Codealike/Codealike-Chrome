@@ -7,10 +7,10 @@ import { getIsoDate } from '../../../shared/utils/dates-helper';
 
 import { GithubCalendarProps } from './types';
 
-const INACTIVE_DAY_COLOR = '#cccccc';
-const LOW_ACTIVITY_DAY_COLOR = '#839dde';
-const MEDIUM_ACTIVITY_DAY_COLOR = '#4b76e3';
-const HIGH_ACTIVITY_DAY_COLOR = '#103ba6';
+const INACTIVE_DAY_COLOR = '#444444'; // Dark grey, but not black
+const LOW_ACTIVITY_DAY_COLOR = '#114A74'; // A darker, more muted blue
+const MEDIUM_ACTIVITY_DAY_COLOR = '#0073C1'; // A mid-range, slightly lighter blue
+const HIGH_ACTIVITY_DAY_COLOR = '#5BC0FB'; // A very light, bright blue
 const COLORS = [
   INACTIVE_DAY_COLOR,
   LOW_ACTIVITY_DAY_COLOR,
