@@ -12,6 +12,8 @@ import { DailyActivityTab } from '../components/ActivityPageDailyActivityTab/Act
 import { ActivityPageWeeklyActivityTab } from '../components/ActivityPageWeeklyActivityTab/ActivityPageWeeklyActivityTab';
 import { WeekDatePicker } from '../components/WeekDatePicker/WeekDatePicker';
 import { usePopupContext } from '../hooks/PopupContext';
+import { MonthDatePicker } from '../components/MonthDatePicker/MonthDatePicker';
+import { ActivityPageMonthlyActivityTab } from '../components/ActivityPageMonthlyActivityTab/ActivityPageMonthlyActivityTab';
 
 interface ActivityPageProps {
   date?: string;
@@ -20,6 +22,7 @@ interface ActivityPageProps {
 enum ActivityPageTabs {
   Daily,
   Weekly,
+  Monthly
 }
 
 export const ActivityPage: React.FC<ActivityPageProps> = ({
@@ -46,6 +49,7 @@ export const ActivityPage: React.FC<ActivityPageProps> = ({
           buttonType={
             activeTab === value ? ButtonType.Primary : ButtonType.Secondary
           }
+          className='px-2'
           onClick={() => setActiveTab(value)}
           key={key}
         >
@@ -71,6 +75,12 @@ export const ActivityPage: React.FC<ActivityPageProps> = ({
             onWeekChange={setPickedSunday}
           />
         )}
+        {activeTab === ActivityPageTabs.Monthly && (
+          <MonthDatePicker
+            sundayDate={pickedSunday}
+            onMonthChange={setPickedSunday}
+          />
+        )}
       </Panel>
 
       {activeTab === ActivityPageTabs.Daily && (
@@ -79,6 +89,12 @@ export const ActivityPage: React.FC<ActivityPageProps> = ({
 
       {activeTab === ActivityPageTabs.Weekly && (
         <ActivityPageWeeklyActivityTab
+          store={store}
+          sundayDate={pickedSunday}
+        />
+      )}
+      {activeTab === ActivityPageTabs.Monthly && (
+        <ActivityPageMonthlyActivityTab
           store={store}
           sundayDate={pickedSunday}
         />

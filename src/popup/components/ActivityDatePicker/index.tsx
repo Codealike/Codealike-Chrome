@@ -38,6 +38,7 @@ export const ActivityDatePicker: React.FC<ActivityDatePickerProps> = ({
       <Button
         buttonType={ButtonType.Secondary}
         onClick={() => onDateChangeButtonClick(-1)}
+        className='px-4'
       >
         <Icon className="m-0 flex" type={IconType.LeftArrow} />
       </Button>
@@ -50,6 +51,7 @@ export const ActivityDatePicker: React.FC<ActivityDatePickerProps> = ({
       <Button
         buttonType={ButtonType.Secondary}
         onClick={() => onDateChangeButtonClick(1)}
+        className='px-4'
       >
         <Icon className="m-0 flex" type={IconType.RightArrow} />
       </Button>

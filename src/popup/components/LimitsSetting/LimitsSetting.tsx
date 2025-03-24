@@ -114,7 +114,7 @@ export const LimitsSetting: React.FC = () => {
               >
                 <Icon
                   type={IconType.Close}
-                  className="hover:text-neutral-400 cursor-pointer"
+                  className="hover:text-[#ff1a1a] cursor-pointer text-red-600"
                   onClick={() => handleLimitRemove(domain)}
                 />
                 <span className="flex-1">{domain}</span>
