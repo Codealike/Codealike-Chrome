@@ -62,6 +62,7 @@ export interface Preferences {
   limits: Record<string, number>;
   displayTimeOnBadge: boolean;
   lastUpdateStats?: Statistics;
+  username?: string
 }
 
 export interface Statistics {
@@ -78,4 +79,15 @@ export enum ConnectionStatus {
 export interface TokenProperties {
   userId: string;
   uuid: string;
+}
+
+export interface ProfileResponse {
+  Identity: string
+  FullName: string
+  DisplayName: string
+  Address?: string
+  State?: string
+  Country?: string
+  AvatarUri: string
+  Email: string
 }
