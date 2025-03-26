@@ -5,4 +5,5 @@ export interface GeneralTimelineProps {
   emptyHoursMarginCount?: number;
   filteredHostname?: string | null;
   activityTimeline: TimelineRecord[];
+  description: string;
 }

@@ -61,6 +61,22 @@ export const get7DaysPriorDate = <
   });
 };
 
+export const get30DaysPriorDate = <
+  T extends (date: Date) => any = (date: Date) => Date
+>(
+  date: Date,
+  map?: T
+): ReturnType<T>[] => {
+  const defaultMap = (date: Date) => new Date(date);
+  const monthEndDate = new Date(date);
+
+  return new Array(30).fill(0).map((_, index) => {
+    monthEndDate.setDate(monthEndDate.getDate() - Number(index > 0));
+
+    return map?.(monthEndDate) ?? defaultMap(monthEndDate);
+  });
+};
+
 export const getDatesWeekSundayDate = (date: Date = new Date()) => {
   date.setDate(date.getDate() + date.getDay());
 
