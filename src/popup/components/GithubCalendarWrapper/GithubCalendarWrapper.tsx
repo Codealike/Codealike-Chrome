@@ -7,10 +7,10 @@ import { getIsoDate } from '../../../shared/utils/dates-helper';
 
 import { GithubCalendarProps } from './types';
 
-const INACTIVE_DAY_COLOR = '#cccccc';
-const LOW_ACTIVITY_DAY_COLOR = '#839dde';
-const MEDIUM_ACTIVITY_DAY_COLOR = '#4b76e3';
-const HIGH_ACTIVITY_DAY_COLOR = '#103ba6';
+const INACTIVE_DAY_COLOR = '#444444';
+const LOW_ACTIVITY_DAY_COLOR = '#114A74';
+const MEDIUM_ACTIVITY_DAY_COLOR = '#0073C1';
+const HIGH_ACTIVITY_DAY_COLOR = '#5BC0FB';
 const COLORS = [
   INACTIVE_DAY_COLOR,
   LOW_ACTIVITY_DAY_COLOR,
@@ -82,6 +82,14 @@ export const GithubCalendarWrapper: React.FC<GithubCalendarProps> = ({
     <div className="calendar" ref={calendarRef} onClick={handleDateClick}>
       {/* @ts-expect-error -- expected, this element does have props */}
       <Calendar values={activity} panelColors={COLORS} />
+      <div className="flex items-center justify-end gap-1">
+        <span className="text-gray-400">Less</span>
+        <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: INACTIVE_DAY_COLOR }} />
+        <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: LOW_ACTIVITY_DAY_COLOR }} />
+        <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: MEDIUM_ACTIVITY_DAY_COLOR }} />
+        <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: HIGH_ACTIVITY_DAY_COLOR }} />
+        <span className="text-gray-400">More</span>
+      </div>
       <ReactTooltip
         id={REACT_TOOLTIP_ID}
         delayShow={REACT_TOOLTIP_SHOW_DELAY_MS}

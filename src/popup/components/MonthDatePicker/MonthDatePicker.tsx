@@ -4,23 +4,23 @@ import { Button, ButtonType } from '../../../blocks/Button';
 import { Icon, IconType } from '../../../blocks/Icon';
 import { getIsoDate } from '../../../shared/utils/dates-helper';
 
-import { WeekDatePickerProps } from './types';
+import { MonthDatePickerProps } from './types';
 
-export const WeekDatePicker: React.FC<WeekDatePickerProps> = ({
-  onWeekChange,
+export const MonthDatePicker: React.FC<MonthDatePickerProps> = ({
+  onMonthChange,
   sundayDate,
 }) => {
-  const weekStartDate = new Date();
-  weekStartDate.setDate(sundayDate.getDate() - 6);
+  const monthStartDate = new Date();
+  monthStartDate.setDate(sundayDate.getDate() - 30);
 
   const handleChangeWeekButtonClick = React.useCallback(
     (direction) => {
       const newWeekEndDate = new Date(sundayDate);
-      newWeekEndDate.setDate(sundayDate.getDate() + direction * 7);
+      newWeekEndDate.setDate(sundayDate.getDate() + direction * 30);
 
-      onWeekChange(newWeekEndDate);
+      onMonthChange(newWeekEndDate);
     },
-    [sundayDate, onWeekChange]
+    [sundayDate, onMonthChange]
   );
 
   return (
@@ -33,7 +33,7 @@ export const WeekDatePicker: React.FC<WeekDatePickerProps> = ({
         <Icon className="m-0 flex" type={IconType.LeftArrow} />
       </Button>
       <div className="break-words break-all text-sm min-w-[120px] text-center dark:text-neutral-300">
-        <span>{getIsoDate(weekStartDate)}</span>
+        <span>{getIsoDate(monthStartDate)}</span>
         <br />
         <span>{getIsoDate(sundayDate)}</span>
       </div>

@@ -5,8 +5,10 @@ export const getTotalDailyActivity = (store: TimeStore, date: Date) => {
   const todayIsoDate = getIsoDate(date);
   const todaysWebsitesUsage: Record<string, number> = store[todayIsoDate] || {};
 
-  return Object.values(todaysWebsitesUsage).reduce(
-    (sum, websiteTime) => sum + websiteTime,
+  const sumVal = Object.values(todaysWebsitesUsage).reduce(
+    (sum, websiteTime) => sum + Math.abs(websiteTime),
     0
   );
+
+  return sumVal
 };
