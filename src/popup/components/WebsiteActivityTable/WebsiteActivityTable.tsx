@@ -73,7 +73,7 @@ const WebsiteActivityTableFC: React.FC<ActivityTableProps> = ({
             >
               <Icon
                 type={IconType.Close}
-                className="hover:text-neutral-400 cursor-pointer"
+                className="hover:text-neutral-400 cursor-pointer text-red-600"
                 onClick={() => handleHideDomainClick(domain)}
               />
               <a
@@ -84,7 +84,7 @@ const WebsiteActivityTableFC: React.FC<ActivityTableProps> = ({
                 {domain}
               </a>
               <span className="min-w-[90px] text-right">
-                {getTimeFromMs(time)}
+                {getTimeFromMs(Math.abs(time))}
               </span>
             </div>
           );
