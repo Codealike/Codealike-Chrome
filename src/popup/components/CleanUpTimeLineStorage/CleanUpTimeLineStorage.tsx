@@ -17,7 +17,7 @@ export const CleanUpTimeLineStorage: React.FC = () => {
 
   const handleClearData = React.useCallback(() => {
     const days = Number(state.cutOffDate);
-    if (days <= 1) {
+    if (days < 1) {
       setState((prev) => ({
         ...prev,
         status: true,
@@ -59,6 +59,7 @@ export const CleanUpTimeLineStorage: React.FC = () => {
               value={cutOffDate}
               onChange={handleCutOffDate}
               type="number"
+              min={1}
             />
           </label>
           <Button
