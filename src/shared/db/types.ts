@@ -62,6 +62,7 @@ export interface Preferences {
   limits: Record<string, number>;
   displayTimeOnBadge: boolean;
   lastUpdateStats?: Statistics;
+  timeLineCleanUpDays?: number;
 }
 
 export interface Statistics {
