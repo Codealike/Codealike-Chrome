@@ -3,10 +3,12 @@ import { Panel, PanelBody, PanelHeader } from "../../../blocks/Panel";
 import { Button, ButtonType } from "../../../blocks/Button";
 import { handleClearTimeLineData } from "../../../shared/db/helper";
 import { Input } from "../../../blocks/Input";
+import { usePopupContext } from "../../hooks/PopupContext";
 
 export const CleanUpTimeLineStorage: React.FC = () => {
+  const { settings, updateSettings } = usePopupContext()
   const [state, setState] = React.useState<{
-    cutOffDate: string
+    cutOffDate: number | string
     status: boolean,
     statusText: string,
   }>({
@@ -17,7 +19,7 @@ export const CleanUpTimeLineStorage: React.FC = () => {
 
   const handleClearData = React.useCallback(() => {
     const days = Number(state.cutOffDate);
-    if (days <= 1) {
+    if (days < 1) {
       setState((prev) => ({
         ...prev,
         status: true,
@@ -28,23 +30,40 @@ export const CleanUpTimeLineStorage: React.FC = () => {
 
     handleClearTimeLineData(days)
       .then((res) => {
-      setState((prev) => ({
-        ...prev,
-        status: true,
-        statusText: res,
-      }));
-    })
-  }, [state]);
+        // Update state
+        setState((prev) => ({
+          ...prev,
+          status: true,
+          statusText: res,
+        }));
+
+        // Update settings
+        updateSettings({
+          timeLineCleanUpDays: days
+        });
+      })
+  }, [state, updateSettings]);
 
   const handleCutOffDate = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setState((prev) => ({
         ...prev,
-        cutOffDate: e.target.value,
+        cutOffDate: Number(e.target.value),
       }));
     },
     [],
   );
+
+  React.useEffect(() => {
+    const { timeLineCleanUpDays } = settings
+    if (timeLineCleanUpDays) {
+      setState((prev) => ({
+        ...prev,
+        cutOffDate: timeLineCleanUpDays
+      }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const { cutOffDate, status, statusText } = state;
   return (
@@ -59,6 +78,7 @@ export const CleanUpTimeLineStorage: React.FC = () => {
               value={cutOffDate}
               onChange={handleCutOffDate}
               type="number"
+              min={1}
             />
           </label>
           <Button

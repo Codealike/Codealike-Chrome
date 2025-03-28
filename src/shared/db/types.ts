@@ -63,6 +63,7 @@ export interface Preferences {
   displayTimeOnBadge: boolean;
   lastUpdateStats?: Statistics;
   username?: string
+  timeLineCleanUpDays?: number;
 }
 
 export interface Statistics {
