@@ -63,7 +63,7 @@ const manageLocalStoreSpace = async (
     return await deleteRecordsById(idsToDelete);
   }
 
-  return `No data available for deletion beyond the ${defaultCutOff} days timeframe.`
+  return `No timeline data available for keeping beyond the ${defaultCutOff} days period.`
 };
 
 export { manageLocalStoreSpace };
