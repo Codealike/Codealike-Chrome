@@ -14,6 +14,7 @@ import { DebugTab } from './shared/db/types';
 import { WAKE_UP_BACKGROUND } from './shared/messages';
 
 import Port = chrome.runtime.Port;
+import { manageLocalStoreSpace } from './background/services/data';
 
 interface Service {
   name: string;
@@ -29,6 +30,10 @@ const ASYNC_POLL_INTERVAL_MINUTES = 1;
 
 const ASYNC_STATS_INTERVAL_ALARM_NAME = 'send-stats';
 const ASYNC_STATS_INTERVAL_MINUTES = 1;
+
+const ASYNC_CLEAN_TIMELINE_ALARM_NAME = 'clean-timeline';
+const ASYNC_CLEAN_TIMELINE_MINUTES = 1440; // 24 hours * 60 minutes - one day
+const DEFAULT_CUTOFF_DAYS = 60;
 
 function findDebuggingTabIndexFromId(tabIdOrUrl: number | string | undefined) {
   if (tabIdOrUrl !== undefined) {
@@ -78,6 +83,10 @@ const asyncPollAlarmHandler = async (): Promise<void> => {
 const sendStatsAlarmHandler = async (): Promise<void> =>
   await sendWebActivityAutomatically();
 
+const cleanTimeLineAlarmHandler = async (): Promise<void> => {
+  await manageLocalStoreSpace(DEFAULT_CUTOFF_DAYS)
+}
+
 const ChromeServiceDefinition: Array<Service> = [
   {
     handler: asyncPollAlarmHandler,
@@ -89,6 +98,11 @@ const ChromeServiceDefinition: Array<Service> = [
     intervalInMinutes: ASYNC_STATS_INTERVAL_MINUTES,
     name: ASYNC_STATS_INTERVAL_ALARM_NAME,
   },
+  {
+    handler: cleanTimeLineAlarmHandler,
+    intervalInMinutes: ASYNC_CLEAN_TIMELINE_MINUTES,
+    name: ASYNC_CLEAN_TIMELINE_ALARM_NAME
+  }
 ];
 
 ChromeServiceDefinition.forEach((service) => {

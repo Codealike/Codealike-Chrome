@@ -32,6 +32,7 @@ export interface TimelineRecord {
   secure: boolean;
   activityPeriodStart: number;
   activityPeriodEnd: number;
+  id?: number;
 }
 
 export type ActiveTabState = {
@@ -61,6 +62,7 @@ export interface Preferences {
   limits: Record<string, number>;
   displayTimeOnBadge: boolean;
   lastUpdateStats?: Statistics;
+  timeLineCleanUpDays?: number;
 }
 
 export interface Statistics {
