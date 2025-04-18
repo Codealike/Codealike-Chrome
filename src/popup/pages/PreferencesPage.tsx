@@ -8,9 +8,20 @@ import { Input } from './../../blocks/Input';
 import {IgnoredDomainSetting} from '../components/IgnoredDomainsSetting/IgnoredDomainSetting';
 import { WhitelistDomainSetting } from '../components/WhitelistDomainsSetting/WhitelistDomainSetting';
 import {UserTokenSetting} from "../components/UserTokenSetting/UserTokenSetting";
+import { LogViewer } from '../components/LogViewer/LogViewer';
 
 export const PreferencesPage: FC = () => {
     const [isWhitelistShown, hideWhitelist] = React.useState<boolean>(true);
+    const [currentEnv, setCurrentEnv] = React.useState<string>();
+
+    React.useEffect(() => {
+        (async function () {
+            const ENV = process.env.NODE_ENV;
+            setCurrentEnv(ENV)
+
+        })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [setCurrentEnv]);
 
     const toggle = React.useCallback(() => {
         hideWhitelist((prev) => !prev);
@@ -45,6 +56,7 @@ export const PreferencesPage: FC = () => {
                     {(isWhitelistShown ? <WhitelistDomainSetting />: <IgnoredDomainSetting />)}
                  </PanelBody>
             </Panel>
+            {currentEnv === 'development' && <LogViewer />}
         </div>
     );
 };

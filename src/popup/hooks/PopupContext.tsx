@@ -1,6 +1,8 @@
 import { Preferences } from '../../shared/db/types';
 import { DEFAULT_PREFERENCES } from '../../shared/preferences';
 import { useActiveTabHostname } from './useActiveTab';
+import { useLogs } from './useLogs';
+import { LogMessage } from "../../shared/db/types";
 import { useSettings } from './useSettings';
 import { TimeStore, useTimeStore } from './useTimeStore';
 import * as React from 'react';
@@ -8,12 +10,14 @@ import * as React from 'react';
 export type PopupContextType = {
   store: TimeStore;
   activeHostname: string;
+  logs: LogMessage[] | [] | undefined
   settings: Preferences;
   updateSettings: (updated: Partial<Preferences>) => void;
 };
 
 const DEFAULT_CONTEXT: PopupContextType = {
   activeHostname: '',
+  logs: [],
   settings: DEFAULT_PREFERENCES,
   store: {},
   updateSettings: () => 0,
@@ -28,6 +32,7 @@ export const PopupContextProvider: React.FC = ({ children }) => {
   const store = useTimeStore();
   const host = useActiveTabHostname();
   const [settings, updateSettings] = useSettings();
+  const [logs] = useLogs();
 
   const filterDomainsFromStore = React.useCallback(
     (store: Record<string, number>) => {
@@ -67,9 +72,10 @@ export const PopupContextProvider: React.FC = ({ children }) => {
     <PopupContext.Provider
       value={{
         activeHostname: host || '',
+        logs,
         settings,
         store: filteredStore,
-        updateSettings,
+        updateSettings
       }}
     >
       {children}

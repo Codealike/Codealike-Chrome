@@ -1,5 +1,6 @@
 import { getTabInfo } from './background/browser-api/tabs';
 import { handleStateChange } from './background/controller';
+import { cleanUpLogIndexedDBTable } from './background/services/logs';
 import {
   handleActiveTabStateChange,
   handleAlarm,
@@ -7,7 +8,7 @@ import {
   handleTabUpdate,
   handleWindowFocusChange,
 } from './background/services/state-service';
-import { sendWebActivityAutomatically } from './background/services/stats';
+import { cleanUpStatsIndexedDBTable, sendWebActivityAutomatically } from './background/services/stats';
 import { logMessage } from './background/tables/logs';
 import { Tab } from './shared/browser-api.types';
 import { DebugTab } from './shared/db/types';
@@ -19,6 +20,7 @@ interface Service {
   name: string;
   intervalInMinutes: number;
   handler: () => Promise<void>;
+  delayInMinutes?: number;
 }
 
 const devToolsPorts: { [tabId: number]: Port } = {};
@@ -29,6 +31,13 @@ const ASYNC_POLL_INTERVAL_MINUTES = 1;
 
 const ASYNC_STATS_INTERVAL_ALARM_NAME = 'send-stats';
 const ASYNC_STATS_INTERVAL_MINUTES = 1;
+
+const ASYNC_CLEAN_UP_LOGS_ALARM_NAME = 'cleanup-logs';
+const ASYNC_CLEAN_UP_LOGS_MINUTES = 1440; // Daily once
+const DEFAULT_LOG_CUTOFF_DAYS = 0; // Daily
+
+const ASYNC_CLEAN_UP_STATS_ALARM_NAME = 'cleanup-stats';
+const ASYNC_CLEAN_UP_STATS_MINUTES = 1440; // Daily once
 
 function findDebuggingTabIndexFromId(tabIdOrUrl: number | string | undefined) {
   if (tabIdOrUrl !== undefined) {
@@ -78,6 +87,14 @@ const asyncPollAlarmHandler = async (): Promise<void> => {
 const sendStatsAlarmHandler = async (): Promise<void> =>
   await sendWebActivityAutomatically();
 
+const cleanUpLogsAlarmHandler = async (): Promise<void> => {
+  await cleanUpLogIndexedDBTable(DEFAULT_LOG_CUTOFF_DAYS);
+};
+
+const cleanUpStatsAlarmHandler = async (): Promise<void> => {
+  await cleanUpStatsIndexedDBTable();
+};
+
 const ChromeServiceDefinition: Array<Service> = [
   {
     handler: asyncPollAlarmHandler,
@@ -89,11 +106,25 @@ const ChromeServiceDefinition: Array<Service> = [
     intervalInMinutes: ASYNC_STATS_INTERVAL_MINUTES,
     name: ASYNC_STATS_INTERVAL_ALARM_NAME,
   },
+  {
+    handler: cleanUpLogsAlarmHandler,
+    intervalInMinutes: ASYNC_CLEAN_UP_LOGS_MINUTES,
+    name: ASYNC_CLEAN_UP_LOGS_ALARM_NAME,
+  },
+  {
+    delayInMinutes: 0.1,
+    handler: cleanUpStatsAlarmHandler,
+    intervalInMinutes: ASYNC_CLEAN_UP_STATS_MINUTES,
+    name: ASYNC_CLEAN_UP_STATS_ALARM_NAME,
+  },
 ];
 
 ChromeServiceDefinition.forEach((service) => {
   chrome.alarms.create(service.name, {
     periodInMinutes: service.intervalInMinutes,
+    ...(service.delayInMinutes !== undefined && service.delayInMinutes !== null
+      ? { delayInMinutes: service.delayInMinutes }
+      : {})
   });
 });
 
