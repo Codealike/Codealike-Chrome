@@ -56,15 +56,16 @@ export const UserInfoHeader: React.FC = () => {
   const { identity } = state;
   return (
   <>
-    <div className="flex justify-between">
-      <span>Codealike</span>
-      {
-        identity 
-          ? (<span className="ml-auto text-green-600">{identity}</span>) 
-          : (<span className="ml-auto text-red-600">User not connected</span>)
-      }
-      <span></span>
+    <div className="flex items-center">
+      <img src="./icons/icon-16.png" alt="icon" />
+      <span className="font-semibold px-2">Codealike</span>
     </div>
+
+    {
+      identity 
+        ? (<span className="ml-auto text-green-600">{identity}</span>) 
+        : (<span className="ml-auto text-red-600">User not connected</span>)
+    }
   </>
   )
 };
