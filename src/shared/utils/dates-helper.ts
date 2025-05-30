@@ -81,3 +81,22 @@ export const presentHoursOrMinutesFromMinutes = (minutes: number) => {
 
   return `${hoursRounded - 0.5}h`;
 };
+
+export const formatEpoch = (timestamp: number) => {
+  // Check if timestamp is in seconds and convert to milliseconds if needed
+  const isInSeconds = timestamp < 1e12;
+  const date = new Date(isInSeconds ? timestamp * 1000 : timestamp);
+
+  // Format: YYYY-MM-DD HH:mm:ss
+  const formatted = date.toLocaleString('en-US', {
+    day: '2-digit',
+    hour: '2-digit',
+    hour12: true,
+    minute: '2-digit',
+    month: '2-digit',
+    second: '2-digit',
+    year: 'numeric',
+  });
+
+  return formatted;
+};
