@@ -1,6 +1,7 @@
 import { Icon, IconType } from '../blocks/Icon';
 import { Panel } from '../blocks/Panel';
 import './App.css';
+import { UserInfoHeader } from './components/UserInfoHeader/UserInfoHeader';
 import { PopupContextProvider } from './hooks/PopupContext';
 import { ActivityPage } from './pages/ActivityPage';
 import { OverallPage } from './pages/OverallPage';
@@ -85,7 +86,7 @@ export const PopupApp: React.FC = () => {
       <div className="flex flex-col p-2 pt-4 dark:bg-neutral-900">
         <div className="text-orange-500 p-2 border-none bg-slate-200 dark:bg-slate-800 tab-body-shadow dark:dark-tab-body-shadow flex">
           <img src="./icons/icon-16.png"></img>
-          <span className='font-semibold px-2'>Codealike</span>
+          <UserInfoHeader />
         </div>
         <Panel className="flex gap-2 p-2 font-semibold">{tabs}</Panel>
         <Panel className="p-2 border-none bg-slate-200 dark:bg-slate-800 tab-body-shadow dark:dark-tab-body-shadow">

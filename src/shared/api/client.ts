@@ -1,4 +1,5 @@
 import {
+  ProfileResponse,
   TokenProperties,
   WebActivityLog,
   WebActivityRecord,
@@ -79,6 +80,34 @@ export const authorize = (token: string): Promise<{ result: boolean }> => {
       console.log((err as Error).message);
       reject();
     }
+  });
+};
+
+export const getProfile = (token: string): Promise<ProfileResponse> => {
+  return new Promise((resolve, reject) => {
+    const { userId, uuid } = getTokenProperties(token);
+    const url = `${CodealikeHost}/account/${userId}/profile`;
+    console.log(`url: ${url}`)
+
+    fetch(url, {
+      headers: getHeaders(userId, uuid),
+      method: 'GET',
+    })
+      .then((result) => {
+        if (result.status === 200) {
+          return result.json()
+        } else {
+          reject();
+        }
+      })
+      .then((response) => {
+        console.log('Response body:', response);
+        resolve(response);
+      })
+      .catch((err) => {
+        console.log((err as Error).message);
+        reject();
+      });
   });
 };
 
