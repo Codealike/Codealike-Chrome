@@ -47,6 +47,8 @@ export const ActivityPageWeeklyActivityTab: React.FC<ActivityPageWeeklyActivityT
         {} as typeof allWeekActivity
       );
     }, [allWeekActivity, pickedDomain]);
+    // console.log('filteredWebsiteWeekActivity --> ', JSON.stringify(filteredWebsiteWeekActivity, null, 2))
+
 
     const totalWebsiteWeeklyActivity = React.useMemo(
       () =>
@@ -60,6 +62,8 @@ export const ActivityPageWeeklyActivityTab: React.FC<ActivityPageWeeklyActivityT
         }, {} as Record<string, number>),
       [allWeekActivity]
     );
+    // console.log('totalWebsiteWeeklyActivity --> ', JSON.stringify(totalWebsiteWeeklyActivity, null, 2))
+
 
     const averageWeeklyActivity = React.useMemo(() => {
       const averageWeekly =

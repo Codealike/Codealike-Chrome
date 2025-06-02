@@ -87,7 +87,7 @@ export const WeeklyWebsiteActivityChart: React.FC<
     const week = get7DaysPriorDate(sundayDate).reverse();
     const labels = week.map((date) => getIsoDate(date));
     const data = week.map(
-      (date) => getTotalDailyActivity(store, date) / HOUR_IN_MS,
+      (date) => Math.abs(getTotalDailyActivity(store, date) / HOUR_IN_MS),
     );
 
     return [labels, data];
