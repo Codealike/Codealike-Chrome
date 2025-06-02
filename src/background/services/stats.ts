@@ -178,4 +178,43 @@ const sendWebActivityAutomatically = async (): Promise<void> => {
   });
 };
 
-export { sendWebActivityAutomatically };
+const deleteRecordsById = async (idsToDelete: string[]) => {
+  try {
+
+    const db = await connect();
+    const transaction = db.transaction(
+      TimeTrackerStoreTables.State,
+      'readwrite',
+    );
+    const store = transaction.objectStore(TimeTrackerStoreTables.State);
+
+    for (const id of idsToDelete) {
+      await store.delete(id);
+    }
+
+    await transaction.done;
+    console.log('Stats deleted successfully.');
+    return 'Stats deleted successfully.';
+  } catch (error) {
+    console.error('Error deleting IDB records:', error);
+    return 'Failed to delete records.';
+  }
+};
+
+const cleanUpStatsIndexedDBTable = async () => {
+  console.log(`handling stats table cleanup`)
+
+  const keysToDelete = ['active-tab', 'app-state', 'overall-state'];
+
+  console.log(
+    `Records to Delete: ${JSON.stringify(keysToDelete, null, 2)}`,
+  );
+
+  if (keysToDelete.length > 0) {
+    return await deleteRecordsById(keysToDelete);
+  }
+
+  return `Stats table cleared and ready to be repopulated.`
+};
+
+export { sendWebActivityAutomatically, cleanUpStatsIndexedDBTable };

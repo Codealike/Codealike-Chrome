@@ -51,6 +51,7 @@ export interface DebugTab {
 export interface LogMessage {
   message: string;
   timestamp: number;
+  id?: number;
 }
 
 export interface Preferences {

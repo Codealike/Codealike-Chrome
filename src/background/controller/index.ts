@@ -8,6 +8,7 @@ import {
 import { getSettings } from '../../shared/preferences';
 import { getIsoDate, getMinutesInMs } from '../../shared/utils/dates-helper';
 import { isInvalidUrl, isDomainAllowedByUser } from '../../shared/utils/url';
+import { logMessage } from '../tables/logs';
 import { setActiveTabRecord } from '../tables/state';
 import { ActiveTimelineRecordDao, createNewActiveRecord } from './active';
 import { updateTimeOnBadge } from './badge';
@@ -151,6 +152,10 @@ async function commitTabActivity(currentTimelineRecord: TimelineRecord | null, p
   }
 
   const currentIsoDate = getIsoDate(new Date());
+
+  const { hostname } = currentTimelineRecord;
+  const message = `Visited ${hostname} on ${currentIsoDate}`;
+  await logMessage(message);
 
   await saveTimelineRecord(currentTimelineRecord, currentIsoDate);
 
