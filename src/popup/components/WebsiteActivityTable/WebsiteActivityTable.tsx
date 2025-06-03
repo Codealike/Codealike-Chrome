@@ -45,8 +45,6 @@ const WebsiteActivityTableFC: React.FC<ActivityTableProps> = ({
     [settings.ignoredHosts, updateSettings]
   );
 
-  console.log('websiteSortedDesc --> ', JSON.stringify(websiteSortedDesc, null, 2))
-
   return (
     <Panel>
       <PanelHeader className="flex justify-between pb-2">

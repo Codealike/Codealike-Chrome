@@ -193,7 +193,7 @@ const deleteRecordsById = async (idsToDelete: string[]) => {
     }
 
     await transaction.done;
-    console.log('Stats deleted successfully.');
+
     return 'Stats deleted successfully.';
   } catch (error) {
     console.error('Error deleting IDB records:', error);
@@ -202,13 +202,13 @@ const deleteRecordsById = async (idsToDelete: string[]) => {
 };
 
 const cleanUpStatsIndexedDBTable = async () => {
-  console.log(`handling stats table cleanup`)
+  // console.log(`handling stats table cleanup`)
 
   const keysToDelete = ['active-tab', 'app-state', 'overall-state'];
 
-  console.log(
-    `Records to Delete: ${JSON.stringify(keysToDelete, null, 2)}`,
-  );
+  // console.log(
+  //   `Records to Delete: ${JSON.stringify(keysToDelete, null, 2)}`,
+  // );
 
   if (keysToDelete.length > 0) {
     return await deleteRecordsById(keysToDelete);

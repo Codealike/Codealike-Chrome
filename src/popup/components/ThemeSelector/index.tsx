@@ -6,7 +6,7 @@ import { getAppTheme, setAppTheme } from '../../hooks/useTheme';
 import { Panel, PanelBody, PanelHeader } from '../../../blocks/Panel';
 
 export const ThemeSelector: React.FC = () => {
-  const [theme, setTheme] = React.useState(getAppTheme());
+  const [_theme, setTheme] = React.useState(getAppTheme());
 
   const handleThemeChange = React.useCallback(
     (theme: 'light' | 'dark' | 'auto') => {
@@ -28,7 +28,6 @@ export const ThemeSelector: React.FC = () => {
     handleThemeChange('auto');
   }, [handleThemeChange]);
 
-  console.log(theme)
   return (
     <Panel>
       <PanelHeader>Change Theme</PanelHeader>

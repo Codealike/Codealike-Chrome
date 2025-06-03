@@ -21,6 +21,15 @@ export function isCouldNotEstablishConnectionError(
   );
 }
 
+export function isBackForwardCacheError(
+  error: unknown
+): error is Error {
+  return (
+    error instanceof Error &&
+    error.message.toLowerCase().includes('extension port is moved into back/forward cache')
+  );
+}
+
 export function isUserDraggingWindowError(error: unknown): error is Error {
   return (
     error instanceof Error &&

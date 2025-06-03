@@ -57,7 +57,6 @@ export const UserInfoHeader: React.FC = () => {
   return (
   <>
     <div className="flex items-center">
-      <img src="./icons/icon-16.png" alt="icon" />
       <span className="font-semibold px-2">Codealike</span>
     </div>
 
