@@ -10,6 +10,9 @@ import {
 } from './background/services/state-service';
 import { cleanUpStatsIndexedDBTable, sendWebActivityAutomatically } from './background/services/stats';
 import { logMessage } from './background/tables/logs';
+import {
+    Logger
+} from './shared/utils/logger';
 import { Tab } from './shared/browser-api.types';
 import { DebugTab } from './shared/db/types';
 import { WAKE_UP_BACKGROUND } from './shared/messages';
@@ -120,17 +123,24 @@ const ChromeServiceDefinition: Array<Service> = [
 ];
 
 ChromeServiceDefinition.forEach((service) => {
-  chrome.alarms.create(service.name, {
-    periodInMinutes: service.intervalInMinutes,
-    ...(service.delayInMinutes !== undefined && service.delayInMinutes !== null
-      ? { delayInMinutes: service.delayInMinutes }
-      : {})
-  });
+  chrome.alarms.clear(service.name,()=>{
+    chrome.alarms.create(service.name, {
+      ...(service.delayInMinutes != null
+        ? { delayInMinutes: service.delayInMinutes }
+        : {}),
+      ...(service.intervalInMinutes != null
+        ? { periodInMinutes: service.intervalInMinutes }
+        : {})
+    });
+    console.log(`Created alarm:${service.name} delay: ${service.delayInMinutes}, period: ${service.intervalInMinutes}`)
+  })
+
 });
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   const { name } = alarm;
   await logMessage(name);
+  Logger.info(name)
   for (let i = 0; i < ChromeServiceDefinition.length; i++) {
     const alarm: Service = ChromeServiceDefinition[i] as Service;
     if (alarm.name === name) {
@@ -169,11 +179,13 @@ chrome.runtime.onConnect.addListener(function (devToolsPort: Port) {
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
   const ts = Date.now();
   await logMessage('tab activated: ' + activeInfo.tabId);
+  Logger.debug('tab activated: ' + activeInfo.tabId)
 
   const newState = await handleActiveTabStateChange(activeInfo);
   if (newState) {
     await handleStateChange(newState, ts, debuggingTabs).catch((e) => {
       logMessage('error handling tab activated: ' + e);
+      Logger.error('error handling tab activated: ' + e)
     });
   }
 });
@@ -181,6 +193,7 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
 chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
   const ts = Date.now();
   await logMessage('tab updated: ' + tab.id);
+  Logger.debug('tab updated: ' + tab.id)
 
   const newState = await handleTabUpdate(tab as Tab);
   if (newState) {
@@ -194,6 +207,7 @@ chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
 chrome.windows.onFocusChanged.addListener(async (windowId) => {
   const ts = Date.now();
   await logMessage('window focus changed: ' + windowId);
+  Logger.debug('window focus changed: ' + windowId)
 
   const newState = await handleWindowFocusChange(windowId);
   if (newState) {
@@ -203,6 +217,7 @@ chrome.windows.onFocusChanged.addListener(async (windowId) => {
 
 chrome.idle.onStateChanged.addListener(async (newIdleState) => {
   await logMessage('idle state changed: ' + newIdleState);
+  Logger.debug('idle state changed: ' + newIdleState)
   const ts = Date.now();
 
   const newTabState = await handleIdleStateChange(newIdleState);
@@ -212,6 +227,7 @@ chrome.idle.onStateChanged.addListener(async (newIdleState) => {
 
 chrome.webNavigation.onCompleted.addListener(async (details) => {
   await logMessage('web navigation: ' + details.tabId);
+  Logger.debug('web navigation: ' + details.tabId)
   const ts = Date.now();
 
   const tab = await getTabInfo(details.tabId);
@@ -228,14 +244,35 @@ chrome.webNavigation.onCompleted.addListener(async (details) => {
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendMessage) => {
-  if (message.type === WAKE_UP_BACKGROUND) {
-    sendMessage({ alive: true });
+    if (message.type === WAKE_UP_BACKGROUND) {
+      sendMessage({ alive: true });
 
-    const ts = Date.now();
-    handleAlarm().then(async (newState) => {
-      await handleStateChange(newState, ts, debuggingTabs);
-    });
-  }
+      const ts = Date.now();
+      handleAlarm().then(async (newState) => {
+        await handleStateChange(newState, ts, debuggingTabs);
+      });
+   }
+   if (message.action === "downloadLogs") {
+        const timestamp = new Date().toISOString().replace(/:/g, '-').replace(/\./g, '_');
+        Logger.download(`extension_logs_${timestamp}.txt`);
+        sendMessage({
+            success: true
+        }); // Respond to the sender
+        return true; // Keep the message channel open for async sendMessage
+    } 
+    if (message.action === "clearLogs") {
+        Logger.clear();
+        sendMessage({
+            success: true
+        });
+        return true;
+    }
+    if (message.action === "getLogs") {
+        Logger.get().then(logs => {
+            sendMessage(logs); // Send the retrieved logs back
+        });
+        return true; // Keep the message channel open
+    }
 });
 
 // This is a background script for a Google Chrome extension. It creates an alarm

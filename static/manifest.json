@@ -25,6 +25,7 @@
   "permissions": [
     "idle",
     "storage",
+    "downloads",
     "tabs",
     "activeTab",
     "alarms",

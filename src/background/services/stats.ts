@@ -168,6 +168,7 @@ const sendWebActivityAutomatically = async (): Promise<void> => {
   const preferences: Preferences = await getSettings();
   if (preferences.connectionStatus !== ConnectionStatus.Connected) {
     await logMessage('unable to send stats when not connected');
+     Logger.error('unable to send stats when not connected');
     return;
   }
 
@@ -175,6 +176,7 @@ const sendWebActivityAutomatically = async (): Promise<void> => {
 
   await sendWebActivity(preferences, timeline, async (response) => {
     await logMessage(JSON.stringify(response));
+    Logger.info(JSON.stringify(response));
   });
 };
 

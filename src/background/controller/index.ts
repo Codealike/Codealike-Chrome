@@ -9,6 +9,9 @@ import { getSettings } from '../../shared/preferences';
 import { getIsoDate, getMinutesInMs } from '../../shared/utils/dates-helper';
 import { isInvalidUrl, isDomainAllowedByUser } from '../../shared/utils/url';
 import { logMessage } from '../tables/logs';
+import {
+    Logger
+} from '../../shared/utils/logger';
 import { setActiveTabRecord } from '../tables/state';
 import { ActiveTimelineRecordDao, createNewActiveRecord } from './active';
 import { updateTimeOnBadge } from './badge';
@@ -156,6 +159,7 @@ async function commitTabActivity(currentTimelineRecord: TimelineRecord | null, p
   const { hostname } = currentTimelineRecord;
   const message = `Visited ${hostname} on ${currentIsoDate}`;
   await logMessage(message);
+  Logger.debug(message);
 
   await saveTimelineRecord(currentTimelineRecord, currentIsoDate);
 
