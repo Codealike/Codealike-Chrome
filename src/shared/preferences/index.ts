@@ -4,6 +4,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
   allowedHosts: [], //whitelisted domains
   connectionStatus: ConnectionStatus.Disconnected,
   displayTimeOnBadge: true,
+  enableLogging: false,
   ignoredHosts: [],
   limits: {},
 };

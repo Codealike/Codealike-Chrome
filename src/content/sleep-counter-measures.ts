@@ -7,6 +7,7 @@ import {
 import { WAKE_UP_BACKGROUND } from '../shared/messages';
 import { getMinutesInMs } from '../shared/utils/dates-helper';
 import { ignore } from '../shared/utils/errors';
+import { Logger } from '../shared/utils/logger';
 
 let messagePollingId = 0;
 let backgroundPort: chrome.runtime.Port | null = null;
@@ -33,6 +34,7 @@ function tryWakeUpBackground() {
         isCouldNotEstablishConnectionError,
         isBackForwardCacheError
       )(error);
+      Logger.debug("SleepCounterMeasure:tryWakeUpBackground => ignore Error " + error)
     }
 }
 
@@ -68,8 +70,8 @@ function connectToExtension() {
         isExtensionContextInvalidatedError,
         isCouldNotEstablishConnectionError,
         isBackForwardCacheError
-        // You might want to add a check for the back/forward cache error here
       )(error);
+      Logger.debug("SleepCounterMeasure:connectToExtension => ignore Error " + error)
     }
 }
 

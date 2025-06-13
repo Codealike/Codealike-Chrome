@@ -10,6 +10,7 @@ import { WhitelistDomainSetting } from '../components/WhitelistDomainsSetting/Wh
 import {UserTokenSetting} from "../components/UserTokenSetting/UserTokenSetting";
 import { ThemeSelector } from '../components/ThemeSelector';
 import { LogViewer } from '../components/LogViewer/LogViewer';
+import { Logger } from '../components/Logger/Logger';
 
 export const PreferencesPage: FC = () => {
     const [isWhitelistShown, hideWhitelist] = React.useState<boolean>(true);
@@ -59,6 +60,7 @@ export const PreferencesPage: FC = () => {
             </Panel>
             <ThemeSelector />
             {currentEnv === 'development' && <LogViewer />}
+            {<Logger />}
         </div>
     );
 };

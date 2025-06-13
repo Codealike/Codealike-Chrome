@@ -26,6 +26,8 @@
     "idle",
     "storage",
     "downloads",
+    "system.cpu",  
+    "system.memory",
     "tabs",
     "activeTab",
     "alarms",

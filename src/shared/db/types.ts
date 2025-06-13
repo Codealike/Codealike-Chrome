@@ -61,6 +61,7 @@ export interface Preferences {
   allowedHosts?: string[]; //urls that are to be whitelisted
   limits: Record<string, number>;
   displayTimeOnBadge: boolean;
+  enableLogging: boolean;
   lastUpdateStats?: Statistics;
   username?: string
 }

@@ -1,4 +1,7 @@
-const LOG_STORAGE_KEY = 'extension_logs';
+import { Preferences } from '../../shared/db/types';
+import { getSettings } from '../../shared/preferences';
+
+const LOG_STORAGE_KEY = 'codealike_extension_logs';
 const MAX_LOG_ENTRIES = 1000;
 
 // Defines the structure of a single log entry.
@@ -9,12 +12,58 @@ interface LogEntry {
     context ? : object; 
 }
 
+interface LoggerAPI {
+    info(message: string, context ? : object): Promise < void > ;
+    warn(message: string, context ? : object): Promise < void > ;
+    error(message: string, context ? : object): Promise < void > ;
+    debug(message: string, context ? : object): Promise < void > ;
+    get(): Promise < LogEntry[] > ;
+    clear(): Promise < void > ;
+}
+
+// In-memory cache for preferences
+let _cachedPreferences: Preferences | null = null;
+let _cacheTimestamp: number | null = null;
+const CACHE_EXPIRATION_MS = 5 * 1000; // 5 seconds in milliseconds 
+
+ async function _getPreferences(): Promise<Preferences> {
+    const now = Date.now();
+
+    // Check if cache exists and is not expired
+    if (_cachedPreferences && _cacheTimestamp && (now - _cacheTimestamp < CACHE_EXPIRATION_MS)) {
+        console.log("Returning settings from cache.");
+        return _cachedPreferences;
+    }
+
+    console.log("Cache expired or not present, fetching settings from storage.");
+    try {
+        const fetchedPreferences = await getSettings();
+        _cachedPreferences = fetchedPreferences;
+        _cacheTimestamp = now; // Update timestamp when new data is fetched
+        return fetchedPreferences;
+    } catch (error) {
+        console.log("Failed to fetch preferences from storage. Returning potentially stale cache or defaults.", error);
+        // In case of error, return cached preferences if they exist, even if expired
+        // This provides a fallback for resilience, but cacheTimestamp is still updated.
+        if (_cachedPreferences) {
+            return _cachedPreferences;
+        }
+        // If no cache and error, getSettingsFromStorage handles returning defaults.
+        throw error; // Re-throw if getSettingsFromStorage propagates error
+    }
+}
+
 /**
  * @param level - The log level ('INFO', 'WARN', 'ERROR', 'DEBUG').
  * @param message - The log message.
  * @param context - Optional context object to store with the log.
  */
 async function addLog(level: LogEntry['level'], message: string, context ? : object): Promise < void > {
+    const preferences: Preferences = await _getPreferences();
+    if(preferences.enableLogging!==true){
+        return ;
+    }
+    
     const timestamp = new Date().toISOString();
     const logEntry: LogEntry = {
       context,
@@ -42,10 +91,7 @@ async function addLog(level: LogEntry['level'], message: string, context ? : obj
     }
 }
 
-/**
- * Retrieves all stored logs from chrome.storage.local.
- * @returns A promise that resolves with an array of log entries.
- */
+// Retrieves all stored logs from chrome.storage.local.
 async function getLogs(): Promise < LogEntry[] > {
     try {
         const result = await chrome.storage.local.get(LOG_STORAGE_KEY);
@@ -56,86 +102,25 @@ async function getLogs(): Promise < LogEntry[] > {
     }
 }
 
-/**
- * Clears all stored logs from chrome.storage.local.
- */
+// Clears all stored logs from chrome.storage.local.
 async function clearLogs(): Promise < void > {
     try {
+        const result1 = await chrome.storage.local.get(LOG_STORAGE_KEY);
+        console.log("Before clear logs ", result1)
         await chrome.storage.local.remove(LOG_STORAGE_KEY);
         console.log("Logs cleared from storage.");
+        const result = await chrome.storage.local.get(LOG_STORAGE_KEY);
+        console.log("AFTER clear logs ", result);
     } catch (error) {
         console.error("Error clearing logs from storage:", error);
     }
 }
 
-/**
- * Formats logs into a readable string and initiates a download.
- * @param filename - The desired filename for the downloaded log file (e.g., "extension_logs.txt").
- */
-async function downloadLogs(filename = 'extension_logs.txt'): Promise < void > {
-    try {
-        const logs = await getLogs();
-        if (logs.length === 0) {
-            console.warn("No logs to download.");
-            alert("No logs available to download!"); // Inform the user
-            return;
-        }
 
-        // Format logs into a plain text string
-        const formattedLogs = logs.map(log => {
-            let contextStr = '';
-            if (log.context && Object.keys(log.context).length > 0) {
-                try {
-                    contextStr = ` - Context: ${JSON.stringify(log.context)}`;
-                } catch (e) {
-                    contextStr = ` - Context: [Serialization Error]`;
-                }
-            }
-            return `${log.timestamp} [${log.level}] ${log.message}${contextStr}`;
-        }).join('\n');
-
-        const blob = new Blob([formattedLogs], {
-            type: 'text/plain'
-        });
-        const url = URL.createObjectURL(blob);
-
-        chrome.downloads.download({
-            filename: filename,
-            saveAs: true,
-            url: url,
-          }, (downloadId) => {
-            if (chrome.runtime.lastError) {
-                console.error("Download failed:", chrome.runtime.lastError.message);
-                alert("Failed to initiate log download. Please check console for details.");
-            } else {
-                console.log(`Download initiated with ID: ${downloadId}`);
-            }
-            URL.revokeObjectURL(url); // Clean up the object URL
-        });
-
-    } catch (error) {
-        console.error("Error preparing or initiating log download:", error);
-        alert("An error occurred while preparing logs for download.");
-    }
-}
-
-/**
- * Logger interface to define the public API.
- */
-interface LoggerAPI {
-    info(message: string, context ? : object): Promise < void > ;
-    warn(message: string, context ? : object): Promise < void > ;
-    error(message: string, context ? : object): Promise < void > ;
-    debug(message: string, context ? : object): Promise < void > ;
-    get(): Promise < LogEntry[] > ;
-    clear(): Promise < void > ;
-    download(filename ? : string): Promise < void > ;
-}
 
 export const Logger: LoggerAPI = {
     clear: clearLogs,
     debug: (message, context) => addLog('DEBUG', message, context),
-    download: downloadLogs,
     error: (message, context) => addLog('ERROR', message, context),
     get: getLogs,
     info: (message, context) => addLog('INFO', message, context),
@@ -143,9 +128,6 @@ export const Logger: LoggerAPI = {
 };
 
 // For environments where `Logger` needs to be globally accessible (e.g., background service worker)
-// In a typical modern TypeScript setup, you'd prefer to import `Logger` directly.
-// This global assignment is mostly for compatibility with direct script inclusion in manifest.json,
-// or if you're using a bundler that outputs to a single file.
 declare global {
     interface Window {
         Logger: LoggerAPI;
@@ -159,7 +141,7 @@ if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL('')
         // This is a service worker (Manifest V3 background script)
         self.Logger = Logger;
     } else if (typeof window !== 'undefined') {
-        // This is a traditional background page (Manifest V2) or other script context
+        // This is a traditional background page (Manifest V2) 
         window.Logger = Logger;
     }
 }

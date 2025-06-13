@@ -10,13 +10,11 @@ import {
 } from './background/services/state-service';
 import { cleanUpStatsIndexedDBTable, sendWebActivityAutomatically } from './background/services/stats';
 import { logMessage } from './background/tables/logs';
-import {
-    Logger
-} from './shared/utils/logger';
+import { Logger } from './shared/utils/logger';
+// import { CurrentClientVersion as EXTENSION_VERSION, IS_PRODUCTION_ENVIRONMENT } from './shared/api/constants';
 import { Tab } from './shared/browser-api.types';
 import { DebugTab } from './shared/db/types';
 import { WAKE_UP_BACKGROUND } from './shared/messages';
-
 import Port = chrome.runtime.Port;
 
 interface Service {
@@ -251,15 +249,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendMessage) => {
       handleAlarm().then(async (newState) => {
         await handleStateChange(newState, ts, debuggingTabs);
       });
+       return true; // Keep the message channel open
    }
-   if (message.action === "downloadLogs") {
-        const timestamp = new Date().toISOString().replace(/:/g, '-').replace(/\./g, '_');
-        Logger.download(`extension_logs_${timestamp}.txt`);
-        sendMessage({
-            success: true
-        }); // Respond to the sender
-        return true; // Keep the message channel open for async sendMessage
-    } 
     if (message.action === "clearLogs") {
         Logger.clear();
         sendMessage({
@@ -271,9 +262,12 @@ chrome.runtime.onMessage.addListener((message, _sender, sendMessage) => {
         Logger.get().then(logs => {
             sendMessage(logs); // Send the retrieved logs back
         });
-        return true; // Keep the message channel open
+        return true; 
     }
 });
+
+Logger.debug("===Background script started===");
+// Logger.debug(`Extension running in: ${IS_PRODUCTION_ENVIRONMENT ? 'Production' : 'Development'} mode.`);
 
 // This is a background script for a Google Chrome extension. It creates an alarm
 // that runs a function at a regular interval, listens for events such as tab
