@@ -1,6 +1,8 @@
+import { Logger } from "../../shared/utils/logger";
 export function throwRuntimeLastError() {
   const error = chrome.runtime.lastError;
   if (error?.message) {
+    Logger.error("erros:throwRuntimeLastError", error);
     throw new Error(error.message);
   }
 }

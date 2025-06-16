@@ -130,7 +130,7 @@ ChromeServiceDefinition.forEach((service) => {
         ? { periodInMinutes: service.intervalInMinutes }
         : {})
     });
-    console.log(`Created alarm:${service.name} delay: ${service.delayInMinutes}, period: ${service.intervalInMinutes}`)
+    //console.log(`Created alarm:${service.name} delay: ${service.delayInMinutes}, period: ${service.intervalInMinutes}`)
   })
 
 });
@@ -197,6 +197,7 @@ chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
   if (newState) {
     await handleStateChange(newState, ts, debuggingTabs).catch((e) => {
       logMessage('error handling tab activated: ' + e);
+      Logger.error('error handling tab activated: ' + tab.id, e)
     });
   }
 });

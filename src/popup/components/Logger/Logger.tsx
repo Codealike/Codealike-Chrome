@@ -96,7 +96,7 @@ export const Logger: React.FC = () => {
         });
         const url = URL.createObjectURL(blob); // This will now work in the popup context
 
-        const filename = `extension_logs_${new Date().toISOString().replace(/:/g, '-').replace(/\./g, '_')}.txt`;
+        const filename = `codealike_extension_logs_${new Date().toISOString().replace(/:/g, '-').replace(/\./g, '_')}.txt`;
 
         chrome.downloads.download({
             filename: filename,

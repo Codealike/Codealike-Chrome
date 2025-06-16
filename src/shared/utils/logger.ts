@@ -49,8 +49,8 @@ const CACHE_EXPIRATION_MS = 5 * 1000; // 5 seconds in milliseconds
             return _cachedPreferences;
         }
         // If no cache and error, getSettingsFromStorage handles returning defaults.
-        throw error; // Re-throw if getSettingsFromStorage propagates error
-    }
+         throw error; // Re-throw if getSettingsFromStorage propagates error
+    } 
 }
 
 /**
@@ -59,7 +59,7 @@ const CACHE_EXPIRATION_MS = 5 * 1000; // 5 seconds in milliseconds
  * @param context - Optional context object to store with the log.
  */
 async function addLog(level: LogEntry['level'], message: string, context ? : object): Promise < void > {
-    const preferences: Preferences = await _getPreferences();
+    const preferences: Preferences = await getSettings();
     if(preferences.enableLogging!==true){
         return ;
     }

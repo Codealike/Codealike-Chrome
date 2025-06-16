@@ -127,7 +127,7 @@ export const handleStateChange = async (
     isImpossiblyLongEvent ||
     isInvalidUrl(focusedActiveTab?.url)
   ) {
-    await commitTabActivity(await activeTimeline.get(), preferences);
+    await commitTabActivity(await activeTimeline.get(), preferences, focusedActiveTab?.id);
     return;
   }
 
@@ -135,7 +135,7 @@ export const handleStateChange = async (
     focusedActiveTab &&
     currentTimelineRecord?.url !== focusedActiveTab?.url
   ) {
-    await commitTabActivity(await activeTimeline.get(), preferences);
+    await commitTabActivity(await activeTimeline.get(), preferences, focusedActiveTab?.id);
     await createNewActiveRecord(
       timestamp,
       focusedActiveTab,
@@ -144,7 +144,7 @@ export const handleStateChange = async (
   }
 };
 
-async function commitTabActivity(currentTimelineRecord: TimelineRecord | null, preferences: Preferences) {
+async function commitTabActivity(currentTimelineRecord: TimelineRecord | null, preferences: Preferences, focusedTabId: number | undefined) {
   if (!currentTimelineRecord) {
     return;
   }
@@ -157,7 +157,7 @@ async function commitTabActivity(currentTimelineRecord: TimelineRecord | null, p
   const currentIsoDate = getIsoDate(new Date());
 
   const { hostname } = currentTimelineRecord;
-  const message = `Visited ${hostname} on ${currentIsoDate}`;
+  const message = `Visited ${hostname} on ${currentIsoDate} [tabID=${focusedTabId}]`;
   await logMessage(message);
   Logger.debug(message);
 
