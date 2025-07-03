@@ -1,5 +1,5 @@
 import { sendStats } from '../../shared/api/client';
-import { connect, TimeTrackerStoreTables } from '../../shared/db/idb';
+import { connect, disconnect, TimeTrackerStoreTables } from '../../shared/db/idb';
 import {
   ConnectionStatus,
   Preferences,
@@ -23,6 +23,7 @@ const fetchStatistics = async (): Promise<{
 };
 
 const clearStatistics = async (): Promise<void> => {
+  await disconnect(); // Ensure any existing connection is closed first
   const db = await connect();
   await db.clear(TimeTrackerStoreTables.Timeline);
 };
@@ -167,7 +168,7 @@ const sendWebActivity = async (
 const sendWebActivityAutomatically = async (): Promise<void> => {
   const preferences: Preferences = await getSettings();
   if (preferences.connectionStatus !== ConnectionStatus.Connected) {
-    await logMessage('unable to send stats when not connected');
+    // await logMessage('unable to send stats when not connected');
     Logger.warn('unable to send stats when not connected');
     return;
   }
@@ -175,19 +176,20 @@ const sendWebActivityAutomatically = async (): Promise<void> => {
   const { timeline } = await fetchStatistics();
 
   await sendWebActivity(preferences, timeline, async (response) => {
-    await logMessage(JSON.stringify(response));
+    // await logMessage(JSON.stringify(response));
     Logger.info(JSON.stringify(response));
   });
 };
 
 const deleteRecordsById = async (idsToDelete: string[]) => {
   try {
-
+    await disconnect(); // Ensure any existing connection is closed first
     const db = await connect();
     const transaction = db.transaction(
       TimeTrackerStoreTables.State,
       'readwrite',
     );
+    
     const store = transaction.objectStore(TimeTrackerStoreTables.State);
 
     for (const id of idsToDelete) {
@@ -195,7 +197,7 @@ const deleteRecordsById = async (idsToDelete: string[]) => {
     }
 
     await transaction.done;
-
+    Logger.debug("Stats deleted successfully.")
     return 'Stats deleted successfully.';
   } catch (error) {
     console.error('Error deleting IDB records:', error);
@@ -211,6 +213,7 @@ const cleanUpStatsIndexedDBTable = async () => {
   // console.log(
   //   `Records to Delete: ${JSON.stringify(keysToDelete, null, 2)}`,
   // );
+
 
   if (keysToDelete.length > 0) {
     return await deleteRecordsById(keysToDelete);

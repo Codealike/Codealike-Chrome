@@ -137,7 +137,7 @@ ChromeServiceDefinition.forEach((service) => {
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   const { name } = alarm;
-  await logMessage(name);
+  // await logMessage(name);
   Logger.info(name)
   for (let i = 0; i < ChromeServiceDefinition.length; i++) {
     const alarm: Service = ChromeServiceDefinition[i] as Service;
@@ -176,7 +176,7 @@ chrome.runtime.onConnect.addListener(function (devToolsPort: Port) {
 
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
   const ts = Date.now();
-  await logMessage('tab activated: ' + activeInfo.tabId);
+  // await logMessage('tab activated: ' + activeInfo.tabId);
   Logger.debug('tab activated: ' + activeInfo.tabId)
 
   const newState = await handleActiveTabStateChange(activeInfo);
@@ -190,7 +190,7 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
 
 chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
   const ts = Date.now();
-  await logMessage('tab updated: ' + tab.id);
+  // await logMessage('tab updated: ' + tab.id);
   Logger.debug('tab updated: ' + tab.id)
 
   const newState = await handleTabUpdate(tab as Tab);
@@ -205,7 +205,7 @@ chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
 // onFocusChanged does not work in Windows 7/8/10 when user alt-tabs or clicks away
 chrome.windows.onFocusChanged.addListener(async (windowId) => {
   const ts = Date.now();
-  await logMessage('window focus changed: ' + windowId);
+  // await logMessage('window focus changed: ' + windowId);
   Logger.debug('window focus changed: ' + windowId)
 
   const newState = await handleWindowFocusChange(windowId);
@@ -215,7 +215,7 @@ chrome.windows.onFocusChanged.addListener(async (windowId) => {
 });
 
 chrome.idle.onStateChanged.addListener(async (newIdleState) => {
-  await logMessage('idle state changed: ' + newIdleState);
+  // await logMessage('idle state changed: ' + newIdleState);
   Logger.debug('idle state changed: ' + newIdleState)
   const ts = Date.now();
 
