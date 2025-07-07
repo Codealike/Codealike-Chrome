@@ -8,7 +8,6 @@ import {
   WebActivityRecord,
 } from '../../shared/db/types';
 import { getSettings, setSettings } from '../../shared/preferences';
-import { logMessage } from '../tables/logs';
 import { DateTime } from 'luxon';
 
 const fetchStatistics = async (): Promise<{

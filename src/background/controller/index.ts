@@ -8,7 +8,6 @@ import {
 import { getSettings } from '../../shared/preferences';
 import { getIsoDate, getMinutesInMs } from '../../shared/utils/dates-helper';
 import { isInvalidUrl, isDomainAllowedByUser } from '../../shared/utils/url';
-import { logMessage } from '../tables/logs';
 import {
     Logger
 } from '../../shared/utils/logger';
