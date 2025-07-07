@@ -4,6 +4,7 @@ import { usePopupContext } from "../../hooks/PopupContext"
 import { Checkbox } from '../../../blocks/Input';
 import { Button, ButtonType } from "../../../blocks/Button";
 import { getSystemSummary, formatSystemSummary, SystemSummary } from '../../../shared/utils/systemInfo';
+import { getAllStates } from '../../../shared/db/sync-storage';
 
 // Define LogEntry interface (can be imported from a shared types file if you have one)
 interface LogEntry {
@@ -41,10 +42,9 @@ export const Logger: React.FC = () => {
         }
     };
 
-    // useEffect hook to run on component mount (equivalent to DOMContentLoaded)
     React.useEffect(() => {
-        fetchAndDisplayRecentLogs();
-    }, []); // Empty dependency array means it runs once on mount
+        fetchAndDisplayRecentLogs(); // Async function no need for await here.. 
+    }, []); 
 
     const handleEnableLogger = React.useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,7 +89,15 @@ export const Logger: React.FC = () => {
             }
             return `${log.timestamp} [${log.level}] ${log.message}${contextStr}`;
         }).join('\n');
-        const fullLogContent = systemInfoString + formattedLogs;
+
+        const stateDump = await getAllStates()
+        let formattedStateTable = ''
+        if(stateDump){
+            formattedStateTable = "\n\n======== State Data ========\n"
+            formattedStateTable += JSON.stringify(stateDump);
+        }
+
+        const fullLogContent = systemInfoString + formattedLogs + formattedStateTable;
 
         const blob = new Blob([fullLogContent], {
             type: 'text/plain'
@@ -117,11 +125,12 @@ export const Logger: React.FC = () => {
         if (confirm("Are you sure you want to clear all logs?")) {
             // Send a message to the background script to clear logs
             if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+                 setLogs([]); // clear log state 
                 await chrome.runtime.sendMessage({
                     action: "clearLogs"
                 });
                 alert("Logs cleared!");
-                fetchAndDisplayRecentLogs(); // Refresh log display
+               await fetchAndDisplayRecentLogs(); // Refresh log display
             }
         }
     };

@@ -46,6 +46,7 @@ let _db: IDBPDatabase<TimelineDatabase> | null = null;
 export const connect = async (): Promise<IDBPDatabase<TimelineDatabase>> => {
   if (_db) {
     // If a connection already exists, return it
+    //Logger.debug(`Already Opened IndexedDB: ${Database.TimeTrackerStore} (Version: ${DB_VERSION})`);
     return _db;
   }
 

@@ -8,7 +8,7 @@ import {
   handleTabUpdate,
   handleWindowFocusChange,
 } from './background/services/state-service';
-import { cleanUpStatsIndexedDBTable, sendWebActivityAutomatically } from './background/services/stats';
+import { sendWebActivityAutomatically } from './background/services/stats';
 import { logMessage } from './background/tables/logs';
 import { Logger } from './shared/utils/logger';
 // import { CurrentClientVersion as EXTENSION_VERSION, IS_PRODUCTION_ENVIRONMENT } from './shared/api/constants';
@@ -36,9 +36,6 @@ const ASYNC_STATS_INTERVAL_MINUTES = 1;
 const ASYNC_CLEAN_UP_LOGS_ALARM_NAME = 'cleanup-logs';
 const ASYNC_CLEAN_UP_LOGS_MINUTES = 1440; // Daily once
 const DEFAULT_LOG_CUTOFF_DAYS = 0; // Daily
-
-const ASYNC_CLEAN_UP_STATS_ALARM_NAME = 'cleanup-stats';
-const ASYNC_CLEAN_UP_STATS_MINUTES = 1440; // Daily once
 
 function findDebuggingTabIndexFromId(tabIdOrUrl: number | string | undefined) {
   if (tabIdOrUrl !== undefined) {
@@ -92,9 +89,6 @@ const cleanUpLogsAlarmHandler = async (): Promise<void> => {
   await cleanUpLogIndexedDBTable(DEFAULT_LOG_CUTOFF_DAYS);
 };
 
-const cleanUpStatsAlarmHandler = async (): Promise<void> => {
-  await cleanUpStatsIndexedDBTable();
-};
 
 const ChromeServiceDefinition: Array<Service> = [
   {
@@ -111,13 +105,7 @@ const ChromeServiceDefinition: Array<Service> = [
     handler: cleanUpLogsAlarmHandler,
     intervalInMinutes: ASYNC_CLEAN_UP_LOGS_MINUTES,
     name: ASYNC_CLEAN_UP_LOGS_ALARM_NAME,
-  },
-  {
-    delayInMinutes: 0.1,
-    handler: cleanUpStatsAlarmHandler,
-    intervalInMinutes: ASYNC_CLEAN_UP_STATS_MINUTES,
-    name: ASYNC_CLEAN_UP_STATS_ALARM_NAME,
-  },
+  }
 ];
 
 ChromeServiceDefinition.forEach((service) => {

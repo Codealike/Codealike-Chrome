@@ -108,6 +108,9 @@ async function clearLogs(): Promise < void > {
         const result1 = await chrome.storage.local.get(LOG_STORAGE_KEY);
         console.log("Before clear logs ", result1)
         await chrome.storage.local.remove(LOG_STORAGE_KEY);
+        await chrome.storage.local.set({
+            [LOG_STORAGE_KEY]: []
+        });
         console.log("Logs cleared from storage.");
         const result = await chrome.storage.local.get(LOG_STORAGE_KEY);
         console.log("AFTER clear logs ", result);

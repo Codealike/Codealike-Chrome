@@ -1,10 +1,13 @@
 import { getIsoDate } from '../utils/dates-helper';
 import { mergeTimeStore } from '../utils/merge-time-store';
+import { IDBPDatabase} from 'idb';
 import {
   connect,
   TimeTrackerStoreStateTableKeys,
   TimeTrackerStoreTables,
+  TimelineDatabase
 } from './idb';
+
 import { TimeStore } from './types';
 
 const getDbCache = async (): Promise<TimeStore> => {
@@ -13,9 +16,65 @@ const getDbCache = async (): Promise<TimeStore> => {
     TimeTrackerStoreTables.State,
     TimeTrackerStoreStateTableKeys.OverallState,
   );
-
   return (store || {}) as TimeStore;
 };
+
+// const getDbStateTbl = async (key:string): Promise<string[]> => {
+//   const db = await connect();
+//   const store = await db.get(
+//     TimeTrackerStoreTables.State,
+//     TimeTrackerStoreStateTableKeys[key],
+//   );
+//   return (store || []);
+// };
+
+export const getAllStates = async () => {
+  const db = await connect();
+  return await getAllRecordsWithKeysUsingGetAll(db, TimeTrackerStoreTables.State)
+};
+
+
+interface RecordWithKey<T> {
+  key: IDBValidKey;
+  value: T;
+}
+
+const getAllRecordsWithKeysUsingGetAll = async(
+  db: IDBPDatabase<TimelineDatabase>,
+  storeName: TimeTrackerStoreTables
+): Promise<RecordWithKey<TimelineDatabase[TimeTrackerStoreTables]['value']>[]> => {
+
+  const transaction = db.transaction(storeName, "readonly");
+  const store = transaction.objectStore(storeName);
+
+  // Fetch keys and values concurrently within the same transaction
+  const [keys, values] = await Promise.all([
+    store.getAllKeys(),
+    store.getAll()
+  ]);
+
+  // Ensure keys and values arrays have the same length 
+  if (keys.length !== values.length) {
+    console.error(`Data inconsistency: Keys (${keys.length}) and Values (${values.length}) count mismatch for store '${storeName}'.`);
+    Logger?.error(`Data inconsistency in store '${storeName}'.`); 
+    return []; // Return empty or throw, depending on desired error handling
+  }
+
+  // Combine keys and values. The type of 'value' is inferred correctly from TimelineDatabase[StoreName]['value'].
+  // const combined: RecordWithKey<TimelineDatabase[TimeTrackerStoreTables]['value']>[] = keys.map((key, index) => ({
+  const combined: any[] = keys.map((key, index) => ({
+    key: key,
+    value: values[index], // values[index] will correctly be of type TimelineDatabase[StoreName]['value']
+  }));
+
+  // Wait for the transaction to complete
+  await transaction.done;
+
+  return combined;
+};
+
+
+
 const setDbCache = async (store: TimeStore) => {
   const db = await connect();
   await db.put(
