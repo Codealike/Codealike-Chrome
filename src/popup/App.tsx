@@ -19,7 +19,7 @@ const PAGES_VALUES = Object.values(Pages);
 
 export const PopupApp: React.FC = () => {
   const [activePage, setPage] = React.useState({
-    params: {} as Record<string, any>,
+    params: {} as Record<string, string>,
     tab: Pages.Overview,
   });
 

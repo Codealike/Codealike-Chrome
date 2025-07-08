@@ -1,5 +1,3 @@
-// Interface for the collected system information.
- 
 export interface SystemSummary {
     availableMemoryGB: string;
     chromeVersion: string;
@@ -17,121 +15,136 @@ export interface SystemSummary {
 }
 
 /**
- * Extracts OS type and a basic version from navigator.platform/appVersion fallback.
- * This is used when userAgentData is not available or fails.
+ * Fallback to get OS info from userAgent string parsing.
+ * Handles Windows, macOS, Linux.
  */
 function getOsInfoFromLegacyNavigator(): Partial<SystemSummary> {
-    const osInfo: Partial<SystemSummary> = { // Initialize all expected properties with defaults
-        cpuArchitecture: 'N/A',
-        osType: 'N/A',
-        osVersion: 'N/A',
+    const osInfo: Partial<SystemSummary> = {
+        cpuArchitecture: "N/A",
+        osType: "N/A",
+        osVersion: "N/A",
     };
-    const platform = navigator.platform || 'N/A';
 
-    if (platform.toLowerCase().includes('win')) {
-        osInfo.osType = 'Windows';
-        osInfo.osVersion = navigator.appVersion.match(/Windows NT ([\d.]+)/)?.[1] || 'N/A';
-    } else if (platform.toLowerCase().includes('mac')) {
-        osInfo.osType = 'macOS';
-        osInfo.osVersion = navigator.appVersion.match(/Mac OS X ([\d_.]+)/)?.[1]?.replace(/_/g, '.') || 'N/A';
-    } else if (platform.toLowerCase().includes('linux')) {
-        osInfo.osType = 'Linux';
+    const userAgent = navigator.userAgent || "";
+    const platform = navigator.platform || "";
+
+    if (/Windows NT (\d+\.\d+)/.test(userAgent)) {
+        osInfo.osType = "Windows";
+        osInfo.osVersion = userAgent.match(/Windows NT (\d+\.\d+)/)?.[1] ?? "N/A";
+    } else if (/Mac OS X (\d+(?:[_.]\d+)+)/.test(userAgent)) {
+        osInfo.osType = "macOS";
+        osInfo.osVersion =
+            userAgent.match(/Mac OS X (\d+(?:[_.]\d+)+)/)?.[1]?.replace(/_/g, ".") ?? "N/A";
+    } else if (/Linux/.test(platform) || /Linux/.test(userAgent)) {
+        osInfo.osType = "Linux";
+        osInfo.osVersion = "N/A";
+    } else {
+        osInfo.osType = platform || "Unknown";
     }
+
+    osInfo.cpuArchitecture = "N/A"; // No reliable fallback for architecture here
+
     return osInfo;
 }
 
-/**
- * Collects OS type, version, and architecture using navigator APIs.
- * This function handles the primary logic, delegating fallback to a smaller function.
- * @returns An object containing OS info. All properties guaranteed to be string, not undefined.
- */
+interface UserAgentData {
+    getHighEntropyValues(
+        hints: string[]
+    ): Promise<{ platformVersion?: string; architecture?: string; platform?: string }>;
+    platform?: string;
+    brands?: Array<{ brand: string; version: string }>;
+}
+
+interface NavigatorWithUAData extends Navigator {
+    userAgentData?: UserAgentData;
+}
+
 async function getOsInfo(): Promise<Partial<SystemSummary>> {
-    // Assert navigator to 'any' or a custom type that includes userAgentData
-    const nav: any = navigator;
+    const nav = navigator as NavigatorWithUAData;
 
     if (nav.userAgentData) {
         try {
-            const uaData = await nav.userAgentData.getHighEntropyValues(["platformVersion", "architecture"]);
+            const uaData = await nav.userAgentData.getHighEntropyValues([
+                "platformVersion",
+                "architecture",
+                "platform",
+            ]);
             return {
-                cpuArchitecture: uaData.architecture || 'N/A',
-                osType: uaData.platform || 'N/A',
-                osVersion: uaData.platformVersion || 'N/A',
+                cpuArchitecture: uaData.architecture ?? "N/A",
+                osType: uaData.platform ?? "N/A",
+                osVersion: uaData.platformVersion ?? "N/A",
             };
         } catch (e) {
             console.warn("Failed to get high-entropy user agent data, falling back:", e);
-            return getOsInfoFromLegacyNavigator(); // This now returns guaranteed strings
+            return getOsInfoFromLegacyNavigator();
         }
     } else {
-        return getOsInfoFromLegacyNavigator(); // This now returns guaranteed strings
+        return getOsInfoFromLegacyNavigator();
     }
 }
 
-/**
- * Collects CPU information using chrome.system.cpu API.
- * @returns An object containing CPU info. All properties guaranteed to be string/number, not undefined.
- */
 async function getCpuDetails(): Promise<Partial<SystemSummary>> {
-    const cpuDetails: Partial<SystemSummary> = { // Initialize all expected properties with defaults
-        cpuArchitecture: 'N/A',
+    const cpuDetails: Partial<SystemSummary> = {
+        cpuArchitecture: "N/A",
         cpuCores: 0,
-        cpuType: 'N/A',
+        cpuType: "N/A",
     };
     try {
-        const cpuInfo = await chrome.system.cpu.getInfo();
-        cpuDetails.cpuArchitecture = cpuInfo.archName || 'N/A';
-        cpuDetails.cpuCores = cpuInfo.numOfProcessors || 0;
-        cpuDetails.cpuType = cpuInfo.modelName || 'N/A';
+        if (chrome?.system?.cpu?.getInfo) {
+            const cpuInfo = await chrome.system.cpu.getInfo();
+            cpuDetails.cpuArchitecture = cpuInfo.archName || "N/A";
+            cpuDetails.cpuCores = cpuInfo.numOfProcessors || 0;
+            cpuDetails.cpuType = cpuInfo.modelName || "N/A";
+        }
     } catch (e) {
         console.warn("Could not get CPU info:", e);
     }
     return cpuDetails;
 }
 
-/**
- * Collects Memory information using chrome.system.memory API.
- * @returns An object containing Memory info (total, available, and calculated used). All properties guaranteed to be string, not undefined.
- */
 async function getMemoryDetails(): Promise<Partial<SystemSummary>> {
-    const memDetails: Partial<SystemSummary> = { // Initialize all expected properties with defaults
-        availableMemoryGB: 'N/A',
-        totalMemoryGB: 'N/A',
-        usedMemoryGB: 'N/A',
+    const memDetails: Partial<SystemSummary> = {
+        availableMemoryGB: "N/A",
+        totalMemoryGB: "N/A",
+        usedMemoryGB: "N/A",
     };
     try {
-        const memoryInfo = await chrome.system.memory.getInfo();
-        const totalGB = (memoryInfo.capacity / (1024 * 1024 * 1024)).toFixed(2);
-        const availableGB = (memoryInfo.availableCapacity / (1024 * 1024 * 1024)).toFixed(2);
+        if (chrome?.system?.memory?.getInfo) {
+            const memoryInfo = await chrome.system.memory.getInfo();
+            const totalGB = (memoryInfo.capacity / (1024 ** 3)).toFixed(2);
+            const availableGB = (memoryInfo.availableCapacity / (1024 ** 3)).toFixed(2);
 
-        memDetails.availableMemoryGB = `${availableGB} GB`;
-        memDetails.totalMemoryGB = `${totalGB} GB`;
+            memDetails.availableMemoryGB = `${availableGB} GB`;
+            memDetails.totalMemoryGB = `${totalGB} GB`;
 
-        const total = parseFloat(totalGB);
-        const available = parseFloat(availableGB);
-        if (!isNaN(total) && !isNaN(available)) {
-            memDetails.usedMemoryGB = (total - available).toFixed(2) + ' GB';
-        } else {
-            memDetails.usedMemoryGB = 'N/A'; // Explicitly set to 'N/A' if calculation fails
+            const total = parseFloat(totalGB);
+            const available = parseFloat(availableGB);
+            memDetails.usedMemoryGB = !isNaN(total) && !isNaN(available)
+                ? `${(total - available).toFixed(2)} GB`
+                : "N/A";
         }
-
     } catch (e) {
         console.warn("Could not get Memory info:", e);
     }
     return memDetails;
 }
 
-// Collects basic browser/extension information.
-
 function getBaseBrowserInfo(): Partial<SystemSummary> {
     return {
-        chromeVersion: navigator.appVersion.match(/Chrome\/(.*?)\s/)?.[1] || 'N/A',
-        extensionVersion: chrome.runtime.getManifest().version || 'N/A', // Add N/A fallback for manifest version as well for robustness
-        language: navigator.language || 'N/A',
+        chromeVersion: navigator.userAgent.match(/Chrome\/(\d+\.\d+\.\d+\.\d+)/)?.[1] || "N/A",
+        extensionVersion: chrome.runtime.getManifest()?.version || "N/A",
+        language: navigator.language || "N/A",
         timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent || 'N/A',
+        userAgent: navigator.userAgent || "N/A",
     };
 }
 
-
+function getOrDefault<T>(...values: (T | undefined)[]): T {
+    for (const v of values) {
+        if (v !== undefined && v !== null) return v;
+    }
+    throw new Error("No value provided.");
+}
 
 function finalizeSystemSummary(
     baseInfo: Partial<SystemSummary>,
@@ -139,44 +152,34 @@ function finalizeSystemSummary(
     cpuDetails: Partial<SystemSummary>,
     memoryDetails: Partial<SystemSummary>
 ): SystemSummary {
-
     return {
-        availableMemoryGB: memoryDetails.availableMemoryGB as string,
-        chromeVersion: baseInfo.chromeVersion as string,
-        //cpuArchitecture: Prioritize userAgentData.architecture if available, else cpuInfo.archName
-        cpuArchitecture: (osInfo.cpuArchitecture || cpuDetails.cpuArchitecture) as string,
-        cpuCores: cpuDetails.cpuCores as number,
-        cpuType: cpuDetails.cpuType as string,
-        extensionVersion: baseInfo.extensionVersion as string,
-        language: baseInfo.language as string,
-        osType: osInfo.osType as string,
-        osVersion: osInfo.osVersion as string,
-        timestamp: baseInfo.timestamp as string,
-        totalMemoryGB: memoryDetails.totalMemoryGB as string,
-        usedMemoryGB: memoryDetails.usedMemoryGB as string,
-        userAgent: baseInfo.userAgent as string,
+        availableMemoryGB: getOrDefault(memoryDetails.availableMemoryGB, "N/A"),
+        chromeVersion: getOrDefault(baseInfo.chromeVersion, "N/A"),
+        cpuArchitecture: getOrDefault(osInfo.cpuArchitecture, cpuDetails.cpuArchitecture, "N/A"),
+        cpuCores: getOrDefault(cpuDetails.cpuCores, 0),
+        cpuType: getOrDefault(cpuDetails.cpuType, "N/A"),
+        extensionVersion: getOrDefault(baseInfo.extensionVersion, "N/A"),
+        language: getOrDefault(baseInfo.language, "N/A"),
+        osType: getOrDefault(osInfo.osType, "N/A"),
+        osVersion: getOrDefault(osInfo.osVersion, "N/A"),
+        timestamp: getOrDefault(baseInfo.timestamp, new Date().toISOString()),
+        totalMemoryGB: getOrDefault(memoryDetails.totalMemoryGB, "N/A"),
+        usedMemoryGB: getOrDefault(memoryDetails.usedMemoryGB, "N/A"),
+        userAgent: getOrDefault(baseInfo.userAgent, "N/A"),
     };
 }
 
-
-// Collects various system and browser information.
 export async function getSystemSummary(): Promise<SystemSummary> {
-    const [
-        baseSummary,
-        osInfo,
-        cpuDetails,
-        memoryDetails
-    ] = await Promise.all([
-        getBaseBrowserInfo(),
+    const [baseSummary, osInfo, cpuDetails, memoryDetails] = await Promise.all([
+        Promise.resolve(getBaseBrowserInfo()), // already synchronous
         getOsInfo(),
         getCpuDetails(),
-        getMemoryDetails()
+        getMemoryDetails(),
     ]);
 
     return finalizeSystemSummary(baseSummary, osInfo, cpuDetails, memoryDetails);
 }
 
-// Formats the SystemSummary object into a human-readable string.
 export function formatSystemSummary(summary: SystemSummary): string {
     return `--- System Information ---
 Available Memory: ${summary.availableMemoryGB}
@@ -184,7 +187,7 @@ Chrome Version: ${summary.chromeVersion}
 CPU Architecture: ${summary.cpuArchitecture}
 CPU Cores: ${summary.cpuCores}
 CPU Type: ${summary.cpuType}
-Codealike Extension Version: ${summary.extensionVersion}
+Extension Version: ${summary.extensionVersion}
 Language: ${summary.language}
 OS Type: ${summary.osType}
 OS Version: ${summary.osVersion}

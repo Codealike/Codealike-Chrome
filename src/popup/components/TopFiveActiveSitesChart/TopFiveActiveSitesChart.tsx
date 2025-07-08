@@ -6,6 +6,7 @@ import { useIsDarkMode } from '../../hooks/useTheme';
 import { DailyUsageChartProps } from './types';
 import * as React from 'react';
 import { Doughnut } from 'react-chartjs-2';
+import { TooltipItem } from 'chart.js';
 
 const DOUGHNUT_CHART_OPTIONS = {
   plugins: {
@@ -17,11 +18,11 @@ const DOUGHNUT_CHART_OPTIONS = {
     },
     tooltip: {
       callbacks: {
-        label: (item: any) => {
+        label: (item: TooltipItem<'line'> ) => {
           return ` ${item.formattedValue}%`;
         },
-        title: ([item]: any) => {
-          return `${item?.label}`;
+        title:(items: TooltipItem<'line'>[]) => {
+           return `${items[0]?.label}`;
         },
       },
     },

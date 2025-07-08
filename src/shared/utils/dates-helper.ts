@@ -45,36 +45,36 @@ export const getTimeWithoutSeconds = (number: number) => {
     .join(' ');
 };
 
-export const get7DaysPriorDate = <
-  T extends (date: Date) => any = (date: Date) => Date
->(
+export const get7DaysPriorDate = (
   date: Date,
-  map?: T
-): ReturnType<T>[] => {
-  const defaultMap = (date: Date) => new Date(date);
-  const weekEndDate = new Date(date);
+  map?: (date: Date) => Date
+): Date[] => {
+  const defaultMap = (d: Date) => new Date(d);
+  const results: Date[] = [];
 
-  return new Array(7).fill(0).map((_, index) => {
-    weekEndDate.setDate(weekEndDate.getDate() - Number(index > 0));
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(date);
+    d.setDate(d.getDate() - i);
+    results.push((map ?? defaultMap)(d));
+  }
 
-    return map?.(weekEndDate) ?? defaultMap(weekEndDate);
-  });
+  return results;
 };
 
-export const get30DaysPriorDate = <
-  T extends (date: Date) => any = (date: Date) => Date
->(
+export const get30DaysPriorDate = (
   date: Date,
-  map?: T
-): ReturnType<T>[] => {
-  const defaultMap = (date: Date) => new Date(date);
-  const monthEndDate = new Date(date);
+  map?: (date: Date) => Date
+): Date[] => {
+  const defaultMap = (d: Date) => new Date(d);
+  const results: Date[] = [];
 
-  return new Array(30).fill(0).map((_, index) => {
-    monthEndDate.setDate(monthEndDate.getDate() - Number(index > 0));
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(date);
+    d.setDate(d.getDate() - i);
+    results.push((map ?? defaultMap)(d));
+  }
 
-    return map?.(monthEndDate) ?? defaultMap(monthEndDate);
-  });
+  return results;
 };
 
 export const getDatesWeekSundayDate = (date: Date = new Date()) => {
@@ -96,23 +96,4 @@ export const presentHoursOrMinutesFromMinutes = (minutes: number) => {
   }
 
   return `${hoursRounded - 0.5}h`;
-};
-
-export const formatEpoch = (timestamp: number) => {
-  // Check if timestamp is in seconds and convert to milliseconds if needed
-  const isInSeconds = timestamp < 1e12;
-  const date = new Date(isInSeconds ? timestamp * 1000 : timestamp);
-
-  // Format: YYYY-MM-DD HH:mm:ss
-  const formatted = date.toLocaleString('en-US', {
-    day: '2-digit',
-    hour: '2-digit',
-    hour12: true,
-    minute: '2-digit',
-    month: '2-digit',
-    second: '2-digit',
-    year: 'numeric',
-  });
-
-  return formatted;
 };

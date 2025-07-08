@@ -12,6 +12,7 @@ import { getTotalDailyActivity } from '../../selectors/get-total-daily-activity'
 import { WeeklyWebsiteActivityChartProps } from './types';
 import * as React from 'react';
 import { Bar } from 'react-chartjs-2';
+import { TooltipItem } from 'chart.js';
 
 const HOUR_IN_MS = getHoursInMs(1);
 
@@ -22,13 +23,13 @@ const BAR_OPTIONS = {
     },
     tooltip: {
       callbacks: {
-        label: (item: any) => {
+        label: (item: TooltipItem<'line'> ) => {
           return (
             ' ' + getTimeFromMs(Number(item.formattedValue || 0) * HOUR_IN_MS)
           );
         },
-        title: ([item]: any) => {
-          return `${item?.label}`;
+        title:(items: TooltipItem<'line'>[]) => {
+          return `${items[0]?.label}`;
         },
       },
     },

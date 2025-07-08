@@ -4,7 +4,7 @@ import { usePopupContext } from "../../hooks/PopupContext"
 import { Checkbox } from '../../../blocks/Input';
 import { Button, ButtonType } from "../../../blocks/Button";
 import { getSystemSummary, formatSystemSummary, SystemSummary } from '../../../shared/utils/systemInfo';
-import { getAllStates } from '../../../shared/db/sync-storage';
+
 
 // Define LogEntry interface (can be imported from a shared types file if you have one)
 interface LogEntry {
@@ -90,14 +90,9 @@ export const Logger: React.FC = () => {
             return `${log.timestamp} [${log.level}] ${log.message}${contextStr}`;
         }).join('\n');
 
-        const stateDump = await getAllStates()
-        let formattedStateTable = ''
-        if(stateDump){
-            formattedStateTable = "\n\n======== State Data ========\n"
-            formattedStateTable += JSON.stringify(stateDump);
-        }
 
-        const fullLogContent = systemInfoString + formattedLogs + formattedStateTable;
+
+        const fullLogContent = systemInfoString + formattedLogs;
 
         const blob = new Blob([fullLogContent], {
             type: 'text/plain'
