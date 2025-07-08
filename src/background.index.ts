@@ -1,6 +1,5 @@
 import { getTabInfo } from './background/browser-api/tabs';
 import { handleStateChange } from './background/controller';
-import { cleanUpLogIndexedDBTable } from './background/services/logs';
 import {
   handleActiveTabStateChange,
   handleAlarm,
@@ -32,10 +31,6 @@ const ASYNC_POLL_INTERVAL_MINUTES = 1;
 
 const ASYNC_STATS_INTERVAL_ALARM_NAME = 'send-stats';
 const ASYNC_STATS_INTERVAL_MINUTES = 1;
-
-const ASYNC_CLEAN_UP_LOGS_ALARM_NAME = 'cleanup-logs';
-const ASYNC_CLEAN_UP_LOGS_MINUTES = 1440; // Daily once
-const DEFAULT_LOG_CUTOFF_DAYS = 0; // Daily
 
 function findDebuggingTabIndexFromId(tabIdOrUrl: number | string | undefined) {
   if (tabIdOrUrl !== undefined) {
@@ -85,11 +80,6 @@ const asyncPollAlarmHandler = async (): Promise<void> => {
 const sendStatsAlarmHandler = async (): Promise<void> =>
   await sendWebActivityAutomatically();
 
-const cleanUpLogsAlarmHandler = async (): Promise<void> => {
-  await cleanUpLogIndexedDBTable(DEFAULT_LOG_CUTOFF_DAYS);
-};
-
-
 const ChromeServiceDefinition: Array<Service> = [
   {
     handler: asyncPollAlarmHandler,
@@ -100,11 +90,6 @@ const ChromeServiceDefinition: Array<Service> = [
     handler: sendStatsAlarmHandler,
     intervalInMinutes: ASYNC_STATS_INTERVAL_MINUTES,
     name: ASYNC_STATS_INTERVAL_ALARM_NAME,
-  },
-  {
-    handler: cleanUpLogsAlarmHandler,
-    intervalInMinutes: ASYNC_CLEAN_UP_LOGS_MINUTES,
-    name: ASYNC_CLEAN_UP_LOGS_ALARM_NAME,
   }
 ];
 
@@ -165,7 +150,7 @@ chrome.runtime.onConnect.addListener(function (devToolsPort: Port) {
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
   const ts = Date.now();
   // await logMessage('tab activated: ' + activeInfo.tabId);
-  Logger.debug('tab activated: ' + activeInfo.tabId)
+  Logger.debug('Background::chrome.tabs.onActivated: ' + activeInfo.tabId)
 
   const newState = await handleActiveTabStateChange(activeInfo);
   if (newState) {
@@ -179,7 +164,7 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
 chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
   const ts = Date.now();
   // await logMessage('tab updated: ' + tab.id);
-  Logger.debug('tab updated: ' + tab.id)
+  Logger.debug('Background::chrome.tabs.onUpdated: ' + tab.id)
 
   const newState = await handleTabUpdate(tab as Tab);
   if (newState) {
@@ -194,7 +179,7 @@ chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
 chrome.windows.onFocusChanged.addListener(async (windowId) => {
   const ts = Date.now();
   // await logMessage('window focus changed: ' + windowId);
-  Logger.debug('window focus changed: ' + windowId)
+  Logger.debug('Background::chrome.windows.onFocusChange: ' + windowId)
 
   const newState = await handleWindowFocusChange(windowId);
   if (newState) {
@@ -204,7 +189,7 @@ chrome.windows.onFocusChanged.addListener(async (windowId) => {
 
 chrome.idle.onStateChanged.addListener(async (newIdleState) => {
   // await logMessage('idle state changed: ' + newIdleState);
-  Logger.debug('idle state changed: ' + newIdleState)
+  Logger.debug('Background::chrome.idle: ' + newIdleState)
   const ts = Date.now();
 
   const newTabState = await handleIdleStateChange(newIdleState);
@@ -214,7 +199,7 @@ chrome.idle.onStateChanged.addListener(async (newIdleState) => {
 
 chrome.webNavigation.onCompleted.addListener(async (details) => {
   await logMessage('web navigation: ' + details.tabId);
-  Logger.debug('web navigation: ' + details.tabId)
+  Logger.debug('Background::chrome.webNavigation: ' + details.tabId)
   const ts = Date.now();
 
   const tab = await getTabInfo(details.tabId);

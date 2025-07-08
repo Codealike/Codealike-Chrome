@@ -8,7 +8,7 @@ import {
   TimelineDatabase
 } from './idb';
 
-import { TimeStore } from './types';
+import { TimeStore, RecordWithKey } from './types';
 
 const getDbCache = async (): Promise<TimeStore> => {
   const db = await connect();
@@ -19,25 +19,10 @@ const getDbCache = async (): Promise<TimeStore> => {
   return (store || {}) as TimeStore;
 };
 
-// const getDbStateTbl = async (key:string): Promise<string[]> => {
-//   const db = await connect();
-//   const store = await db.get(
-//     TimeTrackerStoreTables.State,
-//     TimeTrackerStoreStateTableKeys[key],
-//   );
-//   return (store || []);
-// };
-
 export const getAllStates = async () => {
   const db = await connect();
   return await getAllRecordsWithKeysUsingGetAll(db, TimeTrackerStoreTables.State)
 };
-
-
-interface RecordWithKey<T> {
-  key: IDBValidKey;
-  value: T;
-}
 
 const getAllRecordsWithKeysUsingGetAll = async(
   db: IDBPDatabase<TimelineDatabase>,
@@ -72,8 +57,6 @@ const getAllRecordsWithKeysUsingGetAll = async(
 
   return combined;
 };
-
-
 
 const setDbCache = async (store: TimeStore) => {
   const db = await connect();
@@ -120,7 +103,7 @@ export const setTotalDailyHostTime = async ({
   const dayActivity = (store[day] ??= {}) as Record<string, number>;;
   dayActivity[host] = (dayActivity[host] ?? 0) + duration; // duration addition from timeline
 
-  Logger.debug(`setTotalDailyHostTime: Host ${host}, Duration ${duration}`);
+  Logger.debug(`DB/syncStroage::setTotalDailyHostTime: Host ${host}, Duration ${duration}`);
   
   return setTotalActivity(store);
 };

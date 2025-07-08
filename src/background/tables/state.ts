@@ -13,7 +13,7 @@ export async function setActiveTabRecord(val: TimelineRecord | null) {
     val,
     TimeTrackerStoreStateTableKeys.ActiveTab,
   );
-}
+  }
 
 export async function getActiveTabRecord() {
   const db = await connect();

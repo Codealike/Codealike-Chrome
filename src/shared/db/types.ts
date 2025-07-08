@@ -92,3 +92,8 @@ export interface ProfileResponse {
   AvatarUri: string
   Email: string
 }
+
+export interface RecordWithKey<T> {
+  key: IDBValidKey;
+  value: T;
+}

@@ -50,7 +50,7 @@ export const connect = async (): Promise<IDBPDatabase<TimelineDatabase>> => {
     return _db;
   }
 
-  Logger.debug(`Opening IndexedDB: ${Database.TimeTrackerStore} (Version: ${DB_VERSION})`);
+  // Logger.debug(`DB::connect : Opening IndexedDB:`);
   _db = await openDB<TimelineDatabase>(Database.TimeTrackerStore, DB_VERSION, {
     upgrade(db, oldVersion, newVersion, transaction) {
       if (oldVersion < 1) {
@@ -106,8 +106,8 @@ export const disconnect = async (): Promise<void> => {
   if (_db) {
     _db.close();
     _db = null;
-    Logger.info("IndexedDB connection disconnected.");
+    // Logger.info("IndexedDB connection disconnected.");
   } else {
-    Logger.debug("No active IndexedDB connection to disconnect.");
+    // Logger.debug("DB::No active IndexedDB connection to disconnect.");
   }
 };

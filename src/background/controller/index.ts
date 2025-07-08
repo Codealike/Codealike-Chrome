@@ -158,7 +158,7 @@ async function commitTabActivity(currentTimelineRecord: TimelineRecord | null, p
   const { hostname } = currentTimelineRecord;
   const message = `Visited ${hostname} on ${currentIsoDate} [tabID=${focusedTabId}]`;
   // await logMessage(message);
-  Logger.debug(message);
+  Logger.debug(`Background/controller::commitTabActivity : ${message}`);
 
   await saveTimelineRecord(currentTimelineRecord, currentIsoDate);
 

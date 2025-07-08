@@ -34,7 +34,7 @@ function tryWakeUpBackground() {
         isCouldNotEstablishConnectionError,
         isBackForwardCacheError
       )(error);
-      Logger.debug("SleepCounterMeasure:tryWakeUpBackground => ignore Error " + error)
+      Logger.debug("Content/SleepCounterMeasure::tryWakeUpBackground => ignore Error " + error)
     }
 }
 
@@ -71,7 +71,7 @@ function connectToExtension() {
         isCouldNotEstablishConnectionError,
         isBackForwardCacheError
       )(error);
-      Logger.debug("SleepCounterMeasure:connectToExtension => ignore Error " + error)
+      Logger.debug("Content/SleepCounterMeasure::connectToExtension => ignore Error " + error)
     }
 }
 
@@ -92,7 +92,7 @@ export const runManifestV3SleepCounterMeasures = () => {
 // when the page is restored from the back/forward cache
 window.addEventListener('pageshow', (event) => {
   if (event.persisted && !backgroundPort) {
-    console.log("Page restored from cache, attempting immediate reconnection.");
+    Logger.debug("Content/SleepCounterMeasure::pageshow: Page restored from cache, attempting immediate reconnection.")
     connectToExtension();
   }
 });
