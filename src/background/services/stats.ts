@@ -25,6 +25,7 @@ const clearStatistics = async (): Promise<void> => {
   await disconnect(); // Ensure any existing connection is closed first
   const db = await connect();
   await db.clear(TimeTrackerStoreTables.Timeline);
+  await db.clear(TimeTrackerStoreTables.State);
 };
 
 const emitSuccessSyncStats = async (
@@ -175,8 +176,7 @@ const sendWebActivityAutomatically = async (): Promise<void> => {
   const { timeline } = await fetchStatistics();
 
   await sendWebActivity(preferences, timeline, async (response) => {
-    // await logMessage(JSON.stringify(response));
-    Logger.info(JSON.stringify(response));
+    Logger.info(`Background/services::stats:sendWebActivityAutomatically`,response);
   });
 };
 
