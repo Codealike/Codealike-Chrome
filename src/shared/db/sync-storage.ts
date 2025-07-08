@@ -102,7 +102,7 @@ export const getTotalActivity = async (): Promise<TimeStore> => {
 export const getCurrentHostTime = async (host: string): Promise<number> => {
   const store = await getTotalActivity();
   const currentDate = getIsoDate(new Date());
-
+  
   return (store[currentDate] as any)?.[host] ?? 0;
 };
 
@@ -117,8 +117,10 @@ export const setTotalDailyHostTime = async ({
 }) => {
   const store = await getTotalActivity();
 
-  const dayActivity = (store[day] ??= {});
-  dayActivity[host] = duration;
+  const dayActivity = (store[day] ??= {}) as Record<string, number>;;
+  dayActivity[host] = (dayActivity[host] ?? 0) + duration; // duration addition from timeline
 
+  Logger.debug(`setTotalDailyHostTime: Host ${host}, Duration ${duration}`);
+  
   return setTotalActivity(store);
 };

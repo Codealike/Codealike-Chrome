@@ -98,7 +98,7 @@ export const UserTokenSetting: React.FC = () => {
           <label className="flex flex-col gap-1 w-full">
             <Input
               placeholder="e.g. user token"
-              value={userToken}
+              value={userToken ?? ''}
               onChange={handleUserToken}
             />
           </label>
