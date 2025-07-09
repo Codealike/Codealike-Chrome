@@ -9,6 +9,8 @@ import { getMinutesInMs } from '../shared/utils/dates-helper';
 import { ignore } from '../shared/utils/errors';
 import { Logger } from '../shared/utils/logger';
 
+const SOURCE = 'CONTENT/SLEEP-COUNTER-MEASURES';
+
 let messagePollingId = 0;
 let backgroundPort: chrome.runtime.Port | null = null;
 
@@ -34,7 +36,7 @@ function tryWakeUpBackground() {
         isCouldNotEstablishConnectionError,
         isBackForwardCacheError
       )(error);
-      Logger.debug("Content/SleepCounterMeasure::tryWakeUpBackground => ignore Error " + error)
+      Logger.debug(SOURCE,"tryWakeUpBackground => ignore Error " + error)
     }
 }
 
@@ -71,7 +73,7 @@ function connectToExtension() {
         isCouldNotEstablishConnectionError,
         isBackForwardCacheError
       )(error);
-      Logger.debug("Content/SleepCounterMeasure::connectToExtension => ignore Error " + error)
+      Logger.debug(SOURCE,"connectToExtension => ignore Error " + error)
     }
 }
 
@@ -92,7 +94,7 @@ export const runManifestV3SleepCounterMeasures = () => {
 // when the page is restored from the back/forward cache
 window.addEventListener('pageshow', (event) => {
   if (event.persisted && !backgroundPort) {
-    Logger.debug("Content/SleepCounterMeasure::pageshow: Page restored from cache, attempting immediate reconnection.")
+    Logger.debug(SOURCE,"pageshow: Page restored from cache, attempting immediate reconnection.")
     connectToExtension();
   }
 });

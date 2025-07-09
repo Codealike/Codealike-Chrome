@@ -8,6 +8,8 @@ import {
 
 import { TimeStore } from './types';
 
+const SOURCE = 'DB/SYNC-Stroage';
+
 const getDbCache = async (): Promise<TimeStore> => {
   const db = await connect();
   const store = await db.get(
@@ -59,11 +61,17 @@ export const setTotalDailyHostTime = async ({
 }) => {
   const store = await getTotalActivity();
 
-  const dayActivity = (store[day] ??= {}) as Record<string, number>;;
-  dayActivity[host] = (dayActivity[host] ?? 0) + duration; // duration addition from timeline
+  const dayActivity = (store[day] ??= {}) as Record<string, number>;
+  const existingDuration = (dayActivity[host] ?? 0)
 
-
-  Logger.debug(`DB/syncStroage::setTotalDailyHostTime: Host ${host}, Duration ${getTimeFromMs(duration)} - ${duration}ms`);
+  if(duration>0){
+    dayActivity[host] = duration + existingDuration;
+     // dayActivity[host] = duration; // duration addition from timeline
+    Logger.debug(SOURCE, `setTotalDailyHostTime: Host ${host}, Existing Duration ${getTimeFromMs(existingDuration)} - ${existingDuration}ms , NEW Duration ${getTimeFromMs(duration)} - ${duration}ms`);
+    
+    await setTotalActivity(store);
+  }
   
-  return setTotalActivity(store);
+
+
 };

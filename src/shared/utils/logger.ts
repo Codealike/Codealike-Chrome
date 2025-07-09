@@ -8,15 +8,16 @@ const MAX_LOG_ENTRIES = 1000;
 interface LogEntry {
     timestamp: string;
     level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
+    source: string,
     message: string;
     context ? : object; 
 }
 
 interface LoggerAPI {
-    info(message: string, context ? : object): Promise < void > ;
-    warn(message: string, context ? : object): Promise < void > ;
-    error(message: string, context ? : object): Promise < void > ;
-    debug(message: string, context ? : object): Promise < void > ;
+    info(source: string, message: string, context ? : object): Promise < void > ;
+    warn(source: string, message: string, context ? : object): Promise < void > ;
+    error(source: string, message: string, context ? : object): Promise < void > ;
+    debug(source: string, message: string, context ? : object): Promise < void > ;
     get(): Promise < LogEntry[] > ;
     clear(): Promise < void > ;
 }
@@ -58,7 +59,7 @@ const CACHE_EXPIRATION_MS = 5 * 1000; // 5 seconds in milliseconds
  * @param message - The log message.
  * @param context - Optional context object to store with the log.
  */
-async function addLog(level: LogEntry['level'], message: string, context ? : object): Promise < void > {
+async function addLog(level: LogEntry['level'],  source: string, message: string, context ? : object): Promise < void > {
     const preferences: Preferences = await getSettings();
     if(preferences.enableLogging!==true){
         return ;
@@ -69,6 +70,7 @@ async function addLog(level: LogEntry['level'], message: string, context ? : obj
       context,
       level,
       message,
+      source,
       timestamp,
     };
 
@@ -107,13 +109,11 @@ async function clearLogs(): Promise < void > {
     try {
         const result1 = await chrome.storage.local.get(LOG_STORAGE_KEY);
         console.log("Before clear logs ", result1)
-        await chrome.storage.local.remove(LOG_STORAGE_KEY);
         await chrome.storage.local.set({
             [LOG_STORAGE_KEY]: []
         });
+        await chrome.storage.local.remove(LOG_STORAGE_KEY);
         console.log("Logs cleared from storage.");
-        const result = await chrome.storage.local.get(LOG_STORAGE_KEY);
-        console.log("AFTER clear logs ", result);
     } catch (error) {
         console.error("Error clearing logs from storage:", error);
     }
@@ -123,11 +123,11 @@ async function clearLogs(): Promise < void > {
 
 export const Logger: LoggerAPI = {
     clear: clearLogs,
-    debug: (message, context) => addLog('DEBUG', message, context),
-    error: (message, context) => addLog('ERROR', message, context),
+    debug: (source, message, context) => addLog('DEBUG', source, message, context),
+    error: (source, message, context) => addLog('ERROR', source, message, context),
     get: getLogs,
-    info: (message, context) => addLog('INFO', message, context),
-    warn: (message, context) => addLog('WARN', message, context),
+    info: (source, message, context) => addLog('INFO', source, message, context),
+    warn: (source, message, context) => addLog('WARN', source, message, context),
 };
 
 // For environments where `Logger` needs to be globally accessible (e.g., background service worker)

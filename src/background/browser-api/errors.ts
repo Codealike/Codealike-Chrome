@@ -1,8 +1,11 @@
 import { Logger } from "../../shared/utils/logger";
+
+const SOURCE = 'BACKGROUND/ERRORS';
+
 export function throwRuntimeLastError() {
   const error = chrome.runtime.lastError;
   if (error?.message) {
-    Logger.error("erros:throwRuntimeLastError", error);
+    Logger.error(SOURCE, "throwRuntimeLastError", error);
     throw new Error(error.message);
   }
 }

@@ -16,6 +16,8 @@ import { DebugTab } from './shared/db/types';
 import { WAKE_UP_BACKGROUND } from './shared/messages';
 import Port = chrome.runtime.Port;
 
+const SOURCE = 'BACKGROUND/INDEX';
+
 interface Service {
   name: string;
   intervalInMinutes: number;
@@ -111,7 +113,7 @@ ChromeServiceDefinition.forEach((service) => {
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   const { name } = alarm;
   // await logMessage(name);
-  Logger.info(name)
+  Logger.info(SOURCE,name)
   for (let i = 0; i < ChromeServiceDefinition.length; i++) {
     const alarm: Service = ChromeServiceDefinition[i] as Service;
     if (alarm.name === name) {
@@ -150,13 +152,15 @@ chrome.runtime.onConnect.addListener(function (devToolsPort: Port) {
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
   const ts = Date.now();
   // await logMessage('tab activated: ' + activeInfo.tabId);
-  Logger.debug('Background::chrome.tabs.onActivated: ' + activeInfo.tabId)
+  const tabId = activeInfo.tabId;
+
+  Logger.debug(SOURCE,'Background::chrome.tabs.onActivated: ' + tabId)
 
   const newState = await handleActiveTabStateChange(activeInfo);
   if (newState) {
     await handleStateChange(newState, ts, debuggingTabs).catch((e) => {
       logMessage('error handling tab activated: ' + e);
-      Logger.error('error handling tab activated: ' + e)
+      Logger.error(SOURCE,'error handling tab activated: ' + e)
     });
   }
 });
@@ -164,13 +168,13 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
 chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
   const ts = Date.now();
   // await logMessage('tab updated: ' + tab.id);
-  Logger.debug('Background::chrome.tabs.onUpdated: ' + tab.id)
+  Logger.debug(SOURCE,'Background::chrome.tabs.onUpdated: ' + tab.id)
 
   const newState = await handleTabUpdate(tab as Tab);
   if (newState) {
     await handleStateChange(newState, ts, debuggingTabs).catch((e) => {
       logMessage('error handling tab activated: ' + e);
-      Logger.error('error handling tab activated: ' + tab.id, e)
+      Logger.error(SOURCE,'error handling tab activated: ' + tab.id, e)
     });
   }
 });
@@ -179,7 +183,7 @@ chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
 chrome.windows.onFocusChanged.addListener(async (windowId) => {
   const ts = Date.now();
   // await logMessage('window focus changed: ' + windowId);
-  Logger.debug('Background::chrome.windows.onFocusChange: ' + windowId)
+  Logger.debug(SOURCE,'chrome.windows.onFocusChange: ' + windowId)
 
   const newState = await handleWindowFocusChange(windowId);
   if (newState) {
@@ -189,7 +193,7 @@ chrome.windows.onFocusChanged.addListener(async (windowId) => {
 
 chrome.idle.onStateChanged.addListener(async (newIdleState) => {
   // await logMessage('idle state changed: ' + newIdleState);
-  Logger.debug('Background::chrome.idle: ' + newIdleState)
+  Logger.debug(SOURCE,'chrome.idle: ' + newIdleState)
   const ts = Date.now();
 
   const newTabState = await handleIdleStateChange(newIdleState);
@@ -199,7 +203,7 @@ chrome.idle.onStateChanged.addListener(async (newIdleState) => {
 
 chrome.webNavigation.onCompleted.addListener(async (details) => {
   await logMessage('web navigation: ' + details.tabId);
-  Logger.debug('Background::chrome.webNavigation: ' + details.tabId)
+  Logger.debug(SOURCE,'chrome.webNavigation: ' + details.tabId)
   const ts = Date.now();
 
   const tab = await getTabInfo(details.tabId);
@@ -240,8 +244,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendMessage) => {
     }
 });
 
-Logger.debug("===Background script started===");
-// Logger.debug(`Extension running in: ${IS_PRODUCTION_ENVIRONMENT ? 'Production' : 'Development'} mode.`);
+Logger.debug(SOURCE,"===Background script started===");
+// Logger.debug(SOURCE,`Extension running in: ${IS_PRODUCTION_ENVIRONMENT ? 'Production' : 'Development'} mode.`);
 
 // This is a background script for a Google Chrome extension. It creates an alarm
 // that runs a function at a regular interval, listens for events such as tab

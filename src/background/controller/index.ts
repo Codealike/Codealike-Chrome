@@ -19,6 +19,8 @@ import { updateTotalTime } from './overall';
 import { saveTimelineRecord } from './timeline';
 import { DateTime } from 'luxon';
 
+const SOURCE = 'BACKGROUND/CONTROLLER/INDEX';
+
 const FIVE_MINUTES = getMinutesInMs(5);
 
 const getLastHeartbeatTimestamp = (
@@ -158,7 +160,7 @@ async function commitTabActivity(currentTimelineRecord: TimelineRecord | null, p
   const { hostname } = currentTimelineRecord;
   const message = `Visited ${hostname} on ${currentIsoDate} [tabID=${focusedTabId}]`;
   // await logMessage(message);
-  Logger.debug(`Background/controller::commitTabActivity : ${message}`);
+  Logger.debug(SOURCE, `commitTabActivity : ${message}`);
 
   await saveTimelineRecord(currentTimelineRecord, currentIsoDate);
 

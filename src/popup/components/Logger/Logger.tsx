@@ -10,6 +10,7 @@ import { getSystemSummary, formatSystemSummary, SystemSummary } from '../../../s
 interface LogEntry {
     timestamp: string;
     level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
+    source: string;
     message: string;
     context ? : object;
 }
@@ -87,7 +88,7 @@ export const Logger: React.FC = () => {
                     contextStr = ` - Context: [Serialization Error]`;
                 }
             }
-            return `${log.timestamp} [${log.level}] ${log.message}${contextStr}`;
+            return `${log.timestamp} [${log.level}] ${log.source} ${log.message} ${contextStr}`;
         }).join('\n');
 
 

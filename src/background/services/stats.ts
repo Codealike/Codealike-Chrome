@@ -10,6 +10,8 @@ import {
 import { getSettings, setSettings } from '../../shared/preferences';
 import { DateTime } from 'luxon';
 
+const SOURCE = 'BACKGROUND/SERVICES/STATS';
+
 const fetchStatistics = async (): Promise<{
   timeline: TimelineRecord[];
 }> => {
@@ -169,14 +171,14 @@ const sendWebActivityAutomatically = async (): Promise<void> => {
   const preferences: Preferences = await getSettings();
   if (preferences.connectionStatus !== ConnectionStatus.Connected) {
     // await logMessage('unable to send stats when not connected');
-    Logger.warn('unable to send stats when not connected');
+    Logger.warn(SOURCE, 'unable to send stats when not connected');
     return;
   }
 
   const { timeline } = await fetchStatistics();
 
   await sendWebActivity(preferences, timeline, async (response) => {
-    Logger.info(`Background/services::stats:sendWebActivityAutomatically`,response);
+    Logger.info(SOURCE, `sendWebActivityAutomatically`,response);
   });
 };
 
