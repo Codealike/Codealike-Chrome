@@ -10,7 +10,7 @@ import { TimeStore } from './types';
 
 const SOURCE = 'DB/SYNC-Stroage';
 
-const getDbCache = async (): Promise<TimeStore> => {
+export const getDbCache = async (): Promise<TimeStore> => {
   const db = await connect();
   const store = await db.get(
     TimeTrackerStoreTables.State,
@@ -19,27 +19,24 @@ const getDbCache = async (): Promise<TimeStore> => {
   return (store || {}) as TimeStore;
 };
 
-const setDbCache = async (store: TimeStore) => {
-  const db = await connect();
-  await db.put(
-    TimeTrackerStoreTables.State,
-    store,
-    TimeTrackerStoreStateTableKeys.OverallState,
-  );
-};
-
 const setTotalActivity = async (store: TimeStore) => {
-  await setDbCache(store);
+  // await setDbCache(store);
   await chrome.storage.local.set({
     activity: store,
   });
 };
+
+export const getLocalActivity = async (): Promise<TimeStore> => {
+ const {activity={}} = await chrome.storage.local.get('activity')
+ return activity;
+}
 
 export const getTotalActivity = async (): Promise<TimeStore> => {
   const [localStore, dbStore] = await Promise.all([
     chrome.storage.local.get('activity').then((store) => store?.activity ?? {}),
     getDbCache(),
   ]);
+  // TODO : impliment : getLocalActivity
   return mergeTimeStore(dbStore, localStore);
 };
 
@@ -60,18 +57,14 @@ export const setTotalDailyHostTime = async ({
   duration: number;
 }) => {
   const store = await getTotalActivity();
-
+ // console.log("Harman Store",store);
   const dayActivity = (store[day] ??= {}) as Record<string, number>;
   const existingDuration = (dayActivity[host] ?? 0)
 
-  if(duration>0){
-    dayActivity[host] = duration + existingDuration;
-     // dayActivity[host] = duration; // duration addition from timeline
-    Logger.debug(SOURCE, `setTotalDailyHostTime: Host ${host}, Existing Duration ${getTimeFromMs(existingDuration)} - ${existingDuration}ms , NEW Duration ${getTimeFromMs(duration)} - ${duration}ms`);
-    
-    await setTotalActivity(store);
-  }
+  dayActivity[host] = duration;
   
+  Logger.debug(SOURCE, `setTotalDailyHostTime: Host ${host}, Existing Duration ${getTimeFromMs(existingDuration)} - ${existingDuration}ms , NEW Duration ${getTimeFromMs(duration)} - ${duration}ms`);
 
+  await setTotalActivity(store);
 
 };

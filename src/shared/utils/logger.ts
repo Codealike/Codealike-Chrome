@@ -87,7 +87,7 @@ async function addLog(level: LogEntry['level'],  source: string, message: string
         await chrome.storage.local.set({
             [LOG_STORAGE_KEY]: logs
         });
-        console.log(`[${level}] ${message}`); // console.log for immediate visibility
+        console.log(`${timestamp} [${level}] ${message}`); // console.log for immediate visibility
     } catch (error) {
         console.error("Error adding log to storage:", error);
     }

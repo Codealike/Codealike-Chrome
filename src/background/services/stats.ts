@@ -1,14 +1,17 @@
 import { sendStats } from '../../shared/api/client';
-import { connect, disconnect, TimeTrackerStoreTables } from '../../shared/db/idb';
+import { connect, /*disconnect,*/ TimeTrackerStoreTables,TimeTrackerStoreStateTableKeys } from '../../shared/db/idb';
 import {
   ConnectionStatus,
   Preferences,
   TimelineRecord,
+  TimeStore,
   WebActivityLog,
   WebActivityRecord,
 } from '../../shared/db/types';
 import { getSettings, setSettings } from '../../shared/preferences';
 import { DateTime } from 'luxon';
+import {getLocalActivity,getDbCache} from '../../shared/db/sync-storage'
+import { sumTimeStores } from '../../shared/utils/merge-time-store';
 
 const SOURCE = 'BACKGROUND/SERVICES/STATS';
 
@@ -23,11 +26,39 @@ const fetchStatistics = async (): Promise<{
   };
 };
 
-const clearStatistics = async (): Promise<void> => {
-  await disconnect(); // Ensure any existing connection is closed first
+const setDbCacheTimeStore = async (store: TimeStore) => {
   const db = await connect();
-  await db.clear(TimeTrackerStoreTables.Timeline);
-  await db.clear(TimeTrackerStoreTables.State);
+  await db.put(
+    TimeTrackerStoreTables.State,
+    store,
+    TimeTrackerStoreStateTableKeys.OverallState,
+  );
+};
+
+const clearStatistics = async (): Promise<void> => {
+    const oldDBcacheStore = await getDbCache();
+    const localStore:TimeStore = await getLocalActivity();
+    // const localvalue:any = localStore["2025-07-11"];
+    // const cacheOldvalue:any = oldDBcacheStore["2025-07-11"]
+    // const updatedval:TimeStore =  {
+    // "2025-07-11": {
+    //         "chatgpt.com": localvalue["chatgpt.com"] + cacheOldvalue["chatgpt.com"],
+    //     }
+    // }
+    const totalTimeStores = sumTimeStores(oldDBcacheStore,localStore);
+    await setDbCacheTimeStore(totalTimeStores);
+    
+    console.log("Harman : BeforeclearStatistics: oldDBcacheStore",oldDBcacheStore)
+    console.log("Harman : BeforeclearStatistics: localStore",localStore)
+    
+    //await disconnect(); // Ensure any existing connection is closed first
+    const db = await connect();
+    // const totalActivity = await getTotalActivity();
+    // console.log("totalActivity merged",totalActivity);
+    setTimeout(async()=>{await db.clear(TimeTrackerStoreTables.Timeline);},200)
+    
+    // await db.clear(TimeTrackerStoreTables.State);
+
 };
 
 const emitSuccessSyncStats = async (
