@@ -22,6 +22,7 @@ export interface WebActivityRecord {
 export type TimelineRecordStatus = 'navigation' | 'debugging' | 'debugger';
 
 export interface TimelineRecord {
+  id?: number ;
   tabId: number;
   url: string;
   hostname: string;
@@ -69,6 +70,7 @@ export interface Preferences {
 export interface Statistics {
   Status: 'OK' | 'NOK';
   Datetime: string;
+  LastTimelineId?: number | null
 }
 
 export enum ConnectionStatus {

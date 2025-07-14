@@ -183,7 +183,7 @@ chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
 chrome.windows.onFocusChanged.addListener(async (windowId) => {
   const ts = Date.now();
   // await logMessage('window focus changed: ' + windowId);
-  Logger.debug(SOURCE,'chrome.windows.onFocusChange: ' + windowId)
+  // Logger.debug(SOURCE,'chrome.windows.onFocusChange: ' + windowId)
 
   const newState = await handleWindowFocusChange(windowId);
   if (newState) {

@@ -1,23 +1,24 @@
 import { setTotalDailyHostTime } from '../../shared/db/sync-storage';
 import { getActivityTimeline } from '../tables/activity-timeline';
+import { getSettings } from '../../shared/preferences';
 
 export async function updateTotalTime(
   currentIsoDate: string,
   hostname: string,
 ) {
   const timeline = await getActivityTimeline(currentIsoDate);
+  const preferences = await getSettings();
+  const lastTimeLineID :number  = preferences.lastUpdateStats?.LastTimelineId ?? 0;
+
   const timeOnRecord = timeline
-    .filter((t) => t.hostname === hostname)
+    .filter((t) => t.hostname === hostname && (t.id ?? 0 > lastTimeLineID))
     .reduce((acc, t) => acc + t.activityPeriodEnd - t.activityPeriodStart, 0);
-    // .reduce((acc, t) => {
-    //   const duration = t.activityPeriodEnd - t.activityPeriodStart
-    //   return acc + Math.abs(duration)
-    // }, 0);
 
   await setTotalDailyHostTime({
     date: currentIsoDate,
     duration: timeOnRecord,
     host: hostname,
+    lastTimeLineID
   });
 }
 

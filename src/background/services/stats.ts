@@ -1,5 +1,5 @@
 import { sendStats } from '../../shared/api/client';
-import { connect, /*disconnect,*/ TimeTrackerStoreTables,TimeTrackerStoreStateTableKeys } from '../../shared/db/idb';
+import { connect, disconnect, TimeTrackerStoreTables,TimeTrackerStoreStateTableKeys } from '../../shared/db/idb';
 import {
   ConnectionStatus,
   Preferences,
@@ -10,8 +10,7 @@ import {
 } from '../../shared/db/types';
 import { getSettings, setSettings } from '../../shared/preferences';
 import { DateTime } from 'luxon';
-import {getLocalActivity,getDbCache} from '../../shared/db/sync-storage'
-import { sumTimeStores } from '../../shared/utils/merge-time-store';
+import {getLocalActivity} from '../../shared/db/sync-storage'
 
 const SOURCE = 'BACKGROUND/SERVICES/STATS';
 
@@ -20,11 +19,26 @@ const fetchStatistics = async (): Promise<{
 }> => {
   const db = await connect();
   const timeline = await db.getAll(TimeTrackerStoreTables.Timeline);
-
+  
   return {
     timeline,
   };
 };
+
+async function getLastKeyTimeLine(storeName: TimeTrackerStoreTables.Timeline): Promise<number | null> {
+  const db = await connect();
+
+  const tx = db.transaction(storeName, 'readonly');
+  const store = tx.objectStore(storeName);
+
+  const cursor = await store.openKeyCursor(null, 'prev');
+
+  if (cursor && typeof cursor.key === 'number') {
+    return cursor.key;
+  }
+
+  return null;
+}
 
 const setDbCacheTimeStore = async (store: TimeStore) => {
   const db = await connect();
@@ -36,34 +50,20 @@ const setDbCacheTimeStore = async (store: TimeStore) => {
 };
 
 const clearStatistics = async (): Promise<void> => {
-    const oldDBcacheStore = await getDbCache();
     const localStore:TimeStore = await getLocalActivity();
-    // const localvalue:any = localStore["2025-07-11"];
-    // const cacheOldvalue:any = oldDBcacheStore["2025-07-11"]
-    // const updatedval:TimeStore =  {
-    // "2025-07-11": {
-    //         "chatgpt.com": localvalue["chatgpt.com"] + cacheOldvalue["chatgpt.com"],
-    //     }
-    // }
-    const totalTimeStores = sumTimeStores(oldDBcacheStore,localStore);
-    await setDbCacheTimeStore(totalTimeStores);
-    
-    console.log("Harman : BeforeclearStatistics: oldDBcacheStore",oldDBcacheStore)
-    console.log("Harman : BeforeclearStatistics: localStore",localStore)
-    
-    //await disconnect(); // Ensure any existing connection is closed first
+    await disconnect();
     const db = await connect();
-    // const totalActivity = await getTotalActivity();
-    // console.log("totalActivity merged",totalActivity);
-    setTimeout(async()=>{await db.clear(TimeTrackerStoreTables.Timeline);},200)
-    
-    // await db.clear(TimeTrackerStoreTables.State);
+    await db.clear(TimeTrackerStoreTables.State);
+    await setDbCacheTimeStore(localStore);
+
+    await db.clear(TimeTrackerStoreTables.Timeline);
 
 };
 
 const emitSuccessSyncStats = async (
   preferences: Preferences,
   callback: (input: { result: string }) => Promise<void>,
+  lastTimelineId?:number | null
 ): Promise<void> => {
   await callback({
     result: 'ok',
@@ -86,7 +86,8 @@ const emitSuccessSyncStats = async (
   await setSettings({
     lastUpdateStats: {
       Datetime: new Date().toJSON(),
-      Status: 'OK',
+      LastTimelineId: lastTimelineId,
+      Status: 'OK'
     },
   });
 };
@@ -187,10 +188,10 @@ const sendWebActivity = async (
   catch(err) {
     console.log(err);
   }
-
   if (result) {
+    const lastKeyID =await getLastKeyTimeLine(TimeTrackerStoreTables.Timeline);
     await Promise.all([
-      emitSuccessSyncStats(preferences, callback),
+      emitSuccessSyncStats(preferences, callback, lastKeyID),
       clearStatistics(),
     ]);
   } else {

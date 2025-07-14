@@ -1,5 +1,4 @@
 import { getIsoDate, getTimeFromMs } from '../utils/dates-helper';
-import { mergeTimeStore } from '../utils/merge-time-store';
 import {
   connect,
   TimeTrackerStoreStateTableKeys,
@@ -32,12 +31,8 @@ export const getLocalActivity = async (): Promise<TimeStore> => {
 }
 
 export const getTotalActivity = async (): Promise<TimeStore> => {
-  const [localStore, dbStore] = await Promise.all([
-    chrome.storage.local.get('activity').then((store) => store?.activity ?? {}),
-    getDbCache(),
-  ]);
-  // TODO : impliment : getLocalActivity
-  return mergeTimeStore(dbStore, localStore);
+  const dbStore = await getDbCache();
+  return dbStore;
 };
 
 export const getCurrentHostTime = async (host: string): Promise<number> => {
@@ -51,17 +46,23 @@ export const setTotalDailyHostTime = async ({
   date: day,
   host,
   duration,
+  lastTimeLineID
 }: {
   date: string;
   host: string;
   duration: number;
+  lastTimeLineID: number;
 }) => {
   const store = await getTotalActivity();
- // console.log("Harman Store",store);
   const dayActivity = (store[day] ??= {}) as Record<string, number>;
   const existingDuration = (dayActivity[host] ?? 0)
 
-  dayActivity[host] = duration;
+  if(lastTimeLineID > 0){
+     dayActivity[host] = duration + existingDuration;
+  }else{
+     dayActivity[host] = duration
+  }
+ 
   
   Logger.debug(SOURCE, `setTotalDailyHostTime: Host ${host}, Existing Duration ${getTimeFromMs(existingDuration)} - ${existingDuration}ms , NEW Duration ${getTimeFromMs(duration)} - ${duration}ms`);
 

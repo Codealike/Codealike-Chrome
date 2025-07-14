@@ -7,6 +7,7 @@ export enum Database {
 }
 
 export enum TimeTrackerStoreTables {
+  Id = 'id',
   Timeline = 'timeline',
   State = 'state',
   Logs = 'logs',
