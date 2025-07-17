@@ -25,20 +25,6 @@ const fetchStatistics = async (): Promise<{
   };
 };
 
-async function getLastKeyTimeLine(storeName: TimeTrackerStoreTables.Timeline): Promise<number | null> {
-  const db = await connect();
-
-  const tx = db.transaction(storeName, 'readonly');
-  const store = tx.objectStore(storeName);
-
-  const cursor = await store.openKeyCursor(null, 'prev');
-
-  if (cursor && typeof cursor.key === 'number') {
-    return cursor.key;
-  }
-
-  return null;
-}
 
 const setDbCacheTimeStore = async (store: TimeStore) => {
   const db = await connect();
@@ -56,14 +42,13 @@ const clearStatistics = async (): Promise<void> => {
     await db.clear(TimeTrackerStoreTables.State);
     await setDbCacheTimeStore(localStore);
 
-    await db.clear(TimeTrackerStoreTables.Timeline);
+   // await db.clear(TimeTrackerStoreTables.Timeline);
 
 };
 
 const emitSuccessSyncStats = async (
   preferences: Preferences,
   callback: (input: { result: string }) => Promise<void>,
-  lastTimelineId?:number | null
 ): Promise<void> => {
   await callback({
     result: 'ok',
@@ -86,7 +71,6 @@ const emitSuccessSyncStats = async (
   await setSettings({
     lastUpdateStats: {
       Datetime: new Date().toJSON(),
-      LastTimelineId: lastTimelineId,
       Status: 'OK'
     },
   });
@@ -189,9 +173,8 @@ const sendWebActivity = async (
     console.log(err);
   }
   if (result) {
-    const lastKeyID =await getLastKeyTimeLine(TimeTrackerStoreTables.Timeline);
     await Promise.all([
-      emitSuccessSyncStats(preferences, callback, lastKeyID),
+      emitSuccessSyncStats(preferences, callback),
       clearStatistics(),
     ]);
   } else {

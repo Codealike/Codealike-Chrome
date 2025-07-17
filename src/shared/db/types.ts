@@ -70,7 +70,6 @@ export interface Preferences {
 export interface Statistics {
   Status: 'OK' | 'NOK';
   Datetime: string;
-  LastTimelineId?: number | null
 }
 
 export enum ConnectionStatus {

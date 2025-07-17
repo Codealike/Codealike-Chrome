@@ -31,7 +31,7 @@ export const getLocalActivity = async (): Promise<TimeStore> => {
 }
 
 export const getTotalActivity = async (): Promise<TimeStore> => {
-  const dbStore = await getDbCache();
+  const dbStore = await getLocalActivity();
   return dbStore;
 };
 
@@ -45,23 +45,21 @@ export const getCurrentHostTime = async (host: string): Promise<number> => {
 export const setTotalDailyHostTime = async ({
   date: day,
   host,
-  duration,
-  lastTimeLineID
+  duration
 }: {
   date: string;
   host: string;
   duration: number;
-  lastTimeLineID: number;
 }) => {
   const store = await getTotalActivity();
   const dayActivity = (store[day] ??= {}) as Record<string, number>;
   const existingDuration = (dayActivity[host] ?? 0)
 
-  if(lastTimeLineID > 0){
-     dayActivity[host] = duration + existingDuration;
-  }else{
+  // if(lastTimeLineID > 0){
+  //    dayActivity[host] = duration + existingDuration;
+  // }else{
      dayActivity[host] = duration
-  }
+  // }
  
   
   Logger.debug(SOURCE, `setTotalDailyHostTime: Host ${host}, Existing Duration ${getTimeFromMs(existingDuration)} - ${existingDuration}ms , NEW Duration ${getTimeFromMs(duration)} - ${duration}ms`);
