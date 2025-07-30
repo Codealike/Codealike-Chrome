@@ -98,3 +98,12 @@ export interface RecordWithKey<T> {
   key: IDBValidKey;
   value: T;
 }
+
+export interface LogEntry {
+    timestamp: string;
+    level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
+    source: string;
+    message: string;
+    context ? : object | undefined;
+}
+

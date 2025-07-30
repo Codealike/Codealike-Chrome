@@ -4,8 +4,14 @@ import {
   TimeTrackerStoreStateTableKeys,
   TimeTrackerStoreTables
 } from './idb';
-
+import { getSettings } from '../../shared/preferences';
 import { TimeStore } from './types';
+
+import {
+  Preferences,
+  ConnectionStatus
+} from '../../shared/db/types';
+
 
 const SOURCE = 'DB/SYNC-Stroage';
 
@@ -18,11 +24,20 @@ export const getDbCache = async (): Promise<TimeStore> => {
   return (store || {}) as TimeStore;
 };
 
+export const setDbCacheTimeStore = async (store: TimeStore) => {
+  const db = await connect();
+  await db.put(
+    TimeTrackerStoreTables.State,
+    store,
+    TimeTrackerStoreStateTableKeys.OverallState,
+  );
+};
+
 const setTotalActivity = async (store: TimeStore) => {
-  // await setDbCache(store);
-  await chrome.storage.local.set({
-    activity: store,
-  });
+    await setDbCacheTimeStore(store);
+  // await chrome.storage.local.set({
+  //   activity: store,
+  // });
 };
 
 export const getLocalActivity = async (): Promise<TimeStore> => {
@@ -31,8 +46,15 @@ export const getLocalActivity = async (): Promise<TimeStore> => {
 }
 
 export const getTotalActivity = async (): Promise<TimeStore> => {
+  const preferences: Preferences = await getSettings();
+
+  if (preferences.connectionStatus !== ConnectionStatus.Connected) {
+     const dbStore = await getDbCache(); //getLocalActivity();
+    return dbStore;
+  }
+  
   const dbStore = await getLocalActivity();
-  return dbStore;
+  return dbStore
 };
 
 export const getCurrentHostTime = async (host: string): Promise<number> => {

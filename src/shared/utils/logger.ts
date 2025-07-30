@@ -1,17 +1,10 @@
-import { Preferences } from '../../shared/db/types';
+import { Preferences,LogEntry } from '../../shared/db/types';
 import { getSettings } from '../../shared/preferences';
 
 const LOG_STORAGE_KEY = 'codealike_extension_logs';
 const MAX_LOG_ENTRIES = 1000;
 
 // Defines the structure of a single log entry.
-interface LogEntry {
-    timestamp: string;
-    level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
-    source: string,
-    message: string;
-    context ? : object; 
-}
 
 interface LoggerAPI {
     info(source: string, message: string, context ? : object): Promise < void > ;

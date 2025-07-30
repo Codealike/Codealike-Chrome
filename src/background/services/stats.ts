@@ -1,16 +1,20 @@
 import { sendStats } from '../../shared/api/client';
-import { connect, disconnect, TimeTrackerStoreTables,TimeTrackerStoreStateTableKeys } from '../../shared/db/idb';
+import { connect, disconnect, TimeTrackerStoreTables, 
+      //  TimeTrackerStoreStateTableKeys 
+      } from '../../shared/db/idb';
 import {
   ConnectionStatus,
   Preferences,
   TimelineRecord,
-  TimeStore,
+  // TimeStore,
   WebActivityLog,
   WebActivityRecord,
 } from '../../shared/db/types';
 import { getSettings, setSettings } from '../../shared/preferences';
 import { DateTime } from 'luxon';
-import {getLocalActivity} from '../../shared/db/sync-storage'
+import { getDbCache, getLocalActivity } from '../../shared/db/sync-storage'
+import { getIsoDate } from '../../shared/utils/dates-helper';
+import { sumTimeStores } from '../../shared/utils/merge-time-store';
 
 const SOURCE = 'BACKGROUND/SERVICES/STATS';
 
@@ -19,32 +23,122 @@ const fetchStatistics = async (): Promise<{
 }> => {
   const db = await connect();
   const timeline = await db.getAll(TimeTrackerStoreTables.Timeline);
-  
+
   return {
     timeline,
   };
 };
 
 
-const setDbCacheTimeStore = async (store: TimeStore) => {
-  const db = await connect();
-  await db.put(
-    TimeTrackerStoreTables.State,
-    store,
-    TimeTrackerStoreStateTableKeys.OverallState,
-  );
-};
-
 const clearStatistics = async (): Promise<void> => {
-    const localStore:TimeStore = await getLocalActivity();
-    await disconnect();
-    const db = await connect();
-    await db.clear(TimeTrackerStoreTables.State);
-    await setDbCacheTimeStore(localStore);
 
-   // await db.clear(TimeTrackerStoreTables.Timeline);
+   const [localStore, dbStore] = await Promise.all([
+    getLocalActivity(),
+    getDbCache(),
+  ]);
+
+  const totalActivites = sumTimeStores(dbStore,localStore);
+
+  Logger.debug(SOURCE,`clearStatistics:sumTimeStores -> LOCAL:: ${JSON.stringify(localStore)} \n DBCacheStore:: ${JSON.stringify(dbStore)} `)
+  Logger.debug(SOURCE,`clearStatistics:sumTimeStores -> TOTAL : ${JSON.stringify(totalActivites)} `)
+  
+  await chrome.storage.local.set({
+    activity: totalActivites,
+  });
+
+  await disconnect();
+  const db = await connect();
+  await db.clear(TimeTrackerStoreTables.State);
+
+  //await deleteOldTimelineRecords(); // clear timeline 
+  await disconnect();
+  await db.clear(TimeTrackerStoreTables.Timeline);
 
 };
+
+// Assuming SOURCE, Logger, connect, TimeTrackerStoreTables, getIsoDate, TimelineRecord are imported/defined
+
+const _deleteOldTimelineRecords = async(): Promise<void> => {
+    const storeName = TimeTrackerStoreTables.Timeline; 
+
+    Logger.info(SOURCE, `deleteOldTimelineRecords: Initiating deletion of old timeline records from '${storeName}' store.`);
+
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+    twoDaysAgo.setHours(0, 0, 0, 0);
+    const cutoffIsoDate = getIsoDate(twoDaysAgo);
+
+    Logger.debug(SOURCE, `deleteOldTimelineRecords: Calculated cutoff date for records: ${cutoffIsoDate}`);
+
+    const db = await connect();
+
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = tx.objectStore(storeName);
+
+    try {
+        // Get all records in the store
+        const allRecords = await store.getAll() as TimelineRecord[];
+
+        // Find IDs of records to delete, ensuring 'id' is defined and a valid key type
+        const idsToDelete: (number)[] = allRecords
+            .filter(record => record.date < cutoffIsoDate && record.id !== undefined && (typeof record.id === 'number'))
+            .map(record => record.id as (number)); // Cast to specific IDBValidKey types
+
+        if (idsToDelete.length === 0) {
+            Logger.info(SOURCE, "No old records found to delete based on cutoff date or missing IDs.");
+            await tx.done;
+            return;
+        }
+
+        // Batch delete by key
+        // Each delete call runs within the same transaction.
+        await Promise.all(idsToDelete.map((id:any) => store.delete(id)));
+
+        Logger.info(SOURCE, `Successfully deleted ${idsToDelete.length} old records from '${storeName}'.`);
+
+    } catch (e) {
+        Logger.error(SOURCE, `Error during deletion of old timeline records from '${storeName}':`);
+      //  throw e;
+    } finally {
+        try {
+            await tx.done;
+            Logger.debug(SOURCE, "Transaction for old record deletion completed.");
+        } catch (txError) {
+            Logger.error(SOURCE, "Transaction for old record deletion failed or aborted:");
+           // throw txError;
+        }
+    }
+}
+// export async function deleteOldTimelineRecords(): Promise<void> {
+
+//   // Calculate the cutoff date (2 days ago) in ISO format
+//   const today = new Date();
+//   today.setHours(0, 0, 0, 0); // Normalize to midnight
+//   const cutoffDate = new Date(today);
+//   cutoffDate.setDate(today.getDate() - 2);
+//   const cutoffIso = getIsoDate(cutoffDate); // e.g., "2025-07-26"
+
+//   // Open your IndexedDB
+//   const db = await connect();
+
+//   // Get all keys & corresponding records
+//   const tx = db.transaction(TimeTrackerStoreTables.State, 'readwrite');
+//   const store = tx.objectStore(TimeTrackerStoreTables.State);
+
+//   // Get all records (optionally, you can use indexes to optimize)
+//   let cursor = await store.openCursor();
+//   while (cursor) {
+//     const record = cursor.value;
+//     if (isTimelineRecord(record) && record.date < cutoffIso) {
+//       await cursor.delete();
+//     }
+//     cursor = await cursor.continue();
+//   }
+
+//   await tx.done;
+//   db.close();
+//   console.log('Old records deleted from timeline.');
+// }
 
 const emitSuccessSyncStats = async (
   preferences: Preferences,
@@ -83,7 +177,7 @@ const emitFailedSyncStats = async (
   await callback({
     result: 'failed',
   });
-  
+
   let lastUpdateDateTime = DateTime.fromJSDate(new Date());
   if (preferences.lastUpdateStats?.Datetime) {
     lastUpdateDateTime = DateTime.fromISO(preferences.lastUpdateStats?.Datetime);
@@ -91,7 +185,7 @@ const emitFailedSyncStats = async (
   await chrome.action.setTitle({
     title:
       'Codealike time tracker. An error happened trying to send Web Activity ' +
-        lastUpdateDateTime.toLocaleString(DateTime.DATETIME_SHORT) + '.',
+      lastUpdateDateTime.toLocaleString(DateTime.DATETIME_SHORT) + '.',
   });
   await chrome.action.setBadgeText({
     text: '',
@@ -165,11 +259,11 @@ const sendWebActivity = async (
   }
 
   const { records, states } = transformTimelineInWebActivity(timeline);
-  let result = null; 
+  let result = null;
   try {
     result = await sendStats(userToken, records, states);
   }
-  catch(err) {
+  catch (err) {
     console.log(err);
   }
   if (result) {
@@ -193,7 +287,7 @@ const sendWebActivityAutomatically = async (): Promise<void> => {
   const { timeline } = await fetchStatistics();
 
   await sendWebActivity(preferences, timeline, async (response) => {
-    Logger.info(SOURCE, `sendWebActivityAutomatically`,response);
+    Logger.info(SOURCE, `sendWebActivityAutomatically`, response);
   });
 };
 

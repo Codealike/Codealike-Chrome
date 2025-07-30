@@ -1,5 +1,6 @@
 import { getTabInfo } from './background/browser-api/tabs';
 import { handleStateChange } from './background/controller';
+import { getTotalActivity } from './shared/db/sync-storage';
 import {
   handleActiveTabStateChange,
   handleAlarm,
@@ -240,6 +241,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendMessage) => {
         Logger.get().then(logs => {
             sendMessage(logs); // Send the retrieved logs back
         });
+        return true; 
+    }
+    if (message.action === "getState") {
+        getTotalActivity().then(stats => {
+            sendMessage(stats); // Send the retrieved logs back
+        });
+        
         return true; 
     }
 });
