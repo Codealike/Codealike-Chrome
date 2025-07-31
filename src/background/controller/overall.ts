@@ -9,7 +9,10 @@ export async function updateTotalTime(
   
   const timeOnRecord = timeline
     .filter((t) => t.hostname === hostname )
-    .reduce((acc, t) => acc + t.activityPeriodEnd - t.activityPeriodStart, 0);
+    .reduce((acc, t) => {
+        const duration = t.activityPeriodEnd - t.activityPeriodStart;
+        return acc + (duration > 0 ? duration : 0); // sanitize data so that negative intervals are ignored
+      }, 0);
 
   await setTotalDailyHostTime({
     date: currentIsoDate,
