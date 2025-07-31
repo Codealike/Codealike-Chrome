@@ -1,5 +1,5 @@
 import { sendStats } from '../../shared/api/client';
-import { connect, disconnect, TimeTrackerStoreTables } from '../../shared/db/idb';
+import { connect, disconnect, TimeTrackerStoreStateTableKeys, TimeTrackerStoreTables } from '../../shared/db/idb';
 import {
   ConnectionStatus,
   Preferences,
@@ -119,7 +119,15 @@ const emitFailedSyncStats = async (
       Status: 'NOK',
     },
   });
+
+  // Delete ActiveTab Key to prevent tracking issue when sync failed.
+  await clearActiveTab();
 };
+
+const clearActiveTab = async()=>{
+  const db = await connect();
+  await db.delete(TimeTrackerStoreTables.State,TimeTrackerStoreStateTableKeys.ActiveTab);
+}
 
 const transformToWebActivity = (record: TimelineRecord): WebActivityRecord => {
   const startTime = DateTime.fromMillis(record.activityPeriodStart);
