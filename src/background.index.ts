@@ -1,6 +1,6 @@
 import { getTabInfo } from './background/browser-api/tabs';
 import { handleStateChange } from './background/controller';
-import { getTotalActivity } from './shared/db/sync-storage';
+
 import {
   handleActiveTabStateChange,
   handleAlarm,
@@ -155,12 +155,11 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
   // await logMessage('tab activated: ' + activeInfo.tabId);
   const tabId = activeInfo.tabId;
 
-  Logger.debug(SOURCE,'Background::chrome.tabs.onActivated: ' + tabId)
+  Logger.debug(SOURCE,'Background::chrome.tabs.onActivated: ' + tabId, activeInfo)
 
   const newState = await handleActiveTabStateChange(activeInfo);
   if (newState) {
     await handleStateChange(newState, ts, debuggingTabs).catch((e) => {
-      logMessage('error handling tab activated: ' + e);
       Logger.error(SOURCE,'error handling tab activated: ' + e)
     });
   }
@@ -168,7 +167,6 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
 
 chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
   const ts = Date.now();
-  // await logMessage('tab updated: ' + tab.id);
   Logger.debug(SOURCE,'Background::chrome.tabs.onUpdated: ' + tab.id)
 
   const newState = await handleTabUpdate(tab as Tab);
@@ -183,9 +181,7 @@ chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
 // onFocusChanged does not work in Windows 7/8/10 when user alt-tabs or clicks away
 chrome.windows.onFocusChanged.addListener(async (windowId) => {
   const ts = Date.now();
-  // await logMessage('window focus changed: ' + windowId);
-  // Logger.debug(SOURCE,'chrome.windows.onFocusChange: ' + windowId)
-
+  Logger.debug(SOURCE,'chrome.windows.onFocusChange: ' + windowId)
   const newState = await handleWindowFocusChange(windowId);
   if (newState) {
     await handleStateChange(newState, ts, debuggingTabs);
@@ -193,7 +189,6 @@ chrome.windows.onFocusChanged.addListener(async (windowId) => {
 });
 
 chrome.idle.onStateChanged.addListener(async (newIdleState) => {
-  // await logMessage('idle state changed: ' + newIdleState);
   Logger.debug(SOURCE,'chrome.idle: ' + newIdleState)
   const ts = Date.now();
 
@@ -203,8 +198,7 @@ chrome.idle.onStateChanged.addListener(async (newIdleState) => {
 });
 
 chrome.webNavigation.onCompleted.addListener(async (details) => {
-  await logMessage('web navigation: ' + details.tabId);
-  Logger.debug(SOURCE,'chrome.webNavigation: ' + details.tabId)
+  Logger.debug(SOURCE,'chrome.webNavigation: ' + details.tabId);
   const ts = Date.now();
 
   const tab = await getTabInfo(details.tabId);
@@ -243,13 +237,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendMessage) => {
         });
         return true; 
     }
-    if (message.action === "getState") {
-        getTotalActivity().then(stats => {
-            sendMessage(stats); // Send the retrieved logs back
-        });
-        
-        return true; 
-    }
+
 });
 
 Logger.debug(SOURCE,"===Background script started===");

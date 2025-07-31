@@ -12,6 +12,7 @@ import {
   ConnectionStatus
 } from '../../shared/db/types';
 
+import { Logger } from '../../shared/utils/logger';
 
 const SOURCE = 'DB/SYNC-Stroage';
 
@@ -34,10 +35,8 @@ export const setDbCacheTimeStore = async (store: TimeStore) => {
 };
 
 const setTotalActivity = async (store: TimeStore) => {
-    await setDbCacheTimeStore(store);
-  // await chrome.storage.local.set({
-  //   activity: store,
-  // });
+  //Logger.debug(SOURCE,`setTotalActivity`, store);
+  await setDbCacheTimeStore(store);
 };
 
 export const getLocalActivity = async (): Promise<TimeStore> => {
@@ -48,8 +47,9 @@ export const getLocalActivity = async (): Promise<TimeStore> => {
 export const getTotalActivity = async (): Promise<TimeStore> => {
   const preferences: Preferences = await getSettings();
 
+  // Check if account is not connected with API key
   if (preferences.connectionStatus !== ConnectionStatus.Connected) {
-     const dbStore = await getDbCache(); //getLocalActivity();
+     const dbStore = await getDbCache();
     return dbStore;
   }
   
@@ -73,19 +73,17 @@ export const setTotalDailyHostTime = async ({
   host: string;
   duration: number;
 }) => {
-  const store = await getTotalActivity();
+  const store:TimeStore = await getDbCache();
   const dayActivity = (store[day] ??= {}) as Record<string, number>;
   const existingDuration = (dayActivity[host] ?? 0)
 
-  // if(lastTimeLineID > 0){
-  //    dayActivity[host] = duration + existingDuration;
-  // }else{
-     dayActivity[host] = duration
-  // }
- 
-  
-  Logger.debug(SOURCE, `setTotalDailyHostTime: Host ${host}, Existing Duration ${getTimeFromMs(existingDuration)} - ${existingDuration}ms , NEW Duration ${getTimeFromMs(duration)} - ${duration}ms`);
+  dayActivity[host] = duration;
+
+  const logStr =  "\n--- setTotal Time Cache --\nHost: " + host + 
+                  "\nExisting Duration: " + getTimeFromMs(existingDuration) + " - "+ existingDuration+ "ms" +
+                  "\nNEW Duration : " + getTimeFromMs(duration) + " - " + duration + "ms";
+
+  Logger.debug(SOURCE, `setTotalDailyHostTime: ${logStr}`, dayActivity);
 
   await setTotalActivity(store);
-
 };

@@ -1,18 +1,15 @@
 import { sendStats } from '../../shared/api/client';
-import { connect, disconnect, TimeTrackerStoreTables, 
-      //  TimeTrackerStoreStateTableKeys 
-      } from '../../shared/db/idb';
+import { connect, disconnect, TimeTrackerStoreTables } from '../../shared/db/idb';
 import {
   ConnectionStatus,
   Preferences,
   TimelineRecord,
-  // TimeStore,
   WebActivityLog,
   WebActivityRecord,
 } from '../../shared/db/types';
 import { getSettings, setSettings } from '../../shared/preferences';
 import { DateTime } from 'luxon';
-import { getDbCache, getLocalActivity } from '../../shared/db/sync-storage'
+import { getDbCache, getLocalActivity } from '../../shared/db/sync-storage';
 import { getIsoDate } from '../../shared/utils/dates-helper';
 import { sumTimeStores } from '../../shared/utils/merge-time-store';
 import { Logger } from '../../shared/utils/logger';
@@ -30,125 +27,40 @@ const fetchStatistics = async (): Promise<{
   };
 };
 
-
 const clearStatistics = async (): Promise<void> => {
 
    const [localStore, dbStore] = await Promise.all([
-    getLocalActivity(),
-    getDbCache(),
+    getLocalActivity(), // Persistent
+    getDbCache(), // temp cache
   ]);
 
-  const totalActivities = sumTimeStores(dbStore,localStore);
+  const totalActivities = sumTimeStores(localStore,dbStore);
+
+  const currentISODate = getIsoDate(new Date());
 
   Logger.debug(
     SOURCE,
-    "clearStatistics:sumTimeStores -> BEFORE SUM\n" +
-      "localStore:\n" + JSON.stringify(localStore,null,2) +
-      "\ndbStore:\n" + JSON.stringify(dbStore,null,2) 
+    "clearStatistics:sumTimeStores -> \n--- BEFORE SUM ---\n" +
+    "localStore (Persistent):\n" + 
+    JSON.stringify(localStore?.[currentISODate] || {}, null, 2) +
+    "\ndbStore (TempCache):\n" + 
+    JSON.stringify(dbStore?.[currentISODate] || {}, null, 2) +
+    "\n--- AFTER SUM ---\n" +
+    JSON.stringify(totalActivities?.[currentISODate] || {}, null, 2)
   );
 
-  Logger.debug(SOURCE,
-    "clearStatistics:sumTimeStores -> AFTER SUM\n" +
-      JSON.stringify(totalActivities,null,2)
-    );
-
+  // Store merged result in persistent localstore
   await chrome.storage.local.set({
     activity: totalActivities,
   });
 
+  // Clear dbStore (temp)
   await disconnect();
   const db = await connect();
   await db.clear(TimeTrackerStoreTables.State);
-
-  //await deleteOldTimelineRecords(); // clear timeline 
-  //await disconnect();
   await db.clear(TimeTrackerStoreTables.Timeline);
 
 };
-
-// Assuming SOURCE, Logger, connect, TimeTrackerStoreTables, getIsoDate, TimelineRecord are imported/defined
-
-const _deleteOldTimelineRecords = async(): Promise<void> => {
-    const storeName = TimeTrackerStoreTables.Timeline; 
-
-    Logger.info(SOURCE, `deleteOldTimelineRecords: Initiating deletion of old timeline records from '${storeName}' store.`);
-
-    const twoDaysAgo = new Date();
-    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-    twoDaysAgo.setHours(0, 0, 0, 0);
-    const cutoffIsoDate = getIsoDate(twoDaysAgo);
-
-    Logger.debug(SOURCE, `deleteOldTimelineRecords: Calculated cutoff date for records: ${cutoffIsoDate}`);
-
-    const db = await connect();
-
-    const tx = db.transaction(storeName, 'readwrite');
-    const store = tx.objectStore(storeName);
-
-    try {
-        // Get all records in the store
-        const allRecords = await store.getAll() as TimelineRecord[];
-
-        // Find IDs of records to delete, ensuring 'id' is defined and a valid key type
-        const idsToDelete: (number)[] = allRecords
-            .filter(record => record.date < cutoffIsoDate && record.id !== undefined && (typeof record.id === 'number'))
-            .map(record => record.id as (number)); // Cast to specific IDBValidKey types
-
-        if (idsToDelete.length === 0) {
-            Logger.info(SOURCE, "No old records found to delete based on cutoff date or missing IDs.");
-            await tx.done;
-            return;
-        }
-
-        // Batch delete by key
-        // Each delete call runs within the same transaction.
-        await Promise.all(idsToDelete.map((id:any) => store.delete(id)));
-
-        Logger.info(SOURCE, `Successfully deleted ${idsToDelete.length} old records from '${storeName}'.`);
-
-    } catch (e) {
-        Logger.error(SOURCE, `Error during deletion of old timeline records from '${storeName}':`);
-      //  throw e;
-    } finally {
-        try {
-            await tx.done;
-            Logger.debug(SOURCE, "Transaction for old record deletion completed.");
-        } catch (txError) {
-            Logger.error(SOURCE, "Transaction for old record deletion failed or aborted:");
-           // throw txError;
-        }
-    }
-}
-// export async function deleteOldTimelineRecords(): Promise<void> {
-
-//   // Calculate the cutoff date (2 days ago) in ISO format
-//   const today = new Date();
-//   today.setHours(0, 0, 0, 0); // Normalize to midnight
-//   const cutoffDate = new Date(today);
-//   cutoffDate.setDate(today.getDate() - 2);
-//   const cutoffIso = getIsoDate(cutoffDate); // e.g., "2025-07-26"
-
-//   // Open your IndexedDB
-//   const db = await connect();
-
-//   // Get all keys & corresponding records
-//   const tx = db.transaction(TimeTrackerStoreTables.State, 'readwrite');
-//   const store = tx.objectStore(TimeTrackerStoreTables.State);
-
-//   // Get all records (optionally, you can use indexes to optimize)
-//   let cursor = await store.openCursor();
-//   while (cursor) {
-//     const record = cursor.value;
-//     if (isTimelineRecord(record) && record.date < cutoffIso) {
-//       await cursor.delete();
-//     }
-//     cursor = await cursor.continue();
-//   }
-
-//   await tx.done;
-//   db.close();
-//   console.log('Old records deleted from timeline.');
-// }
 
 const emitSuccessSyncStats = async (
   preferences: Preferences,
@@ -269,13 +181,8 @@ const sendWebActivity = async (
   }
 
   const { records, states } = transformTimelineInWebActivity(timeline);
-  let result = null;
-  try {
-    result = await sendStats(userToken, records, states);
-  }
-  catch (err) {
-    console.log(err);
-  }
+  const result:boolean = await sendStats(userToken, records, states);
+
   if (result) {
     await Promise.all([
       emitSuccessSyncStats(preferences, callback),
@@ -284,12 +191,12 @@ const sendWebActivity = async (
   } else {
     await emitFailedSyncStats(preferences, callback);
   }
+  
 };
 
 const sendWebActivityAutomatically = async (): Promise<void> => {
   const preferences: Preferences = await getSettings();
   if (preferences.connectionStatus !== ConnectionStatus.Connected) {
-    // await logMessage('unable to send stats when not connected');
     Logger.warn(SOURCE, 'unable to send stats when not connected');
     return;
   }
