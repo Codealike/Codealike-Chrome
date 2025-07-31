@@ -15,6 +15,7 @@ import { DateTime } from 'luxon';
 import { getDbCache, getLocalActivity } from '../../shared/db/sync-storage'
 import { getIsoDate } from '../../shared/utils/dates-helper';
 import { sumTimeStores } from '../../shared/utils/merge-time-store';
+import { Logger } from '../../shared/utils/logger';
 
 const SOURCE = 'BACKGROUND/SERVICES/STATS';
 
@@ -37,13 +38,22 @@ const clearStatistics = async (): Promise<void> => {
     getDbCache(),
   ]);
 
-  const totalActivites = sumTimeStores(dbStore,localStore);
+  const totalActivities = sumTimeStores(dbStore,localStore);
 
-  Logger.debug(SOURCE,`clearStatistics:sumTimeStores -> LOCAL:: ${JSON.stringify(localStore)} \n DBCacheStore:: ${JSON.stringify(dbStore)} `)
-  Logger.debug(SOURCE,`clearStatistics:sumTimeStores -> TOTAL : ${JSON.stringify(totalActivites)} `)
-  
+  Logger.debug(
+    SOURCE,
+    "clearStatistics:sumTimeStores -> BEFORE SUM\n" +
+      "localStore:\n" + JSON.stringify(localStore,null,2) +
+      "\ndbStore:\n" + JSON.stringify(dbStore,null,2) 
+  );
+
+  Logger.debug(SOURCE,
+    "clearStatistics:sumTimeStores -> AFTER SUM\n" +
+      JSON.stringify(totalActivities,null,2)
+    );
+
   await chrome.storage.local.set({
-    activity: totalActivites,
+    activity: totalActivities,
   });
 
   await disconnect();
@@ -51,7 +61,7 @@ const clearStatistics = async (): Promise<void> => {
   await db.clear(TimeTrackerStoreTables.State);
 
   //await deleteOldTimelineRecords(); // clear timeline 
-  await disconnect();
+  //await disconnect();
   await db.clear(TimeTrackerStoreTables.Timeline);
 
 };

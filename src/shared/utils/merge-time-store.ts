@@ -31,8 +31,8 @@ export const mergeTimeStore = (
 };
 
 function getAllKeys<T>(objA: T, objB: T): string[] {
-  const keysA = Object.keys(objA ?? {});
-  const keysB = Object.keys(objB ?? {});
+  const keysA = Object.keys(objA || {});
+  const keysB = Object.keys(objB || {});
   return Array.from(new Set([...keysA, ...keysB]));
 }
 
@@ -40,6 +40,9 @@ function sumSubKeys(
   subA: Record<string, number> = {},
   subB: Record<string, number> = {}
 ): Record<string, number> {
+  // Ensure both are objects, not null
+  subA=subA || {};
+  subB= subB || {}
   const allSubKeys = getAllKeys(subA, subB);
   const subResult: Record<string, number> = {};
 
@@ -57,6 +60,9 @@ export function sumTimeStores(
   storeA: TimeStore = {},
   storeB: TimeStore = {}
 ): TimeStore {
+    // Ensure both are objects, not null
+  storeA=storeA || {};
+  storeB= storeB || {}
   const allKeys = getAllKeys(storeA, storeB);
   const result: TimeStore = {};
 
