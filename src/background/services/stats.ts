@@ -1,5 +1,5 @@
 import { sendStats } from '../../shared/api/client';
-import { connect, disconnect, TimeTrackerStoreStateTableKeys, TimeTrackerStoreTables } from '../../shared/db/idb';
+import { connect, TimeTrackerStoreStateTableKeys, TimeTrackerStoreTables } from '../../shared/db/idb';
 import {
   ConnectionStatus,
   Preferences,
@@ -20,10 +20,12 @@ const fetchStatistics = async (): Promise<{
   timeline: TimelineRecord[];
 }> => {
   const db = await connect();
-  const timeline = await db.getAll(TimeTrackerStoreTables.Timeline);
+  const allTimeline = await db.getAll(TimeTrackerStoreTables.Timeline) as TimelineRecord[];
 
+  // Only fetch unsynced timeline records to avoid duplicating data 
+  const unsyncedTimeline = allTimeline.filter(record=>record.synced !==true);
   return {
-    timeline,
+    timeline: unsyncedTimeline,
   };
 };
 
@@ -55,10 +57,10 @@ const clearStatistics = async (): Promise<void> => {
   });
 
   // Clear dbStore (temp)
-  await disconnect();
+
   const db = await connect();
   await db.clear(TimeTrackerStoreTables.State);
-  await db.clear(TimeTrackerStoreTables.Timeline);
+  //await db.clear(TimeTrackerStoreTables.Timeline);
 
 };
 
@@ -127,6 +129,38 @@ const emitFailedSyncStats = async (
 const clearActiveTab = async()=>{
   const db = await connect();
   await db.delete(TimeTrackerStoreTables.State,TimeTrackerStoreStateTableKeys.ActiveTab);
+  Logger.debug(SOURCE,"clearActiveTab:");
+}
+
+// Mark timline records as synced instead of deleting them 
+const markTimelineRecordsAsSynced = async (timeline: TimelineRecord[]): Promise<void> =>{
+    const db = await connect();
+    for(const record of timeline){
+      if(record.id){
+        const updateRecord = {...record,synced:true}
+        await db.put(TimeTrackerStoreTables.Timeline, updateRecord);
+      }
+    }
+}
+
+const cleanupSyncedTimelineRecords = async (): Promise<void> =>{
+  const db = await connect();
+  const allRecords = await db.getAll(TimeTrackerStoreTables.Timeline) as TimelineRecord[];
+  const twoDaysAgo = new Date();
+  twoDaysAgo.setDate(twoDaysAgo.getDate()-2);
+  twoDaysAgo.setHours(0,0,0,0);
+  const cutoffDate = getIsoDate(twoDaysAgo);
+
+  const recordsToDelete  = allRecords.filter(record=>record.synced === true && record.date < cutoffDate)
+  if(recordsToDelete.length > 0 ){
+    for(const record of recordsToDelete){
+      if(record.id){
+        await db.delete(TimeTrackerStoreTables.Timeline, record?.id.toString())
+      }
+    }
+    Logger.debug(SOURCE,"cleanupSyncedTimelineRecords: old synced timeline records Cleaned up: "+ recordsToDelete.length)
+  }
+
 }
 
 const transformToWebActivity = (record: TimelineRecord): WebActivityRecord => {
@@ -195,6 +229,8 @@ const sendWebActivity = async (
     await Promise.all([
       emitSuccessSyncStats(preferences, callback),
       clearStatistics(),
+      markTimelineRecordsAsSynced(timeline),
+      cleanupSyncedTimelineRecords()
     ]);
   } else {
     await emitFailedSyncStats(preferences, callback);
@@ -206,6 +242,7 @@ const sendWebActivityAutomatically = async (): Promise<void> => {
   const preferences: Preferences = await getSettings();
   if (preferences.connectionStatus !== ConnectionStatus.Connected) {
     Logger.warn(SOURCE, 'unable to send stats when not connected');
+    await clearActiveTab()
     return;
   }
 

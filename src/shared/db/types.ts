@@ -33,6 +33,7 @@ export interface TimelineRecord {
   secure: boolean;
   activityPeriodStart: number;
   activityPeriodEnd: number;
+  synced?:boolean;
 }
 
 export type ActiveTabState = {
