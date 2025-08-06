@@ -8,7 +8,7 @@ export async function updateTotalTime(
   const timeline = await getActivityTimeline(currentIsoDate);
   
   const timeOnRecord = timeline
-    .filter((t) => t.hostname === hostname )
+    .filter((t) => t.hostname === hostname && t?.synced !== true)
     .reduce((acc, t) => {
         const duration = t.activityPeriodEnd - t.activityPeriodStart;
         return acc + (duration > 0 ? duration : 0); // sanitize data so that negative intervals are ignored

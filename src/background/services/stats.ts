@@ -10,6 +10,7 @@ import {
 import { getSettings, setSettings } from '../../shared/preferences';
 import { DateTime } from 'luxon';
 import { getDbCache, getLocalActivity } from '../../shared/db/sync-storage';
+import { ActiveTimelineRecordDao } from '../controller/active';
 import { getIsoDate } from '../../shared/utils/dates-helper';
 import { sumTimeStores } from '../../shared/utils/merge-time-store';
 import { Logger } from '../../shared/utils/logger';
@@ -42,12 +43,12 @@ const clearStatistics = async (): Promise<void> => {
 
   Logger.debug(
     SOURCE,
-    "clearStatistics:sumTimeStores -> \n--- BEFORE SUM ---\n" +
+    "clearStatistics: sumTimeStores -> \n--- Unaggregated Data ---\n" +
     "localStore (Persistent):\n" + 
     JSON.stringify(localStore?.[currentISODate] || {}, null, 2) +
     "\ndbStore (TempCache):\n" + 
     JSON.stringify(dbStore?.[currentISODate] || {}, null, 2) +
-    "\n--- AFTER SUM ---\n" +
+    "\n--- Final Result ---\n" +
     JSON.stringify(totalActivities?.[currentISODate] || {}, null, 2)
   );
 
@@ -57,9 +58,11 @@ const clearStatistics = async (): Promise<void> => {
   });
 
   // Clear dbStore (temp)
-
   const db = await connect();
-  await db.clear(TimeTrackerStoreTables.State);
+  await db.delete(TimeTrackerStoreTables.State,TimeTrackerStoreStateTableKeys.OverallState);
+
+  Logger.debug(SOURCE,"clearStatistics: OverallState");
+  // await db.clear(TimeTrackerStoreTables.State);
   //await db.clear(TimeTrackerStoreTables.Timeline);
 
 };
@@ -126,10 +129,27 @@ const emitFailedSyncStats = async (
   await clearActiveTab();
 };
 
+const isInactive = (activity: TimelineRecord): boolean => {
+  if (!activity || activity.activityPeriodEnd == null) {
+    return false;
+  }
+  const TWO_MINUTES_MS = 2 * 60 * 1000;
+  const nowUTC = DateTime.utc().toMillis();
+  return nowUTC - activity.activityPeriodEnd > TWO_MINUTES_MS;
+};
+
 const clearActiveTab = async()=>{
-  const db = await connect();
-  await db.delete(TimeTrackerStoreTables.State,TimeTrackerStoreStateTableKeys.ActiveTab);
-  Logger.debug(SOURCE,"clearActiveTab:");
+  let activeTabLogStr = "== Checking activite-tab ==";
+  const activeTimeline = new ActiveTimelineRecordDao();
+  const currentTimelineRecord: TimelineRecord | null = await activeTimeline.get();
+
+  if (currentTimelineRecord && isInactive(currentTimelineRecord)) {
+    const db = await connect();
+    await db.delete(TimeTrackerStoreTables.State,TimeTrackerStoreStateTableKeys.ActiveTab);
+    activeTabLogStr ="Deleting activite-tab due to inactivity...";
+  }
+
+  Logger.debug(SOURCE,`clearActiveTab: ${activeTabLogStr}`,(currentTimelineRecord || {}));
 }
 
 // Mark timline records as synced instead of deleting them 

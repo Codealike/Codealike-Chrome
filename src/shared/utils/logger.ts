@@ -52,12 +52,12 @@ const CACHE_EXPIRATION_MS = 5 * 1000; // 5 seconds in milliseconds
  * @param message - The log message.
  * @param context - Optional context object to store with the log.
  */
-async function addLog(level: LogEntry['level'],  source: string, message: string, context ? : object): Promise < void > {
+async function addLog(level: LogEntry['level'],  source: string, message: string, context ? : object ): Promise < void > {
     const preferences: Preferences = await getSettings();
     if(preferences.enableLogging!==true){
         return ;
     }
-    
+
     const timestamp = new Date().toISOString();
     const logEntry: LogEntry = {
       context,
@@ -80,7 +80,8 @@ async function addLog(level: LogEntry['level'],  source: string, message: string
         await chrome.storage.local.set({
             [LOG_STORAGE_KEY]: logs
         });
-        const contextStr = context ? "\nData: \n" + JSON.stringify(context,null,2): '';
+        const contextStr = context !== undefined && context !== null
+                            ? `\nData:\n${typeof context === 'object' ? JSON.stringify(context, null, 2) : String(context)}` : '';
         console.log(`${timestamp} [${level}] ${source} ${message} ${contextStr}`); // console.log for immediate visibility
         
     } catch (error) {

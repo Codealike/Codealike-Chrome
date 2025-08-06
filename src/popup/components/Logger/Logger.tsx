@@ -84,10 +84,11 @@ export const Logger: React.FC = () => {
         const formattedLogs = logsToDownload.map(log => {
             let contextStr = '';
             if (log.context && Object.keys(log.context).length > 0) {
+                contextStr += "\n";
                 try {
-                    contextStr = ` - Context: ${JSON.stringify(log.context)}`;
+                    contextStr += `- Debug Data: ${JSON.stringify(log.context, null, 2)}`;
                 } catch (e) {
-                    contextStr = ` - Context: [Serialization Error]`;
+                    contextStr += `- Debug Data: [Serialization Error]`;
                 }
             }
             return `${log.timestamp} [${log.level}] ${log.source} ${log.message} ${contextStr}`;

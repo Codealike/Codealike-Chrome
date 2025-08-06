@@ -25,6 +25,27 @@ export const getDbCache = async (): Promise<TimeStore> => {
   return (store || {}) as TimeStore;
 };
 
+
+type LogsHelper = {
+  [date: string]: {
+    [domain: string]: {
+      localTime: string;
+      timeSpentMinutes: string ;
+      timeSpentMs: number | undefined;
+    };
+  };
+};
+
+
+function getLocalTimeString(): string {
+  return new Date().toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    hour12: true,
+    minute: "2-digit",
+    second: "2-digit"
+  });
+}
+
 export const setDbCacheTimeStore = async (store: TimeStore) => {
   const db = await connect();
   await db.put(
@@ -83,7 +104,23 @@ export const setTotalDailyHostTime = async ({
                   "\nExisting Duration: " + getTimeFromMs(existingDuration) + " - "+ existingDuration+ "ms" +
                   "\nNEW Duration : " + getTimeFromMs(duration) + " - " + duration + "ms";
 
-  Logger.debug(SOURCE, `setTotalDailyHostTime: ${logStr}`, dayActivity);
+                 const logsHelperObj: LogsHelper = {};
+if (dayActivity && Object.keys(dayActivity).length > 0) {
+    if (!logsHelperObj[day]) {
+      logsHelperObj[day] = {};
+    }
+
+    for (const domain in dayActivity) {
+      const time = dayActivity[domain] || 0;
+      (logsHelperObj[day] ??= {})[domain] = {
+        localTime: getLocalTimeString(),
+        timeSpentMinutes: getTimeFromMs(time),
+        timeSpentMs: time,
+      };
+    }
+  }
+  Logger.debug(SOURCE, `setTotalDailyHostTime: ${logStr}`, (logsHelperObj??{}));
+
 
   await setTotalActivity(store);
 };
