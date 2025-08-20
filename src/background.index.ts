@@ -9,7 +9,6 @@ import {
   handleWindowFocusChange,
 } from './background/services/state-service';
 import { sendWebActivityAutomatically } from './background/services/stats';
-import { logMessage } from './background/tables/logs';
 import { Logger } from './shared/utils/logger';
 // import { CurrentClientVersion as EXTENSION_VERSION, IS_PRODUCTION_ENVIRONMENT } from './shared/api/constants';
 import { Tab } from './shared/browser-api.types';
@@ -113,7 +112,6 @@ ChromeServiceDefinition.forEach((service) => {
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   const { name } = alarm;
-  // await logMessage(name);
   Logger.info(SOURCE,name)
   for (let i = 0; i < ChromeServiceDefinition.length; i++) {
     const alarm: Service = ChromeServiceDefinition[i] as Service;
@@ -152,7 +150,6 @@ chrome.runtime.onConnect.addListener(function (devToolsPort: Port) {
 
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
   const ts = Date.now();
-  // await logMessage('tab activated: ' + activeInfo.tabId);
   const tabId = activeInfo.tabId;
 
   Logger.debug(SOURCE,'Background::chrome.tabs.onActivated: ' + tabId, activeInfo)
@@ -172,7 +169,6 @@ chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
   const newState = await handleTabUpdate(tab as Tab);
   if (newState) {
     await handleStateChange(newState, ts, debuggingTabs).catch((e) => {
-      logMessage('error handling tab activated: ' + e);
       Logger.error(SOURCE,'error handling tab activated: ' + tab.id, e)
     });
   }
