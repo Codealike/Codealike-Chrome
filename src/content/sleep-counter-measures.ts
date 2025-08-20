@@ -46,24 +46,17 @@ function connectToExtension() {
       return; // Already connected
     }
 
-    backgroundPort = chrome.runtime.connect({ name: "codealike-chrome" }); // Use a name for the port
-
+    backgroundPort = chrome.runtime.connect({ name: "codealike-chrome" }); 
     backgroundPort.onDisconnect.addListener(() => {
       //console.log("Disconnected from background script.");
       backgroundPort = null; // Reset the port
-
-      
-        throwRuntimeLastError(); // Your error logging function
-      
-
-      // Fallback reconnection after a delay
-      setTimeout(connectToExtension, getMinutesInMs(1));
+      throwRuntimeLastError(); // error logging function
+      setTimeout(connectToExtension, getMinutesInMs(1)); // Fallback reconnection after a delay
     });
 
     // Optionally, send an initial message upon successful connection
     backgroundPort.onMessage.addListener((message) => {
-      console.log("Received message from background:", message);
-      // Handle messages
+      Logger.debug(SOURCE,"Received message from background: " + message)
     });
 
     // console.log("Connected to background script.");
@@ -73,7 +66,8 @@ function connectToExtension() {
         isCouldNotEstablishConnectionError,
         isBackForwardCacheError
       )(error);
-      Logger.debug(SOURCE,"connectToExtension => ignore Error " + error)
+      const errorObj = error instanceof Error ? error : new Error(String(error));
+      Logger.error(SOURCE,"connectToExtension => ignore Error ", errorObj)
     }
 }
 

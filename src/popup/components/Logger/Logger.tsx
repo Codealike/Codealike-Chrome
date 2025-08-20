@@ -9,9 +9,6 @@ import {
   LogEntry
 } from '../../../shared/db/types';
 
-// Define LogEntry interface (can be imported from a shared types file if you have one)
-
-
 export const Logger: React.FC = () => {
     const { settings, updateSettings } = usePopupContext();
     const [isEnableLoggingChecked, setIsEnableLoggingChecked] = React.useState<boolean>(settings.enableLogging);
@@ -71,10 +68,6 @@ export const Logger: React.FC = () => {
             action: "getLogs"
         });
 
-        // const statsToDownload: TimeStore[] = await chrome.runtime.sendMessage({
-        //     action: "getState"
-        // });
-
         if (logsToDownload.length === 0) {
             alert("No logs available to download!");
             return;
@@ -95,7 +88,6 @@ export const Logger: React.FC = () => {
         }).join('\n');
 
         // Format stats into a plain text string
-// Format stats into a plain text string
          const _formatTimeStoreForLogs = (timeStore: TimeStore[]): string => {
             if (!timeStore || Object.keys(timeStore).length === 0) {
                 return "--- Time Store Data: No entries ---";
@@ -105,26 +97,19 @@ export const Logger: React.FC = () => {
             const sortedDates = Object.keys(timeStore).sort(); // Sort dates chronologically (string sort works for ISO dates)
 
             for (const date of sortedDates) {
-                //const dailyData = timeStore[date];
-                lines.push(`\n  Date: ${date}`); // New line for separation and indent for date
-
-                // if (dailyData && Object.keys(dailyData).length > 0) {
-                //     lines.push(formatDailyTimeData(dailyData, 2)); // Indent daily data by 2 levels (4 spaces)
-                // } else {
-                //     lines.push(`    No domain data for this date.`); // Default indent of 2 levels for this line
-                // }
+                lines.push(`\n  Date: ${date}`);
             }
 
             lines.push("\n--- End Time Store Data ---");
             return lines.join('\n');
         };
 
-        const fullLogContent = systemInfoString + formattedLogs; //+ formatTimeStoreForLogs(statsToDownload);
+        const fullLogContent = systemInfoString + formattedLogs;
 
         const blob = new Blob([fullLogContent], {
             type: 'text/plain'
         });
-        const url = URL.createObjectURL(blob); // This will now work in the popup context
+        const url = URL.createObjectURL(blob);
 
         const filename = `codealike_extension_logs_${new Date().toISOString().replace(/:/g, '-').replace(/\./g, '_')}.txt`;
 
@@ -185,10 +170,7 @@ export const Logger: React.FC = () => {
                     <Button
                         className="h-fit py-2 ml-2 px-4 border-2 border-solid border-transparent"
                         buttonType={ButtonType.Secondary}
-                        onClick={handleClearLogs}
-                    >
-                    Clear Logs
-                    </Button>
+                        onClick={handleClearLogs}>Clear Logs</Button>
             </div>
           }
           

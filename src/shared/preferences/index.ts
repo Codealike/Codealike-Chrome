@@ -19,7 +19,7 @@ export const setSettings = async (settings: Partial<Preferences>) => {
 export const getSettings = async () => {
 
       if(!(chrome && chrome?.storage && chrome?.storage.local)){
-        console.log("chrome not existing");
+        console.log("chrome object not existing");
         return {...DEFAULT_PREFERENCES};
       }
 

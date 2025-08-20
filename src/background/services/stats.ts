@@ -174,7 +174,6 @@ const cleanupSyncedTimelineRecords = async (): Promise<void> =>{
   const recordsToDelete  = allRecords.filter(record=>record.synced === true && record.date <= cutoffDate)
   if(recordsToDelete.length > 0 ){
     for(const record of recordsToDelete){
-      Logger.debug(SOURCE,"cleanupSyncedTimelineRecords: old synced timeline records Cleaned up: "+ recordsToDelete.length,record)
       if(record.id){
         await db.delete(TimeTrackerStoreTables.Timeline, record?.id.toString())
       }
