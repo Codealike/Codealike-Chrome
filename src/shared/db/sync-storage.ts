@@ -1,22 +1,52 @@
-import { getIsoDate } from '../utils/dates-helper';
-import { mergeTimeStore } from '../utils/merge-time-store';
+import { getIsoDate, getTimeFromMs } from '../utils/dates-helper';
 import {
   connect,
   TimeTrackerStoreStateTableKeys,
-  TimeTrackerStoreTables,
+  TimeTrackerStoreTables
 } from './idb';
+import { getSettings } from '../../shared/preferences';
 import { TimeStore } from './types';
 
-const getDbCache = async (): Promise<TimeStore> => {
+import {
+  Preferences,
+  ConnectionStatus
+} from '../../shared/db/types';
+
+import { Logger } from '../../shared/utils/logger';
+
+const SOURCE = 'DB/SYNC-Stroage';
+
+export const getDbCache = async (): Promise<TimeStore> => {
   const db = await connect();
   const store = await db.get(
     TimeTrackerStoreTables.State,
     TimeTrackerStoreStateTableKeys.OverallState,
   );
-
   return (store || {}) as TimeStore;
 };
-const setDbCache = async (store: TimeStore) => {
+
+
+type LogsHelper = {
+  [date: string]: {
+    [domain: string]: {
+      localTime: string;
+      timeSpentMinutes: string ;
+      timeSpentMs: number | undefined;
+    };
+  };
+};
+
+
+function getLocalTimeString(): string {
+  return new Date().toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    hour12: true,
+    minute: "2-digit",
+    second: "2-digit"
+  });
+}
+
+export const setDbCacheTimeStore = async (store: TimeStore) => {
   const db = await connect();
   await db.put(
     TimeTrackerStoreTables.State,
@@ -26,40 +56,71 @@ const setDbCache = async (store: TimeStore) => {
 };
 
 const setTotalActivity = async (store: TimeStore) => {
-  await setDbCache(store);
-  await chrome.storage.local.set({
-    activity: store,
-  });
+  //Logger.debug(SOURCE,`setTotalActivity`, store);
+  await setDbCacheTimeStore(store);
 };
 
+export const getLocalActivity = async (): Promise<TimeStore> => {
+ const {activity={}} = await chrome.storage.local.get('activity')
+ return activity;
+}
+
 export const getTotalActivity = async (): Promise<TimeStore> => {
-  const [localStore, dbStore] = await Promise.all([
-    chrome.storage.local.get('activity').then((store) => store?.activity ?? {}),
-    getDbCache(),
-  ]);
-  return mergeTimeStore(dbStore, localStore);
+  const preferences: Preferences = await getSettings();
+
+  // Check if account is not connected with API key
+  if (preferences.connectionStatus !== ConnectionStatus.Connected) {
+     const dbStore = await getDbCache();
+    return dbStore;
+  }
+  
+  const dbStore = await getLocalActivity();
+  return dbStore
 };
 
 export const getCurrentHostTime = async (host: string): Promise<number> => {
-  const store = await getTotalActivity();
+  const store: TimeStore = await getTotalActivity();
   const currentDate = getIsoDate(new Date());
 
-  return (store[currentDate] as any)?.[host] ?? 0;
+  return store[currentDate]?.[host] ?? 0;
 };
 
 export const setTotalDailyHostTime = async ({
   date: day,
   host,
-  duration,
+  duration
 }: {
   date: string;
   host: string;
   duration: number;
 }) => {
-  const store = await getTotalActivity();
+  const store:TimeStore = await getDbCache();
+  const dayActivity = (store[day] ??= {}) as Record<string, number>;
+  const existingDuration = (dayActivity[host] ?? 0)
 
-  const dayActivity = (store[day] ??= {});
   dayActivity[host] = duration;
 
-  return setTotalActivity(store);
+  const logStr =  "\n--- setTotal Time Cache --\nHost: " + host + 
+                  "\nExisting Duration: " + getTimeFromMs(existingDuration) + " - "+ existingDuration+ "ms" +
+                  "\nNEW Duration : " + getTimeFromMs(duration) + " - " + duration + "ms";
+
+                 const logsHelperObj: LogsHelper = {};
+if (dayActivity && Object.keys(dayActivity).length > 0) {
+    if (!logsHelperObj[day]) {
+      logsHelperObj[day] = {};
+    }
+
+    for (const domain in dayActivity) {
+      const time = dayActivity[domain] || 0;
+      (logsHelperObj[day] ??= {})[domain] = {
+        localTime: getLocalTimeString(),
+        timeSpentMinutes: getTimeFromMs(time),
+        timeSpentMs: time,
+      };
+    }
+  }
+  Logger.debug(SOURCE, `setTotalDailyHostTime: ${logStr}`, (logsHelperObj??{}));
+
+
+  await setTotalActivity(store);
 };

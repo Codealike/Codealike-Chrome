@@ -13,6 +13,7 @@ const GeneralTimelineFC: React.FC<GeneralTimelineProps> = ({
   activityTimeline,
   title,
   emptyHoursMarginCount = 2,
+  description,
 }) => {
   return (
     <Panel>
@@ -20,6 +21,7 @@ const GeneralTimelineFC: React.FC<GeneralTimelineProps> = ({
         <Icon type={IconType.TimePast} />
         {title}
         {filteredHostname ? ` On ${filteredHostname}` : ''}
+        <span className='text-xs'> ({description})</span>
       </PanelHeader>
       <PanelBody
         className={twMerge(

@@ -1,16 +1,16 @@
 import * as React from 'react';
 
 import { TimeStore } from '../../hooks/useTimeStore';
-import { getTotalWeeklyActivity } from '../../selectors/get-total-weekly-activity';
-import { get7DaysPriorDate, getIsoDate } from '../../../shared/utils/dates-helper';
+import { get30DaysPriorDate, getIsoDate } from '../../../shared/utils/dates-helper';
 
 import { TimeUsagePanel } from '../DailyTimeUsage/DailyTimeUsage';
 import { WebsiteActivityTable } from '../WebsiteActivityTable/WebsiteActivityTable';
-import { WeeklyWebsiteActivityChart } from '../WeeklyWebsiteActivityChart/WeeklyWebsiteActivityChart';
+import { ActivityPageMonthlyActivityTabProps } from './types';
+import { getTotalMonthlyActivity } from '../../selectors/get-total-monthly-activity';
+import { MonthlyWebsiteActivityChart } from '../MonthlyWebsiteActivityChart/MonthlyWebsiteActivityChart';
 
-import { ActivityPageWeeklyActivityTabProps } from './types';
 
-export const ActivityPageWeeklyActivityTab: React.FC<ActivityPageWeeklyActivityTabProps> =
+export const ActivityPageMonthlyActivityTab: React.FC<ActivityPageMonthlyActivityTabProps> =
   ({ store, sundayDate }) => {
     const [pickedDomain, setPickedDomain] = React.useState<null | string>(null);
     const scrollToRef = React.useRef<HTMLDivElement | null>(null);
@@ -20,9 +20,9 @@ export const ActivityPageWeeklyActivityTab: React.FC<ActivityPageWeeklyActivityT
       scrollToRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, []);
 
-    const allWeekActivity = React.useMemo(
+    const allMonthlyActivity = React.useMemo(
       () =>
-        get7DaysPriorDate(sundayDate).reduce((acc, date) => {
+        get30DaysPriorDate(sundayDate).reduce((acc, date) => {
           const isoDate = getIsoDate(date);
           acc[isoDate] = store[isoDate] || {};
 
@@ -31,12 +31,12 @@ export const ActivityPageWeeklyActivityTab: React.FC<ActivityPageWeeklyActivityT
       [store, sundayDate]
     );
 
-    const filteredWebsiteWeekActivity = React.useMemo(() => {
+    const filteredWebsiteMonthActivity = React.useMemo(() => {
       if (pickedDomain === null) {
-        return allWeekActivity;
+        return allMonthlyActivity;
       }
 
-      return Object.entries(allWeekActivity).reduce(
+      return Object.entries(allMonthlyActivity).reduce(
         (acc, [date, dateWebsitesUsage]) => {
           acc[date] = {
             [pickedDomain]: dateWebsitesUsage[pickedDomain] || 0,
@@ -44,15 +44,13 @@ export const ActivityPageWeeklyActivityTab: React.FC<ActivityPageWeeklyActivityT
 
           return acc;
         },
-        {} as typeof allWeekActivity
+        {} as typeof allMonthlyActivity
       );
-    }, [allWeekActivity, pickedDomain]);
-    // console.log('filteredWebsiteWeekActivity --> ', JSON.stringify(filteredWebsiteWeekActivity, null, 2))
+    }, [allMonthlyActivity, pickedDomain]);
 
-
-    const totalWebsiteWeeklyActivity = React.useMemo(
+    const totalWebsiteMonthlyActivity = React.useMemo(
       () =>
-        Object.values(allWeekActivity).reduce((acc, dailyUsage) => {
+        Object.values(allMonthlyActivity).reduce((acc, dailyUsage) => {
           Object.entries(dailyUsage).forEach(([key, value]) => {
             acc[key] ??= 0;
             acc[key] += value;
@@ -60,16 +58,14 @@ export const ActivityPageWeeklyActivityTab: React.FC<ActivityPageWeeklyActivityT
 
           return acc;
         }, {} as Record<string, number>),
-      [allWeekActivity]
+      [allMonthlyActivity]
     );
-    // console.log('totalWebsiteWeeklyActivity --> ', JSON.stringify(totalWebsiteWeeklyActivity, null, 2))
 
-
-    const averageWeeklyActivity = React.useMemo(() => {
-      const averageWeekly =
-        getTotalWeeklyActivity(filteredWebsiteWeekActivity, sundayDate) / 7;
-      return averageWeekly;
-    }, [filteredWebsiteWeekActivity, sundayDate]);
+    const averageMonthlyActivity = React.useMemo(() => {
+      const averageMonthly =
+        getTotalMonthlyActivity(filteredWebsiteMonthActivity, sundayDate) / 7;
+      return averageMonthly;
+    }, [filteredWebsiteMonthActivity, sundayDate]);
 
     const presentedPickedDomain = pickedDomain ?? 'All Websites';
 
@@ -77,11 +73,11 @@ export const ActivityPageWeeklyActivityTab: React.FC<ActivityPageWeeklyActivityT
       <div>
         <TimeUsagePanel
           title="Average Daily Activity"
-          time={averageWeeklyActivity}
+          time={averageMonthlyActivity}
         />
         <div ref={scrollToRef}>
-          <WeeklyWebsiteActivityChart
-            store={filteredWebsiteWeekActivity}
+          <MonthlyWebsiteActivityChart
+            store={filteredWebsiteMonthActivity}
             sundayDate={sundayDate}
             presentChartTitle={() =>
               `Activity on ${presentedPickedDomain} per day`
@@ -89,8 +85,8 @@ export const ActivityPageWeeklyActivityTab: React.FC<ActivityPageWeeklyActivityT
           />
         </div>
         <WebsiteActivityTable
-          websiteTimeMap={totalWebsiteWeeklyActivity}
-          title={'Websites This Week'}
+          websiteTimeMap={totalWebsiteMonthlyActivity}
+          title={'Websites This Month'}
           onDomainRowClicked={handleDomainRowClick}
         />
       </div>

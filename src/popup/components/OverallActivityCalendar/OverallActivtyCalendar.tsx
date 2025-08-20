@@ -34,7 +34,7 @@ export const OverallActivityCalendarPanel: React.FC<OverallActivityCalendarProps
       <Panel>
         <PanelHeader>
           <Icon type={IconType.CalendarClock} />
-          Overall Activity
+          Overall Activity <span className='text-xs'> (Your overall activity timeline.)</span>
         </PanelHeader>
         <PanelBody className="min-h-[115px]">
           <GithubCalendarWrapper

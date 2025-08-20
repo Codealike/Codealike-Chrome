@@ -1,5 +1,6 @@
 import { getTabInfo } from './background/browser-api/tabs';
 import { handleStateChange } from './background/controller';
+
 import {
   handleActiveTabStateChange,
   handleAlarm,
@@ -8,17 +9,20 @@ import {
   handleWindowFocusChange,
 } from './background/services/state-service';
 import { sendWebActivityAutomatically } from './background/services/stats';
-import { logMessage } from './background/tables/logs';
+import { Logger } from './shared/utils/logger';
+// import { CurrentClientVersion as EXTENSION_VERSION, IS_PRODUCTION_ENVIRONMENT } from './shared/api/constants';
 import { Tab } from './shared/browser-api.types';
 import { DebugTab } from './shared/db/types';
 import { WAKE_UP_BACKGROUND } from './shared/messages';
-
 import Port = chrome.runtime.Port;
+
+const SOURCE = 'BACKGROUND/INDEX';
 
 interface Service {
   name: string;
   intervalInMinutes: number;
   handler: () => Promise<void>;
+  delayInMinutes?: number;
 }
 
 const devToolsPorts: { [tabId: number]: Port } = {};
@@ -88,18 +92,27 @@ const ChromeServiceDefinition: Array<Service> = [
     handler: sendStatsAlarmHandler,
     intervalInMinutes: ASYNC_STATS_INTERVAL_MINUTES,
     name: ASYNC_STATS_INTERVAL_ALARM_NAME,
-  },
+  }
 ];
 
 ChromeServiceDefinition.forEach((service) => {
-  chrome.alarms.create(service.name, {
-    periodInMinutes: service.intervalInMinutes,
-  });
+  chrome.alarms.clear(service.name,()=>{
+    chrome.alarms.create(service.name, {
+      ...(service.delayInMinutes != null
+        ? { delayInMinutes: service.delayInMinutes }
+        : {}),
+      ...(service.intervalInMinutes != null
+        ? { periodInMinutes: service.intervalInMinutes }
+        : {})
+    });
+    //console.log(`Created alarm:${service.name} delay: ${service.delayInMinutes}, period: ${service.intervalInMinutes}`)
+  })
+
 });
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   const { name } = alarm;
-  await logMessage(name);
+  Logger.info(SOURCE,name)
   for (let i = 0; i < ChromeServiceDefinition.length; i++) {
     const alarm: Service = ChromeServiceDefinition[i] as Service;
     if (alarm.name === name) {
@@ -137,24 +150,26 @@ chrome.runtime.onConnect.addListener(function (devToolsPort: Port) {
 
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
   const ts = Date.now();
-  await logMessage('tab activated: ' + activeInfo.tabId);
+  const tabId = activeInfo.tabId;
+
+  Logger.debug(SOURCE,'Background::chrome.tabs.onActivated: ' + tabId, activeInfo)
 
   const newState = await handleActiveTabStateChange(activeInfo);
   if (newState) {
     await handleStateChange(newState, ts, debuggingTabs).catch((e) => {
-      logMessage('error handling tab activated: ' + e);
+      Logger.error(SOURCE,'error handling tab activated: ' + e)
     });
   }
 });
 
 chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
   const ts = Date.now();
-  await logMessage('tab updated: ' + tab.id);
+  Logger.debug(SOURCE,'Background::chrome.tabs.onUpdated: ' + tab.id)
 
   const newState = await handleTabUpdate(tab as Tab);
   if (newState) {
     await handleStateChange(newState, ts, debuggingTabs).catch((e) => {
-      logMessage('error handling tab activated: ' + e);
+      Logger.error(SOURCE,'error handling tab activated: ' + tab.id, e)
     });
   }
 });
@@ -162,8 +177,7 @@ chrome.tabs.onUpdated.addListener(async (_tabId, _changeInfo, tab) => {
 // onFocusChanged does not work in Windows 7/8/10 when user alt-tabs or clicks away
 chrome.windows.onFocusChanged.addListener(async (windowId) => {
   const ts = Date.now();
-  await logMessage('window focus changed: ' + windowId);
-
+  Logger.debug(SOURCE,'chrome.windows.onFocusChange: ' + windowId)
   const newState = await handleWindowFocusChange(windowId);
   if (newState) {
     await handleStateChange(newState, ts, debuggingTabs);
@@ -171,7 +185,7 @@ chrome.windows.onFocusChanged.addListener(async (windowId) => {
 });
 
 chrome.idle.onStateChanged.addListener(async (newIdleState) => {
-  await logMessage('idle state changed: ' + newIdleState);
+  Logger.debug(SOURCE,'chrome.idle: ' + newIdleState)
   const ts = Date.now();
 
   const newTabState = await handleIdleStateChange(newIdleState);
@@ -180,7 +194,7 @@ chrome.idle.onStateChanged.addListener(async (newIdleState) => {
 });
 
 chrome.webNavigation.onCompleted.addListener(async (details) => {
-  await logMessage('web navigation: ' + details.tabId);
+  Logger.debug(SOURCE,'chrome.webNavigation: ' + details.tabId);
   const ts = Date.now();
 
   const tab = await getTabInfo(details.tabId);
@@ -197,15 +211,33 @@ chrome.webNavigation.onCompleted.addListener(async (details) => {
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendMessage) => {
-  if (message.type === WAKE_UP_BACKGROUND) {
-    sendMessage({ alive: true });
+    if (message.type === WAKE_UP_BACKGROUND) {
+      sendMessage({ alive: true });
 
-    const ts = Date.now();
-    handleAlarm().then(async (newState) => {
-      await handleStateChange(newState, ts, debuggingTabs);
-    });
-  }
+      const ts = Date.now();
+      handleAlarm().then(async (newState) => {
+        await handleStateChange(newState, ts, debuggingTabs);
+      });
+       return true; // Keep the message channel open
+   }
+    if (message.action === "clearLogs") {
+        Logger.clear();
+        sendMessage({
+            success: true
+        });
+        return true;
+    }
+    if (message.action === "getLogs") {
+        Logger.get().then(logs => {
+            sendMessage(logs); // Send the retrieved logs back
+        });
+        return true; 
+    }
+
 });
+
+Logger.debug(SOURCE,"===Background script started===");
+// Logger.debug(SOURCE,`Extension running in: ${IS_PRODUCTION_ENVIRONMENT ? 'Production' : 'Development'} mode.`);
 
 // This is a background script for a Google Chrome extension. It creates an alarm
 // that runs a function at a regular interval, listens for events such as tab

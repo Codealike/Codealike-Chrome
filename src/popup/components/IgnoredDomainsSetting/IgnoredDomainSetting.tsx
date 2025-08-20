@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { twMerge } from 'tailwind-merge';
 
 import { Button, ButtonType } from '../../../blocks/Button';
 import { Icon, IconType } from '../../../blocks/Icon';
-import { Input } from '../../../blocks/Input';
+import { TextArea } from '../../../blocks/Input';
 import { PanelBody } from '../../../blocks/Panel';
 import { assertDomainIsValid } from '../../../shared/utils/domains';
 import { usePopupContext } from '../../hooks/PopupContext';
@@ -14,27 +13,46 @@ export const IgnoredDomainSetting: React.FC = () => {
     settings.ignoredHosts
   );
   const [domainToIgnore, setDomainToIgnore] = React.useState<string>('');
-  const [isDomainsListExpanded, setDomainsListExpanded] =
-    React.useState<boolean>(false);
+  const [state, setState] = React.useState<{
+      status: boolean,
+      statusText: string,
+    }>({
+      status: false,
+      statusText: '',
+    });
 
   const handleAddIgnoredDomain = React.useCallback(() => {
     try {
-      assertDomainIsValid(domainToIgnore);
-      setIgnoredDomains((prev) => {
-        const newIgnoredHostList = Array.from(
-          new Set([...prev, domainToIgnore])
-        );
-
-        updateSettings({
-          ignoredHosts: newIgnoredHostList,
+      const ignoredHostsList = domainToIgnore.split(',')
+      for (const host of ignoredHostsList) {
+        assertDomainIsValid(host.trim());
+        setIgnoredDomains((prev) => {
+          const newIgnoredHostList = Array.from(
+            new Set([...prev, host.trim()])
+          );
+  
+          updateSettings({
+            ignoredHosts: newIgnoredHostList,
+          });
+  
+          return newIgnoredHostList;
         });
+      }
 
-        return newIgnoredHostList;
-      });
-
+      setState((prev) => ({
+        ...prev,
+        status: false,
+        statusText: ''
+      }));
       setDomainToIgnore('');
-    } catch (_) {
-      //
+    } catch (error) {
+      const errorMessage = (error as Error)?.message;
+
+      setState((prev) => ({
+        ...prev,
+        status: true,
+        statusText: errorMessage
+      }));
     }
   }, [domainToIgnore, updateSettings]);
 
@@ -54,16 +72,20 @@ export const IgnoredDomainSetting: React.FC = () => {
   );
 
   const handleDomainToIgnoreChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setDomainToIgnore(e.target.value);
     },
     []
   );
 
-  const handleToggleDomainsListExpanded = React.useCallback(() => {
-    setDomainsListExpanded((prev) => !prev);
-  }, [setDomainsListExpanded]);
+  const handleKeyDown = ((event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if(event.key === 'Enter') {
+      event.preventDefault();
+      handleAddIgnoredDomain()
+    }
+  })
 
+  const { status, statusText } = state;
   return (
     <div className="p-2">
       <PanelBody className="flex flex-col gap-2">
@@ -71,10 +93,11 @@ export const IgnoredDomainSetting: React.FC = () => {
         <div className="flex justify-between items-end gap-2">
           <label className="flex flex-col gap-1 w-full">
             Domain
-            <Input
-              placeholder="e.g. google.com"
+            <TextArea
+              placeholder="e.g. google.com, bing.com (comma separated)"
               value={domainToIgnore}
               onChange={handleDomainToIgnoreChange}
+              onKeyDown={handleKeyDown}
             />
           </label>
           <Button
@@ -85,15 +108,13 @@ export const IgnoredDomainSetting: React.FC = () => {
             Add
           </Button>
         </div>
+        <div className="flex justify-between items-end gap-2">
+          {status
+            && (<p className="text-red-600">{statusText}</p>)
+          }
+        </div>
         <div className="flex flex-col gap-2">
-          <a
-            href="#"
-            className="text-blue-500"
-            onClick={handleToggleDomainsListExpanded}
-          >
-            View all blacklisted domains
-          </a>
-          <div className={twMerge('hidden', isDomainsListExpanded && 'block')}>
+          <div className="block max-h-[125px] overflow-auto scroll-auto">
             {!ignoredDomains.length && (
               <p className="text-gray-500">No blacklisted domains</p>
             )}
@@ -101,7 +122,7 @@ export const IgnoredDomainSetting: React.FC = () => {
               <div key={domain} className="flex items-center gap-2">
                 <Icon
                   type={IconType.Close}
-                  className="hover:text-neutral-400 cursor-pointer"
+                  className="hover:text-[#ff1a1a] cursor-pointer text-red-600"
                   onClick={() => handleRemoveIgnoredDomain(domain)}
                 />
                 <span>{domain}</span>
