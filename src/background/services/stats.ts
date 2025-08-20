@@ -166,14 +166,15 @@ const markTimelineRecordsAsSynced = async (timeline: TimelineRecord[]): Promise<
 const cleanupSyncedTimelineRecords = async (): Promise<void> =>{
   const db = await connect();
   const allRecords = await db.getAll(TimeTrackerStoreTables.Timeline) as TimelineRecord[];
-  const twoDaysAgo = new Date();
-  twoDaysAgo.setDate(twoDaysAgo.getDate()-2);
-  twoDaysAgo.setHours(0,0,0,0);
-  const cutoffDate = getIsoDate(twoDaysAgo);
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
+  oneMonthAgo.setHours(0,0,0,0);
+  const cutoffDate = getIsoDate(oneMonthAgo);
 
-  const recordsToDelete  = allRecords.filter(record=>record.synced === true && record.date < cutoffDate)
+  const recordsToDelete  = allRecords.filter(record=>record.synced === true && record.date <= cutoffDate)
   if(recordsToDelete.length > 0 ){
     for(const record of recordsToDelete){
+      Logger.debug(SOURCE,"cleanupSyncedTimelineRecords: old synced timeline records Cleaned up: "+ recordsToDelete.length,record)
       if(record.id){
         await db.delete(TimeTrackerStoreTables.Timeline, record?.id.toString())
       }
