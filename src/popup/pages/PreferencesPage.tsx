@@ -4,10 +4,11 @@ import {FC} from 'react';
 import { Panel, PanelBody, PanelHeader } from './../../blocks/Panel';
 import { Input } from './../../blocks/Input';
 
-
 import {IgnoredDomainSetting} from '../components/IgnoredDomainsSetting/IgnoredDomainSetting';
 import { WhitelistDomainSetting } from '../components/WhitelistDomainsSetting/WhitelistDomainSetting';
 import {UserTokenSetting} from "../components/UserTokenSetting/UserTokenSetting";
+import { ThemeSelector } from '../components/ThemeSelector';
+import { Logger } from '../components/Logger/Logger';
 
 export const PreferencesPage: FC = () => {
     const [isWhitelistShown, hideWhitelist] = React.useState<boolean>(true);
@@ -45,6 +46,8 @@ export const PreferencesPage: FC = () => {
                     {(isWhitelistShown ? <WhitelistDomainSetting />: <IgnoredDomainSetting />)}
                  </PanelBody>
             </Panel>
+            <ThemeSelector />
+            {<Logger />}
         </div>
     );
 };

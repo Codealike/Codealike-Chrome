@@ -75,7 +75,15 @@ export const UserTokenSetting: React.FC = () => {
 
   React.useEffect(() => {
     (async function () {
-      authorizeUserToken();
+      const { connectionStatus } = settings;
+
+      if (connectionStatus === ConnectionStatus.Connected) {
+        setState({
+          ...state,
+          connectionStatus: ConnectionStatus.Connected,
+          status: 'Codealike is connected',
+        });
+      }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -90,7 +98,7 @@ export const UserTokenSetting: React.FC = () => {
           <label className="flex flex-col gap-1 w-full">
             <Input
               placeholder="e.g. user token"
-              value={userToken}
+              value={userToken ?? ''}
               onChange={handleUserToken}
             />
           </label>

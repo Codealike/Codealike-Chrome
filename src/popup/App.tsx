@@ -1,6 +1,7 @@
 import { Icon, IconType } from '../blocks/Icon';
 import { Panel } from '../blocks/Panel';
 import './App.css';
+import { UserInfoHeader } from './components/UserInfoHeader/UserInfoHeader';
 import { PopupContextProvider } from './hooks/PopupContext';
 import { ActivityPage } from './pages/ActivityPage';
 import { OverallPage } from './pages/OverallPage';
@@ -18,7 +19,7 @@ const PAGES_VALUES = Object.values(Pages);
 
 export const PopupApp: React.FC = () => {
   const [activePage, setPage] = React.useState({
-    params: {} as Record<string, any>,
+    params: {} as Record<string, string>,
     tab: Pages.Overview,
   });
 
@@ -63,7 +64,7 @@ export const PopupApp: React.FC = () => {
               activePage.tab === tab &&
                 'bg-neutral-300 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-200',
               activePage.tab !== tab &&
-                'hover:bg-neutral-100 text-neutral-400 dark:hover:bg-neutral-900 dark:text-neutral-400',
+                'hover:bg-neutral-100 text-[#737373] dark:hover:bg-neutral-900 dark:text-neutral-400',
               tab === Pages.Preferences && 'max-w-[75px]',
             )}
             key={tab}
@@ -83,9 +84,9 @@ export const PopupApp: React.FC = () => {
   return (
     <PopupContextProvider>
       <div className="flex flex-col p-2 pt-4 dark:bg-neutral-900">
-        <div className="text-orange-500 p-2 border-none bg-slate-200 dark:bg-slate-800 tab-body-shadow dark:dark-tab-body-shadow">
+        <div className="text-orange-500 p-2 border-none bg-slate-200 dark:bg-slate-800 tab-body-shadow dark:dark-tab-body-shadow flex">
           <img src="./icons/icon-16.png"></img>
-          Codealike
+          <UserInfoHeader />
         </div>
         <Panel className="flex gap-2 p-2 font-semibold">{tabs}</Panel>
         <Panel className="p-2 border-none bg-slate-200 dark:bg-slate-800 tab-body-shadow dark:dark-tab-body-shadow">
