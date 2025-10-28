@@ -2,6 +2,7 @@ import {
   isCouldNotEstablishConnectionError,
   isExtensionContextInvalidatedError,
   isBackForwardCacheError,
+  isTabNotExistError,
   throwRuntimeLastError,
 } from '../background/browser-api/errors';
 import { WAKE_UP_BACKGROUND } from '../shared/messages';
@@ -34,7 +35,8 @@ function tryWakeUpBackground() {
       ignore(
         isExtensionContextInvalidatedError,
         isCouldNotEstablishConnectionError,
-        isBackForwardCacheError
+        isBackForwardCacheError,
+        isTabNotExistError
       )(error);
       Logger.debug(SOURCE,"tryWakeUpBackground => ignore Error " + error)
     }
