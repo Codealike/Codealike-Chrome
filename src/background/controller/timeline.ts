@@ -17,7 +17,10 @@ export async function saveTimelineRecord(
 
   // We need to split dates into 2 events for iso date index to work
   const yesterdayTimeline = { ...currentTimelineRecord };
-  yesterdayTimeline.activityPeriodEnd = millisecondBeforeMidnight;
+
+  // Ensure activityPeriodEnd is never less than activityPeriodStart
+  const endTime = Math.max(millisecondBeforeMidnight, currentTimelineRecord.activityPeriodStart)
+  yesterdayTimeline.activityPeriodEnd = endTime;
 
   currentTimelineRecord.activityPeriodStart = midnightToday;
   currentTimelineRecord.date = currentIsoDate;

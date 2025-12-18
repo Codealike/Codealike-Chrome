@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { twMerge } from 'tailwind-merge';
 
-import { Button } from '../../../blocks/Button';
+import { Button, ButtonType } from '../../../blocks/Button';
 import { Icon, IconType } from '../../../blocks/Icon';
 import { getAppTheme, setAppTheme } from '../../hooks/useTheme';
+import { Panel, PanelBody, PanelHeader } from '../../../blocks/Panel';
 
 export const ThemeSelector: React.FC = () => {
-  const [theme, setTheme] = React.useState(getAppTheme());
+  const [_theme, setTheme] = React.useState(getAppTheme());
 
   const handleThemeChange = React.useCallback(
     (theme: 'light' | 'dark' | 'auto') => {
@@ -29,37 +29,34 @@ export const ThemeSelector: React.FC = () => {
   }, [handleThemeChange]);
 
   return (
-    <div className="flex flex-col gap-2">
-      <h3>Theme</h3>
-      <div className="flex flex-row rounded-lg border-2 border-solid border-neutral-300 dark:border-neutral-900 overflow-hidden">
-        <Button
-          onClick={handleAutoThemeSelect}
-          className={twMerge(
-            'flex-1 rounded-none',
-            theme === 'auto' && 'bg-neutral-300 dark:bg-neutral-900'
-          )}
-        >
-          <Icon type={IconType.Eclipse} /> Auto
-        </Button>
-        <Button
-          onClick={handleDarkThemeSelect}
-          className={twMerge(
-            'flex-1 rounded-none border-l-2 border-r-2 border-solid border-neutral-300 dark:border-neutral-900',
-            theme === 'dark' && 'bg-neutral-300 dark:bg-neutral-900'
-          )}
-        >
-          <Icon type={IconType.Moon} /> Dark
-        </Button>
-        <Button
-          onClick={handleLightThemeSelect}
-          className={twMerge(
-            'flex-1 rounded-none',
-            theme === 'light' && 'bg-neutral-300 dark:bg-neutral-900'
-          )}
-        >
-          <Icon type={IconType.Sun} /> Light
-        </Button>
-      </div>
-    </div>
+    <Panel>
+      <PanelHeader>Change Theme</PanelHeader>
+      <PanelBody className="flex flex-col gap-2">
+        <p>You can change your extension theme from here.</p>
+        <div className="flex justify-between items-end gap-2">
+          <Button
+            className="h-fit py-2 px-4 border-2 border-solid border-transparent"
+            buttonType={ButtonType.Primary}
+            onClick={handleAutoThemeSelect}
+          >
+            <Icon type={IconType.Eclipse} /> Auto
+          </Button>
+          <Button
+            className="h-fit py-2 px-4 border-2 border-solid border-transparent"
+            buttonType={ButtonType.Primary}
+            onClick={handleDarkThemeSelect}
+          >
+            <Icon type={IconType.Moon} /> Dark
+          </Button>
+          <Button
+            className="h-fit py-2 px-4 border-2 border-solid border-transparent"
+            buttonType={ButtonType.Primary}
+            onClick={handleLightThemeSelect}
+          >
+            <Icon type={IconType.Sun} /> Light
+          </Button>
+        </div>
+      </PanelBody>
+    </Panel>
   );
 };

@@ -1,28 +1,27 @@
 import {
   isCouldNotEstablishConnectionError,
   isExtensionContextInvalidatedError,
+  isBackForwardCacheError,
+  isTabNotExistError,
   throwRuntimeLastError,
 } from '../background/browser-api/errors';
 import { WAKE_UP_BACKGROUND } from '../shared/messages';
 import { getMinutesInMs } from '../shared/utils/dates-helper';
 import { ignore } from '../shared/utils/errors';
+import { Logger } from '../shared/utils/logger';
+
+const SOURCE = 'CONTENT/SLEEP-COUNTER-MEASURES';
 
 let messagePollingId = 0;
+let backgroundPort: chrome.runtime.Port | null = null;
 
 function tryWakeUpBackground() {
-  chrome.runtime.sendMessage({ type: WAKE_UP_BACKGROUND }, (response) => {
+ try {
+  chrome.runtime?.sendMessage({ type: WAKE_UP_BACKGROUND }, (response) => {
     if (!response) {
       console.error('Background is not awake');
     }
-
-    try {
       throwRuntimeLastError();
-    } catch (error) {
-      ignore(
-        isExtensionContextInvalidatedError,
-        isCouldNotEstablishConnectionError
-      )(error);
-    }
 
     // Continue polling only if the background is not invalidated and visible
     if (document.visibilityState === 'visible') {
@@ -32,20 +31,46 @@ function tryWakeUpBackground() {
       );
     }
   });
+  } catch (error) {
+      ignore(
+        isExtensionContextInvalidatedError,
+        isCouldNotEstablishConnectionError,
+        isBackForwardCacheError,
+        isTabNotExistError
+      )(error);
+      Logger.debug(SOURCE,"tryWakeUpBackground => ignore Error " + error)
+    }
 }
 
 function connectToExtension() {
-  chrome.runtime.connect().onDisconnect.addListener(() => {
-    try {
-      throwRuntimeLastError();
-    } catch (error) {
+  try {
+    if (backgroundPort) {
+      return; // Already connected
+    }
+
+    backgroundPort = chrome.runtime.connect({ name: "codealike-chrome" }); 
+    backgroundPort.onDisconnect.addListener(() => {
+      //console.log("Disconnected from background script.");
+      backgroundPort = null; // Reset the port
+      throwRuntimeLastError(); // error logging function
+      setTimeout(connectToExtension, getMinutesInMs(1)); // Fallback reconnection after a delay
+    });
+
+    // Optionally, send an initial message upon successful connection
+    backgroundPort.onMessage.addListener((message) => {
+      Logger.debug(SOURCE,"Received message from background: " + message)
+    });
+
+    // console.log("Connected to background script.");
+  } catch (error) {
       ignore(
         isExtensionContextInvalidatedError,
-        isCouldNotEstablishConnectionError
+        isCouldNotEstablishConnectionError,
+        isBackForwardCacheError
       )(error);
+      const errorObj = error instanceof Error ? error : new Error(String(error));
+      Logger.error(SOURCE,"connectToExtension => ignore Error ", errorObj)
     }
-    setTimeout(() => connectToExtension(), getMinutesInMs(1));
-  });
 }
 
 export const runManifestV3SleepCounterMeasures = () => {
@@ -60,3 +85,12 @@ export const runManifestV3SleepCounterMeasures = () => {
     }
   });
 };
+
+// Listen for the 'pageshow' event to attempt immediate reconnection
+// when the page is restored from the back/forward cache
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted && !backgroundPort) {
+    Logger.debug(SOURCE,"pageshow: Page restored from cache, attempting immediate reconnection.")
+    connectToExtension();
+  }
+});

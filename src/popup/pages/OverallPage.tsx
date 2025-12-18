@@ -54,6 +54,7 @@ export const OverallPage: React.FC<OverallPageProps> = ({
         activityTimeline={timelineEvents}
         filteredHostname={null}
         emptyHoursMarginCount={0}
+        description="Your web activity in last 6 hours."
       />
     </div>
   );
