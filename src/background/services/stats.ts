@@ -104,16 +104,18 @@ const emitFailedSyncStats = async (
   await callback({
     result: 'failed',
   });
-
+  
   let lastUpdateDateTime = DateTime.fromJSDate(new Date());
   if (preferences.lastUpdateStats?.Datetime) {
     lastUpdateDateTime = DateTime.fromISO(preferences.lastUpdateStats?.Datetime);
   }
+
   await chrome.action.setTitle({
     title:
       'Codealike time tracker. An error happened trying to send Web Activity ' +
       lastUpdateDateTime.toLocaleString(DateTime.DATETIME_SHORT) + '.',
   });
+
   await chrome.action.setBadgeText({
     text: '',
   });
