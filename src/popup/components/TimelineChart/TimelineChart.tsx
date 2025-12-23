@@ -7,6 +7,7 @@ import {
 import { TimelineChartProps } from './types';
 import * as React from 'react';
 import { Bar } from 'react-chartjs-2';
+import { TooltipItem } from 'chart.js';
 
 const OPTIONS = {
   plugins: {
@@ -19,13 +20,13 @@ const OPTIONS = {
     tooltip: {
       callbacks: {
         label: () => void 0,
-        title: (items: any[]) => {
+        title: (items: TooltipItem<'line'>[]) => {
           const totalActivityThisHour = items.reduce((acc, item) => {
-            const { raw } = item;
+            const raw = item.raw as [number, number];
             const [startMin = 0, endMin = 0] = raw;
             return acc + (endMin - startMin);
           }, 0);
-          return `${totalActivityThisHour}m surfed between ${items[0].label}`;
+          return `${totalActivityThisHour}m surfed between ${items[0]?.label}`;
         },
       },
       display: false,

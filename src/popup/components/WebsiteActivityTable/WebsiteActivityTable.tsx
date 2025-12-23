@@ -60,7 +60,7 @@ const WebsiteActivityTableFC: React.FC<ActivityTableProps> = ({
             Click on the website name to view stats for this website.
           </p>
           <p className="dark:text-neutral-300">
-            Click on the <Icon className="m-0" type={IconType.Close} /> icon to
+            Click on the <Icon className="m-0 text-red-600" type={IconType.Close} /> icon to
             hide and ignore this website.
           </p>
           <p>You can always add it in the Ignored domains section.</p>
@@ -73,7 +73,7 @@ const WebsiteActivityTableFC: React.FC<ActivityTableProps> = ({
             >
               <Icon
                 type={IconType.Close}
-                className="hover:text-neutral-400 cursor-pointer"
+                className="hover:text-[#ff1a1a] cursor-pointer text-red-600"
                 onClick={() => handleHideDomainClick(domain)}
               />
               <a
@@ -84,7 +84,7 @@ const WebsiteActivityTableFC: React.FC<ActivityTableProps> = ({
                 {domain}
               </a>
               <span className="min-w-[90px] text-right">
-                {getTimeFromMs(time)}
+                {getTimeFromMs(Math.abs(time))}
               </span>
             </div>
           );

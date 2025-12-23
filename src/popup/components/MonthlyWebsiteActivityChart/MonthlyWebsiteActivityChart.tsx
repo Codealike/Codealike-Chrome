@@ -1,7 +1,7 @@
 import { Icon, IconType } from '../../../blocks/Icon';
 import { Panel, PanelHeader } from '../../../blocks/Panel';
 import {
-  get7DaysPriorDate,
+  get30DaysPriorDate,
   getHoursInMs,
   getIsoDate,
   getTimeFromMs,
@@ -9,7 +9,7 @@ import {
 } from '../../../shared/utils/dates-helper';
 import { useIsDarkMode } from '../../hooks/useTheme';
 import { getTotalDailyActivity } from '../../selectors/get-total-daily-activity';
-import { WeeklyWebsiteActivityChartProps } from './types';
+import { MonthlyWebsiteActivityChartProps } from './types';
 import * as React from 'react';
 import { Bar } from 'react-chartjs-2';
 import { TooltipItem } from 'chart.js';
@@ -28,7 +28,7 @@ const BAR_OPTIONS = {
             ' ' + getTimeFromMs(Number(item.formattedValue || 0) * HOUR_IN_MS)
           );
         },
-        title:(items: TooltipItem<'line'>[]) => {
+        title: (items: TooltipItem<'line'>[]) => {
           return `${items[0]?.label}`;
         },
       },
@@ -79,22 +79,22 @@ const DARK_MODE_BAR_OPTIONS = {
   },
 };
 
-export const WeeklyWebsiteActivityChart: React.FC<
-  WeeklyWebsiteActivityChartProps
+export const MonthlyWebsiteActivityChart: React.FC<
+  MonthlyWebsiteActivityChartProps
 > = ({ store, sundayDate, presentChartTitle }) => {
   const isDarkMode = useIsDarkMode();
 
   const [labels, data] = React.useMemo(() => {
-    const week = get7DaysPriorDate(sundayDate).reverse();
-    const labels = week.map((date) => getIsoDate(date));
-    const data = week.map(
-      (date) => Math.abs(getTotalDailyActivity(store, date) / HOUR_IN_MS),
+    const month = get30DaysPriorDate(sundayDate).reverse();
+    const labels = month.map((date) => getIsoDate(date));
+    const data = month.map(
+      (date) => getTotalDailyActivity(store, date) / HOUR_IN_MS,
     );
 
     return [labels, data];
   }, [store, sundayDate]);
 
-  const weekName = React.useMemo(
+  const monthName = React.useMemo(
     () => `${labels[0]} - ${labels[labels.length - 1]}`,
     [labels],
   );
@@ -107,7 +107,7 @@ export const WeeklyWebsiteActivityChart: React.FC<
           borderRadius: 12,
           borderSkipped: false,
           data: data,
-          label: 'Weekly activity',
+          label: 'Monthly activity',
         },
       ],
       labels: labels,
@@ -119,7 +119,7 @@ export const WeeklyWebsiteActivityChart: React.FC<
     <Panel>
       <PanelHeader>
         <Icon type={IconType.ChartHistogram} />
-        {presentChartTitle?.(weekName) ?? weekName}
+        {presentChartTitle?.(monthName) ?? monthName}
       </PanelHeader>
       <Bar
         options={isDarkMode ? DARK_MODE_BAR_OPTIONS : BAR_OPTIONS}
