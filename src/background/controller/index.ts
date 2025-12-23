@@ -8,6 +8,9 @@ import {
 import { getSettings } from '../../shared/preferences';
 import { getIsoDate, getMinutesInMs } from '../../shared/utils/dates-helper';
 import { isInvalidUrl, isDomainAllowedByUser } from '../../shared/utils/url';
+import {
+    Logger
+} from '../../shared/utils/logger';
 import { setActiveTabRecord } from '../tables/state';
 import { ActiveTimelineRecordDao, createNewActiveRecord } from './active';
 import { updateTimeOnBadge } from './badge';
@@ -15,6 +18,8 @@ import { handlePageLimitExceed } from './limits';
 import { updateTotalTime } from './overall';
 import { saveTimelineRecord } from './timeline';
 import { DateTime } from 'luxon';
+
+const SOURCE = 'BACKGROUND/CONTROLLER/INDEX';
 
 const FIVE_MINUTES = getMinutesInMs(5);
 
@@ -123,7 +128,7 @@ export const handleStateChange = async (
     isImpossiblyLongEvent ||
     isInvalidUrl(focusedActiveTab?.url)
   ) {
-    await commitTabActivity(await activeTimeline.get(), preferences);
+    await commitTabActivity(await activeTimeline.get(), preferences, focusedActiveTab?.id);
     return;
   }
 
@@ -131,7 +136,7 @@ export const handleStateChange = async (
     focusedActiveTab &&
     currentTimelineRecord?.url !== focusedActiveTab?.url
   ) {
-    await commitTabActivity(await activeTimeline.get(), preferences);
+    await commitTabActivity(await activeTimeline.get(), preferences, focusedActiveTab?.id);
     await createNewActiveRecord(
       timestamp,
       focusedActiveTab,
@@ -140,7 +145,7 @@ export const handleStateChange = async (
   }
 };
 
-async function commitTabActivity(currentTimelineRecord: TimelineRecord | null, preferences: Preferences) {
+async function commitTabActivity(currentTimelineRecord: TimelineRecord | null, preferences: Preferences, focusedTabId: number | undefined) {
   if (!currentTimelineRecord) {
     return;
   }
@@ -151,6 +156,11 @@ async function commitTabActivity(currentTimelineRecord: TimelineRecord | null, p
   }
 
   const currentIsoDate = getIsoDate(new Date());
+
+  const { hostname } = currentTimelineRecord;
+  const message = `Visited ${hostname} on ${currentIsoDate} [tabID=${focusedTabId}]`;
+  // await logMessage(message);
+  Logger.debug(SOURCE, `commitTabActivity : ${message}`);
 
   await saveTimelineRecord(currentTimelineRecord, currentIsoDate);
 

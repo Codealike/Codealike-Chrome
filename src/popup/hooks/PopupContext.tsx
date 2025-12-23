@@ -69,7 +69,7 @@ export const PopupContextProvider: React.FC = ({ children }) => {
         activeHostname: host || '',
         settings,
         store: filteredStore,
-        updateSettings,
+        updateSettings
       }}
     >
       {children}

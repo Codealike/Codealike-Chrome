@@ -22,6 +22,7 @@ export interface WebActivityRecord {
 export type TimelineRecordStatus = 'navigation' | 'debugging' | 'debugger';
 
 export interface TimelineRecord {
+  id?: number ;
   tabId: number;
   url: string;
   hostname: string;
@@ -32,6 +33,7 @@ export interface TimelineRecord {
   secure: boolean;
   activityPeriodStart: number;
   activityPeriodEnd: number;
+  synced?:boolean;
 }
 
 export type ActiveTabState = {
@@ -60,7 +62,9 @@ export interface Preferences {
   allowedHosts?: string[]; //urls that are to be whitelisted
   limits: Record<string, number>;
   displayTimeOnBadge: boolean;
+  enableLogging: boolean;
   lastUpdateStats?: Statistics;
+  username?: string
 }
 
 export interface Statistics {
@@ -78,3 +82,28 @@ export interface TokenProperties {
   userId: string;
   uuid: string;
 }
+
+export interface ProfileResponse {
+  Identity: string
+  FullName: string
+  DisplayName: string
+  Address?: string
+  State?: string
+  Country?: string
+  AvatarUri: string
+  Email: string
+}
+
+export interface RecordWithKey<T> {
+  key: IDBValidKey;
+  value: T;
+}
+
+export interface LogEntry {
+    timestamp: string;
+    level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
+    source: string;
+    message: string;
+    context ? : object | undefined;
+}
+
