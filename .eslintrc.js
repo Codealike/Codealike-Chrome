@@ -52,4 +52,9 @@ module.exports = {
     'react/prop-types': 'off',
     'sort-keys-fix/sort-keys-fix': ['error', 'asc'],
   },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
 };

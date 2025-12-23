@@ -1,4 +1,4 @@
-import { DBSchema, openDB } from 'idb';
+import { DBSchema, openDB,  IDBPDatabase } from 'idb';
 
 import { ActiveTabState, LogMessage, TimeStore, TimelineRecord } from './types';
 
@@ -7,6 +7,7 @@ export enum Database {
 }
 
 export enum TimeTrackerStoreTables {
+  Id = 'id',
   Timeline = 'timeline',
   State = 'state',
   Logs = 'logs',
@@ -40,8 +41,18 @@ export interface TimelineDatabase extends DBSchema {
   };
 }
 
-export const connect = () =>
-  openDB<TimelineDatabase>(Database.TimeTrackerStore, DB_VERSION, {
+// --- Internal Global Connection Variable ---
+let _db: IDBPDatabase<TimelineDatabase> | null = null;
+
+export const connect = async (): Promise<IDBPDatabase<TimelineDatabase>> => {
+  if (_db) {
+    // If a connection already exists, return it
+    //Logger.debug(`Already Opened IndexedDB: ${Database.TimeTrackerStore} (Version: ${DB_VERSION})`);
+    return _db;
+  }
+
+  // Logger.debug(`DB::connect : Opening IndexedDB:`);
+  _db = await openDB<TimelineDatabase>(Database.TimeTrackerStore, DB_VERSION, {
     upgrade(db, oldVersion, newVersion, transaction) {
       if (oldVersion < 1) {
         const tabsStateStore = db.createObjectStore(
@@ -61,12 +72,10 @@ export const connect = () =>
         const timelineStore = db.createObjectStore(
           TimeTrackerStoreTables.Timeline,
           {
-            
             // If it isn't explicitly set, create a value by auto incrementing.
-autoIncrement: true,
-            
-            // The 'id' property of the object will be the key.
-keyPath: 'id',
+            autoIncrement: true,
+          // The 'id' property of the object will be the key.
+            keyPath: 'id',
           }
         );
 
@@ -91,3 +100,15 @@ keyPath: 'id',
       }
     },
   });
+  return _db;
+}
+
+export const disconnect = async (): Promise<void> => {
+  if (_db) {
+    _db.close();
+    _db = null;
+    // Logger.info("IndexedDB connection disconnected.");
+  } else {
+    // Logger.debug("DB::No active IndexedDB connection to disconnect.");
+  }
+};

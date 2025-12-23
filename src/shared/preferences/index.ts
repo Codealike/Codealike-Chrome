@@ -4,6 +4,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
   allowedHosts: [], //whitelisted domains
   connectionStatus: ConnectionStatus.Disconnected,
   displayTimeOnBadge: true,
+  enableLogging: false,
   ignoredHosts: [],
   limits: {},
 };
@@ -16,9 +17,15 @@ export const setSettings = async (settings: Partial<Preferences>) => {
 };
 
 export const getSettings = async () => {
-  const { settings = {} } = await chrome.storage.local.get('settings');
-  return {
-    ...DEFAULT_PREFERENCES,
-    ...settings,
-  } as Preferences;
+
+      if(!(chrome && chrome?.storage && chrome?.storage.local)){
+        console.log("chrome object not existing");
+        return {...DEFAULT_PREFERENCES};
+      }
+
+      const { settings = {} } = await chrome.storage.local.get('settings');
+      return {
+        ...DEFAULT_PREFERENCES,
+        ...settings,
+      } as Preferences;
 };

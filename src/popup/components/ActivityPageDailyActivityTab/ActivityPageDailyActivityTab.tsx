@@ -67,6 +67,7 @@ export const DailyActivityTab: React.FC<DailyActivityTabProps> = ({
           title="Activity Timeline"
           activityTimeline={activityTimeline}
           filteredHostname={filteredHostname}
+          description="Your web activity timeline."
         />
       </div>
       <WebsiteActivityTable

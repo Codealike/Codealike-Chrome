@@ -1,13 +1,19 @@
 import {
+  ProfileResponse,
   TokenProperties,
   WebActivityLog,
   WebActivityRecord,
 } from '../db/types';
+
 import {
   CodealikeHost,
   CurrentClientVersion,
   InvalidTokenError,
 } from './constants';
+
+import { Logger } from '../utils/logger';
+
+const SOURCE = 'SHARED/API/CLIENT';
 
 const getHeaders = (userId: string, uuid: string): Record<string, string> => {
   return {
@@ -22,37 +28,31 @@ export const sendStats = async (
   token: string,
   records: WebActivityRecord[],
   states: WebActivityLog[],
-): Promise<{ result: boolean }> => {
-  return new Promise((resolve, reject) => {
-    try {
-      const { userId, uuid } = getTokenProperties(token);
-      const url = `${CodealikeHost}/webactivity/SaveWebActivity`;
+): Promise<boolean> => {
+  try {
+    const { userId, uuid } = getTokenProperties(token);
+    const url = `${CodealikeHost}/webactivity/SaveWebActivity`;
 
-      fetch(url, {
-        body: JSON.stringify({
-          Extension: CurrentClientVersion,
-          WebActivity: records,
-          WebActivityLog: states,
-        }),
-        headers: getHeaders(userId, uuid),
-        method: 'POST',
-      })
-        .then((result) => {
-          if (result.status === 200) {
-            resolve({ result: true });
-          } else {
-            reject();
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          reject();
-        });
-    } catch (err) {
-      console.log((err as Error).message);
-      reject();
+    const response = await fetch(url, {
+      body: JSON.stringify({
+        Extension: CurrentClientVersion,
+        WebActivity: records,
+        WebActivityLog: states,
+      }),
+      headers: getHeaders(userId, uuid),
+      method: 'POST',
+    });
+
+    if (response.status === 200) {
+      return true;
+    } else {
+      throw new Error(`Request failed with status ${response.status}`);
     }
-  });
+  } catch (err) {
+    const errorObj = err instanceof Error ? err : new Error(String(err));
+    Logger.error(SOURCE,`sendStats:`, errorObj)
+    return false;
+  }
 };
 
 export const authorize = (token: string): Promise<{ result: boolean }> => {
@@ -79,6 +79,34 @@ export const authorize = (token: string): Promise<{ result: boolean }> => {
       console.log((err as Error).message);
       reject();
     }
+  });
+};
+
+export const getProfile = (token: string): Promise<ProfileResponse> => {
+  return new Promise((resolve, reject) => {
+    const { userId, uuid } = getTokenProperties(token);
+    const url = `${CodealikeHost}/account/${userId}/profile`;
+    console.log(`url: ${url}`)
+
+    fetch(url, {
+      headers: getHeaders(userId, uuid),
+      method: 'GET',
+    })
+      .then((result) => {
+        if (result.status === 200) {
+          return result.json()
+        } else {
+          reject();
+        }
+      })
+      .then((response) => {
+        console.log('Response body:', response);
+        resolve(response);
+      })
+      .catch((err) => {
+        console.log((err as Error).message);
+        reject();
+      });
   });
 };
 

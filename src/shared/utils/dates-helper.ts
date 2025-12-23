@@ -45,20 +45,36 @@ export const getTimeWithoutSeconds = (number: number) => {
     .join(' ');
 };
 
-export const get7DaysPriorDate = <
-  T extends (date: Date) => any = (date: Date) => Date
->(
+export const get7DaysPriorDate = (
   date: Date,
-  map?: T
-): ReturnType<T>[] => {
-  const defaultMap = (date: Date) => new Date(date);
-  const weekEndDate = new Date(date);
+  map?: (date: Date) => Date
+): Date[] => {
+  const defaultMap = (d: Date) => new Date(d);
+  const results: Date[] = [];
 
-  return new Array(7).fill(0).map((_, index) => {
-    weekEndDate.setDate(weekEndDate.getDate() - Number(index > 0));
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(date);
+    d.setDate(d.getDate() - i);
+    results.push((map ?? defaultMap)(d));
+  }
 
-    return map?.(weekEndDate) ?? defaultMap(weekEndDate);
-  });
+  return results;
+};
+
+export const get30DaysPriorDate = (
+  date: Date,
+  map?: (date: Date) => Date
+): Date[] => {
+  const defaultMap = (d: Date) => new Date(d);
+  const results: Date[] = [];
+
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(date);
+    d.setDate(d.getDate() - i);
+    results.push((map ?? defaultMap)(d));
+  }
+
+  return results;
 };
 
 export const getDatesWeekSundayDate = (date: Date = new Date()) => {

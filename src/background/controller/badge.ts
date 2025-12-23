@@ -70,3 +70,14 @@ export async function updateTimeOnBadge(
 // hours and minutes or minutes, depending on the duration. If currentHostTimeInMinutes 
 // is less than or equal to zero, the function hides the badge using the hideBadge function.
 
+/*
+== Terms Explained ==
+committedHostTime:
+This is the time (in milliseconds) that has already been saved in the database for this user on this website. It's like the “past time spent” the system already knows about.
+
+notCommittedHostTime:
+This is the total time the user has been active on the website since they started (possibly since page load or login), but including uncommitted time (i.e., time not yet saved to the database).
+
+currentHostTimeInMinutes:
+This is the difference between the two, converted to minutes — it's how much new time the user has spent on the website since the last save.
+*/

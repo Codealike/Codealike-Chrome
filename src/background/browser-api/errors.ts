@@ -1,6 +1,11 @@
+import { Logger } from "../../shared/utils/logger";
+
+const SOURCE = 'BACKGROUND/ERRORS';
+
 export function throwRuntimeLastError() {
   const error = chrome.runtime.lastError;
   if (error?.message) {
+    Logger.error(SOURCE, "throwRuntimeLastError", error);
     throw new Error(error.message);
   }
 }
@@ -18,6 +23,15 @@ export function isCouldNotEstablishConnectionError(
   return (
     error instanceof Error &&
     error.message.toLowerCase().startsWith('could not establish connection')
+  );
+}
+
+export function isBackForwardCacheError(
+  error: unknown
+): error is Error {
+  return (
+    error instanceof Error &&
+    error.message.toLowerCase().includes('extension port is moved into back/forward cache')
   );
 }
 

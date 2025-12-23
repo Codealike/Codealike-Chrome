@@ -6,8 +6,8 @@
     "default_popup": "popup.html",
     "default_title": "Codealike",
     "default_icon": {
-      "32": "icons/icon-32.png",
-      "16": "icons/icon-16.png"
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
     }
   },
   "icons": {
@@ -15,24 +15,32 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.bundle.js"]
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.bundle.js"
+      ]
     }
   ],
   "minimum_chrome_version": "90",
-
   "version": "2.1.0",
-
   "description": "Track activity while coding.",
   "permissions": [
     "idle",
     "storage",
+    "downloads",
+    "system.cpu",
+    "system.memory",
     "tabs",
     "activeTab",
     "alarms",
     "webNavigation"
   ],
-  "host_permissions": ["http://*/*", "https://*/*"],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
   "background": {
     "service_worker": "background.bundle.js"
   },

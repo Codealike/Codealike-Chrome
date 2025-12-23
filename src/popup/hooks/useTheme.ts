@@ -1,6 +1,9 @@
 type Themes = 'light' | 'dark' | 'auto';
 
-let theme: Themes = (localStorage.getItem('theme') as any) || 'light';
+const stored = localStorage.getItem('theme');
+let theme: Themes = stored === 'light' || stored === 'dark' || stored === 'auto'
+  ? stored
+  : 'light';
 
 export const useTheme = () => {
   return theme;

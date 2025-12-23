@@ -6,14 +6,18 @@ export async function updateTotalTime(
   hostname: string,
 ) {
   const timeline = await getActivityTimeline(currentIsoDate);
+  
   const timeOnRecord = timeline
-    .filter((t) => t.hostname === hostname)
-    .reduce((acc, t) => acc + t.activityPeriodEnd - t.activityPeriodStart, 0);
+    .filter((t) => t.hostname === hostname && t?.synced !== true)
+    .reduce((acc, t) => {
+        const duration = t.activityPeriodEnd - t.activityPeriodStart;
+        return acc + (duration > 0 ? duration : 0); // sanitize data so that negative intervals are ignored
+      }, 0);
 
   await setTotalDailyHostTime({
     date: currentIsoDate,
     duration: timeOnRecord,
-    host: hostname,
+    host: hostname
   });
 }
 
